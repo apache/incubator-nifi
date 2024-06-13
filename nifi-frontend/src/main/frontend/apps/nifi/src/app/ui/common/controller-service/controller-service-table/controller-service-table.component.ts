@@ -74,6 +74,8 @@ export class ControllerServiceTable {
         new EventEmitter<ControllerServiceEntity>();
     @Output() manageAccessPolicies: EventEmitter<ControllerServiceEntity> = new EventEmitter<ControllerServiceEntity>();
     @Output() openAdvancedUi: EventEmitter<ControllerServiceEntity> = new EventEmitter<ControllerServiceEntity>();
+    @Output() moveControllerService: EventEmitter<ControllerServiceEntity> =
+            new EventEmitter<ControllerServiceEntity>();
     @Output() enableControllerService: EventEmitter<ControllerServiceEntity> =
         new EventEmitter<ControllerServiceEntity>();
     @Output() disableControllerService: EventEmitter<ControllerServiceEntity> =
@@ -223,6 +225,10 @@ export class ControllerServiceTable {
 
     enabledClicked(entity: ControllerServiceEntity): void {
         this.enableControllerService.next(entity);
+    }
+
+    moveClicked(entity: ControllerServiceEntity): void {
+        this.moveControllerService.next(entity);
     }
 
     canDisable(entity: ControllerServiceEntity): boolean {

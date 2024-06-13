@@ -1,0 +1,82 @@
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<h2 mat-dialog-title>Move Controller Service</h2>
+@if ((controllerService$ | async)!; as controllerService) {
+<form class="controller-service-enable-form" [formGroup]="moveControllerServiceForm">
+    <mat-dialog-content>
+        <div class="py-4 flex gap-x-4">
+            <div class="flex basis-2/3 flex-col gap-y-4 pr-4 overflow-hidden">
+                <div class="flex flex-col">
+                    <div>Service</div>
+                    <div
+                        class="accent-color font-medium overflow-ellipsis overflow-hidden whitespace-nowrap"
+                        [title]="controllerService.component.name">
+                        {{ controllerService.component.name }}
+                    </div>
+                </div>
+                <div>
+                    <mat-form-field>
+                        <mat-label>Process Group:</mat-label>
+                        <mat-select formControlName="processGroups" >
+                            @for (option of controllerServiceActionProcessGroups; track option) {
+                            <mat-option
+                                [value]="option.value">
+                                {{ option.text }}
+                            </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="flex basis-1/3 flex-col">
+                <div>
+                    Referencing Components
+                    <i
+                        class="fa fa-info-circle"
+                        nifiTooltip
+                        [tooltipComponentType]="TextTip"
+                        tooltipInputData="Other components referencing this controller service."></i>
+                </div>
+                <div class="relative h-full border" style="min-height: 320px">
+                    <div class="absolute inset-0 overflow-y-auto p-1">
+                        <controller-service-references
+                            [serviceReferences]="controllerService.component.referencingComponents"
+                            [goToReferencingComponent]="
+                                            goToReferencingComponent
+                                        "></controller-service-references>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+        <button mat-button mat-dialog-close>Cancel</button>
+        <button type="button" color="primary" (click)="submitForm()" mat-button>Move</button>
+    </mat-dialog-actions>
+</form>
+}
+<ng-template #stepInProgress>
+    <div class="fa fa-spin fa-circle-o-notch primary-color"></div>
+</ng-template>
+<ng-template #stepComplete>
+    <div class="complete fa fa-check success-color"></div>
+</ng-template>
+<ng-template #stepError>
+    <div class="fa fa-times warn-color"></div>
+</ng-template>
+<ng-template #stepNotStarted><div class="w-3.5"></div></ng-template>

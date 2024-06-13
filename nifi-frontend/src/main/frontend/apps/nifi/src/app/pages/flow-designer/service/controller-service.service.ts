@@ -26,7 +26,7 @@ import {
     CreateControllerServiceRequest,
     PropertyDescriptorRetriever
 } from '../../../state/shared';
-import { ConfigureControllerServiceRequest, DeleteControllerServiceRequest } from '../state/controller-services';
+import { ConfigureControllerServiceRequest, DeleteControllerServiceRequest, MoveControllerServiceRequest } from '../state/controller-services';
 import { ClusterConnectionService } from '../../../service/cluster-connection.service';
 
 @Injectable({ providedIn: 'root' })
@@ -93,6 +93,13 @@ export class ControllerServiceService implements ControllerServiceCreator, Prope
         return this.httpClient.put(
             this.nifiCommon.stripProtocol(configureControllerService.uri),
             configureControllerService.payload
+        );
+    }
+
+    moveControllerService(moveControllerService: MoveControllerServiceRequest): Observable<any> {
+        return this.httpClient.put(
+            this.nifiCommon.stripProtocol(moveControllerService.controllerService.uri + '/move'),
+            moveControllerService.data
         );
     }
 

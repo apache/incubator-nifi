@@ -20,6 +20,8 @@ import {
     ConfigureControllerServiceRequest,
     ConfigureControllerServiceSuccess,
     CreateControllerServiceSuccess,
+    MoveControllerServiceRequest,
+    MoveControllerServiceSuccess,
     DeleteControllerServiceRequest,
     DeleteControllerServiceSuccess,
     LoadControllerServicesRequest,
@@ -30,6 +32,7 @@ import {
     CreateControllerServiceRequest,
     DisableControllerServiceDialogRequest,
     EditControllerServiceDialogRequest,
+    MoveControllerServiceDialogRequest,
     FetchComponentVersionsRequest,
     SetEnableControllerServiceDialogRequest
 } from '../../../../state/shared';
@@ -101,6 +104,21 @@ export const configureControllerService = createAction(
 export const configureControllerServiceSuccess = createAction(
     '[Controller Services] Configure Controller Service Success',
     props<{ response: ConfigureControllerServiceSuccess }>()
+);
+
+export const openMoveControllerServiceDialog = createAction(
+    '[Controller Services] Open Move Controller Service Dialog',
+    props<{ request: MoveControllerServiceDialogRequest }>()
+);
+
+export const moveControllerService = createAction(
+    '[Controller Services] Move Controller Service',
+    props<{ request: MoveControllerServiceRequest }>()
+);
+
+export const moveControllerServiceSuccess = createAction(
+    '[Controller Services] Move Controller Service Success',
+    props<{ response: MoveControllerServiceSuccess }>()
 );
 
 export const openEnableControllerServiceDialog = createAction(

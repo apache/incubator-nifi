@@ -2580,7 +2580,9 @@ public final class StandardProcessGroup implements ProcessGroup {
                 throw new IllegalStateException("ControllerService " + service.getIdentifier() + " is not a member of this Process Group");
             }
 
-            service.verifyCanDelete();
+            if (!service.isMoving()) {
+                service.verifyCanDelete();
+            }
 
             try (final NarCloseable ignored = NarCloseable.withComponentNarLoader(extensionManager, service.getControllerServiceImplementation().getClass(), service.getIdentifier())) {
                 final ConfigurationContext configurationContext = new StandardConfigurationContext(service, controllerServiceProvider, null);
@@ -2627,6 +2629,7 @@ public final class StandardProcessGroup implements ProcessGroup {
                 } catch (Throwable ignored) {
                 }
             }
+            service.setMoving(false);
             writeLock.unlock();
         }
     }

@@ -43,6 +43,7 @@ import {
 } from './controller-services.selectors';
 import { ControllerServiceService } from '../../service/controller-service.service';
 import { EnableControllerService } from '../../../../ui/common/controller-service/enable-controller-service/enable-controller-service.component';
+import { MoveControllerService } from '../../../../ui/common/controller-service/move-controller-service/move-controller-service.component';
 import { DisableControllerService } from '../../../../ui/common/controller-service/disable-controller-service/disable-controller-service.component';
 import { PropertyTableHelperService } from '../../../../service/property-table-helper.service';
 import * as ErrorActions from '../../../../state/error/error.actions';
@@ -656,6 +657,82 @@ export class ControllerServicesEffects {
                 })
             ),
         { dispatch: false }
+    );
+
+    openMoveControllerServiceDialog$ = createEffect(
+        () =>
+            this.actions$.pipe(
+                ofType(ControllerServicesActions.openMoveControllerServiceDialog),
+                map((action) => action.request),
+                concatLatestFrom(() => this.store.select(selectCurrentProcessGroupId)),
+                tap(([request, currentProcessGroupId]) => {
+                    const serviceId: string = request.id;
+                    request.processGroupFlow = this.flowService.getFlow(currentProcessGroupId);
+                    const moveDialogReference = this.dialog.open(MoveControllerService, {
+                        ...XL_DIALOG,
+                        data: request,
+                        id: serviceId
+                    });
+
+                    moveDialogReference.componentInstance.goToReferencingComponent = (
+                        component: ControllerServiceReferencingComponent
+                    ) => {
+                        const route: string[] = this.getRouteForReference(component);
+                        this.router.navigate(route);
+                    };
+
+                    moveDialogReference.afterClosed().subscribe((response) => {
+                        if (response != 'ROUTED') {
+                            this.store.dispatch(
+                                ControllerServicesActions.loadControllerServices({
+                                    request: {
+                                        processGroupId: currentProcessGroupId
+                                    }
+                                })
+                            );
+                        }
+                    });
+                })
+            ),
+        { dispatch: false }
+    );
+
+    moveControllerService$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(ControllerServicesActions.moveControllerService),
+            map((action) => action.request),
+            switchMap((request) =>
+                from(this.controllerServiceService.moveControllerService(request)).pipe(
+                    map((response) =>
+                        ControllerServicesActions.moveControllerServiceSuccess({
+                            response: {
+                                controllerService: response
+                            }
+                        })
+                    ),
+                    catchError((errorResponse: HttpErrorResponse) =>
+                        of(ErrorActions.snackBarError({ error: this.errorHelper.getErrorString(errorResponse) }))
+                    )
+                )
+            )
+        )
+    );
+
+    moveControllerServiceSuccess$ = createEffect( () =>
+        this.actions$.pipe(
+            ofType(ControllerServicesActions.moveControllerServiceSuccess),
+            map((action) => action.response),
+            tap((request) => {
+                this.dialog.closeAll();
+                this.router.navigate([
+                    '/process-groups',
+                    request.controllerService.parentGroupId,
+                    'controller-services',
+                    request.controllerService.id
+                ]);
+            })
+        ),
+    { dispatch: false }
     );
 
     openDisableControllerServiceDialog$ = createEffect(
