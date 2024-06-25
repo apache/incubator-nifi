@@ -16,7 +16,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { EMPTY, Observable, of } from 'rxjs';
+import { EMPTY, Observable } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Client } from '../../../service/client.service';
 import { NiFiCommon } from '@nifi/shared';
@@ -45,17 +45,13 @@ export class ControllerServiceService implements ControllerServiceCreator, Prope
     ) {}
 
     getControllerServices(processGroupId: string): Observable<any> {
-        if (processGroupId != '') {
-            const uiOnly: any = { uiOnly: true };
-            return this.httpClient.get(
-                `${ControllerServiceService.API}/flow/process-groups/${processGroupId}/controller-services`,
-                {
-                    params: uiOnly
-                }
-            );
-        } else {
-            return of([]);
-        }
+        const uiOnly: any = { uiOnly: true };
+        return this.httpClient.get(
+            `${ControllerServiceService.API}/flow/process-groups/${processGroupId}/controller-services`,
+            {
+                params: uiOnly
+            }
+        );
     }
 
     getFlow(processGroupId: string): Observable<any> {

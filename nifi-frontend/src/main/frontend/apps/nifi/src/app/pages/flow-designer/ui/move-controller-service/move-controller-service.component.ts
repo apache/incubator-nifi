@@ -90,9 +90,13 @@ export class MoveControllerService extends CloseOnEscapeDialog {
             processGroups: new FormControl('Process Group', Validators.required)
         });
 
+        const parentControllerServices = request.parentControllerServices.filter(
+            (cs) => cs.parentGroupId != request.controllerService.parentGroupId
+        );
+
         if (request.processGroupFlow != null) {
             const processGroups: SelectOption[] = [];
-            this.loadParentOption(request.processGroupFlow, request.parentControllerServices, processGroups);
+            this.loadParentOption(request.processGroupFlow, parentControllerServices, processGroups);
             this.loadChildOptions(request.processGroupFlow, request.processGroupEntity, processGroups);
             this.controllerServiceActionProcessGroups = processGroups;
 

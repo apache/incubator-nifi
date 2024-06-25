@@ -40,7 +40,8 @@ import {
     selectCurrentProcessGroupId,
     selectParameterContext,
     selectSaving,
-    selectStatus
+    selectStatus,
+    selectServices
 } from './controller-services.selectors';
 import { ControllerServiceService } from '../../service/controller-service.service';
 import { EnableControllerService } from '../../../../ui/common/controller-service/enable-controller-service/enable-controller-service.component';
@@ -668,22 +669,18 @@ export class ControllerServicesEffects {
                 map((action) => action.request),
                 concatLatestFrom(() => [
                     this.store.select(selectCurrentProcessGroupId),
-                    this.store.select(selectProcessGroupFlow)
+                    this.store.select(selectProcessGroupFlow),
+                    this.store.select(selectServices)
                 ]),
-                concatMap(([request, currentProcessGroupId, processGroupFlow]) =>
-                    combineLatest([
-                        this.flowService.getProcessGroupWithContent(currentProcessGroupId),
-                        this.controllerServiceService.getControllerServices(
-                            processGroupFlow?.breadcrumb.parentBreadcrumb?.id || ''
-                        )
-                    ]).pipe(
-                        map(([processGroupEntity, parentControllerServices]) => {
+                concatMap(([request, currentProcessGroupId, processGroupFlow, controllerServices]) =>
+                    combineLatest([this.flowService.getProcessGroupWithContent(currentProcessGroupId)]).pipe(
+                        map(([processGroupEntity]) => {
                             return {
                                 request,
                                 currentProcessGroupId,
                                 processGroupFlow,
                                 processGroupEntity,
-                                parentControllerServices
+                                controllerServices
                             };
                         })
                     )
@@ -692,7 +689,7 @@ export class ControllerServicesEffects {
                     const clone = Object.assign({}, request.request);
                     clone.processGroupEntity = request.processGroupEntity;
                     clone.processGroupFlow = request.processGroupFlow;
-                    clone.parentControllerServices = request.parentControllerServices.controllerServices;
+                    clone.parentControllerServices = request.controllerServices;
                     const serviceId: string = request.request.id;
                     const moveDialogReference = this.dialog.open(MoveControllerService, {
                         ...LARGE_DIALOG,
