@@ -4749,11 +4749,14 @@ public class StandardNiFiServiceFacade implements NiFiServiceFacade {
     }
 
     private ProcessGroupEntity createProcessGroupEntity(final ProcessGroup group) {
+        return createProcessGroupEntity(group, false);
+    }
+    private ProcessGroupEntity createProcessGroupEntity(final ProcessGroup group, final boolean recurse) {
         final RevisionDTO revision = dtoFactory.createRevisionDTO(revisionManager.getRevision(group.getIdentifier()));
         final PermissionsDTO permissions = dtoFactory.createPermissionsDto(group);
         final ProcessGroupStatusDTO status = dtoFactory.createConciseProcessGroupStatusDto(controllerFacade.getProcessGroupStatus(group.getIdentifier()));
         final List<BulletinEntity> bulletins = getProcessGroupBulletins(group);
-        return entityFactory.createProcessGroupEntity(dtoFactory.createProcessGroupDto(group), revision, permissions, status, bulletins);
+        return entityFactory.createProcessGroupEntity(dtoFactory.createProcessGroupDto(group, recurse), revision, permissions, status, bulletins);
     }
 
     private List<BulletinEntity> getProcessGroupBulletins(final ProcessGroup group) {
@@ -4932,8 +4935,13 @@ public class StandardNiFiServiceFacade implements NiFiServiceFacade {
 
     @Override
     public ProcessGroupEntity getProcessGroup(final String groupId) {
+        return getProcessGroup(groupId, false);
+    }
+
+    @Override
+    public ProcessGroupEntity getProcessGroup(final String groupId, final boolean recurse) {
         final ProcessGroup processGroup = processGroupDAO.getProcessGroup(groupId);
-        return createProcessGroupEntity(processGroup);
+        return createProcessGroupEntity(processGroup, recurse);
     }
 
     private ControllerServiceEntity createControllerServiceEntity(final ControllerServiceNode serviceNode, final boolean includeReferencingComponents) {

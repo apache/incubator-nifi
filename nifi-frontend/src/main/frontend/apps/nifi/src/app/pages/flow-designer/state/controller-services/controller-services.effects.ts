@@ -19,7 +19,7 @@ import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { concatLatestFrom } from '@ngrx/operators';
 import * as ControllerServicesActions from './controller-services.actions';
-import { catchError, combineLatest, from, map, of, switchMap, take, takeUntil, tap } from 'rxjs';
+import { catchError, combineLatest, concatMap, from, map, of, switchMap, take, takeUntil, tap } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { NiFiState } from '../../../../state';
@@ -36,6 +36,7 @@ import {
 } from '../../../../state/shared';
 import { Router } from '@angular/router';
 import {
+    selectProcessGroupFlow,
     selectCurrentProcessGroupId,
     selectParameterContext,
     selectSaving,
@@ -43,7 +44,7 @@ import {
 } from './controller-services.selectors';
 import { ControllerServiceService } from '../../service/controller-service.service';
 import { EnableControllerService } from '../../../../ui/common/controller-service/enable-controller-service/enable-controller-service.component';
-import { MoveControllerService } from '../../../../ui/common/controller-service/move-controller-service/move-controller-service.component';
+import { MoveControllerService } from '../../ui/move-controller-service/move-controller-service.component';
 import { DisableControllerService } from '../../../../ui/common/controller-service/disable-controller-service/disable-controller-service.component';
 import { PropertyTableHelperService } from '../../../../service/property-table-helper.service';
 import * as ErrorActions from '../../../../state/error/error.actions';
@@ -100,7 +101,8 @@ export class ControllerServicesEffects {
                                 controllerServices: controllerServicesResponse.controllerServices,
                                 loadedTimestamp: controllerServicesResponse.currentTime,
                                 breadcrumb: flowResponse.processGroupFlow.breadcrumb,
-                                parameterContext: flowResponse.processGroupFlow.parameterContext ?? null
+                                parameterContext: flowResponse.processGroupFlow.parameterContext ?? null,
+                                processGroupFlow: flowResponse.processGroupFlow
                             }
                         })
                     ),
@@ -664,13 +666,37 @@ export class ControllerServicesEffects {
             this.actions$.pipe(
                 ofType(ControllerServicesActions.openMoveControllerServiceDialog),
                 map((action) => action.request),
-                concatLatestFrom(() => this.store.select(selectCurrentProcessGroupId)),
-                tap(([request, currentProcessGroupId]) => {
-                    const serviceId: string = request.id;
-                    request.processGroupFlow = this.flowService.getFlow(currentProcessGroupId);
+                concatLatestFrom(() => [
+                    this.store.select(selectCurrentProcessGroupId),
+                    this.store.select(selectProcessGroupFlow)
+                ]),
+                concatMap(([request, currentProcessGroupId, processGroupFlow]) =>
+                    combineLatest([
+                        this.flowService.getProcessGroupWithContent(currentProcessGroupId),
+                        this.controllerServiceService.getControllerServices(
+                            processGroupFlow?.breadcrumb.parentBreadcrumb?.id || ''
+                        )
+                    ]).pipe(
+                        map(([processGroupEntity, parentControllerServices]) => {
+                            return {
+                                request,
+                                currentProcessGroupId,
+                                processGroupFlow,
+                                processGroupEntity,
+                                parentControllerServices
+                            };
+                        })
+                    )
+                ),
+                tap((request) => {
+                    const clone = Object.assign({}, request.request);
+                    clone.processGroupEntity = request.processGroupEntity;
+                    clone.processGroupFlow = request.processGroupFlow;
+                    clone.parentControllerServices = request.parentControllerServices.controllerServices;
+                    const serviceId: string = request.request.id;
                     const moveDialogReference = this.dialog.open(MoveControllerService, {
-                        ...XL_DIALOG,
-                        data: request,
+                        ...LARGE_DIALOG,
+                        data: clone,
                         id: serviceId
                     });
 
@@ -686,7 +712,7 @@ export class ControllerServicesEffects {
                             this.store.dispatch(
                                 ControllerServicesActions.loadControllerServices({
                                     request: {
-                                        processGroupId: currentProcessGroupId
+                                        processGroupId: request.currentProcessGroupId
                                     }
                                 })
                             );
@@ -718,21 +744,16 @@ export class ControllerServicesEffects {
         )
     );
 
-    moveControllerServiceSuccess$ = createEffect( () =>
-        this.actions$.pipe(
-            ofType(ControllerServicesActions.moveControllerServiceSuccess),
-            map((action) => action.response),
-            tap((request) => {
-                this.dialog.closeAll();
-                this.router.navigate([
-                    '/process-groups',
-                    request.controllerService.parentGroupId,
-                    'controller-services',
-                    request.controllerService.id
-                ]);
-            })
-        ),
-    { dispatch: false }
+    moveControllerServiceSuccess$ = createEffect(
+        () =>
+            this.actions$.pipe(
+                ofType(ControllerServicesActions.moveControllerServiceSuccess),
+                map((action) => action.response),
+                tap(() => {
+                    this.dialog.closeAll();
+                })
+            ),
+        { dispatch: false }
     );
 
     openDisableControllerServiceDialog$ = createEffect(

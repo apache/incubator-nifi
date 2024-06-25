@@ -16,6 +16,7 @@
  */
 
 import { ControllerServiceEntity } from '../../../../state/shared';
+import { ProcessGroupFlow } from '../flow';
 import { BreadcrumbEntity } from '../shared';
 import { ParameterContextReferenceEntity, Revision } from '@nifi/shared';
 export const controllerServicesFeatureKey = 'controllerServiceListing';
@@ -30,6 +31,7 @@ export interface LoadControllerServicesResponse {
     controllerServices: ControllerServiceEntity[];
     parameterContext: ParameterContextReferenceEntity | null;
     loadedTimestamp: string;
+    processGroupFlow: ProcessGroupFlow;
 }
 
 export interface CreateControllerServiceSuccess {
@@ -49,6 +51,14 @@ export interface ConfigureControllerServiceSuccess {
     controllerService: ControllerServiceEntity;
     postUpdateNavigation?: string[];
     postUpdateNavigationBoundary?: string[];
+}
+
+export interface MoveControllerServiceDialogRequest {
+    id: string;
+    controllerService: ControllerServiceEntity;
+    processGroupFlow?: ProcessGroupFlow;
+    processGroupEntity?: any;
+    parentControllerServices: ControllerServiceEntity[];
 }
 
 export interface MoveControllerServiceRequest {
@@ -80,6 +90,7 @@ export interface SelectControllerServiceRequest {
 
 export interface ControllerServicesState {
     processGroupId: string;
+    processGroupFlow?: ProcessGroupFlow;
     breadcrumb: BreadcrumbEntity;
     controllerServices: ControllerServiceEntity[];
     parameterContext: ParameterContextReferenceEntity | null;

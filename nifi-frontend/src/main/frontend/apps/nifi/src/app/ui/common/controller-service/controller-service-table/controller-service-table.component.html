@@ -173,7 +173,7 @@
                                         Manage Access Policies
                                     </button>
                                 }
-                                @if (canConfigure(item)) {
+                                @if (canMove(item)) {
                                     <button mat-menu-item (click)="moveClicked(item)">
                                         <i class="fa fa-arrows primary-color mr-2"></i>
                                         Move

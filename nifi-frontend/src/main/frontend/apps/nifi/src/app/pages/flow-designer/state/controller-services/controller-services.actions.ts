@@ -20,6 +20,7 @@ import {
     ConfigureControllerServiceRequest,
     ConfigureControllerServiceSuccess,
     CreateControllerServiceSuccess,
+    MoveControllerServiceDialogRequest,
     MoveControllerServiceRequest,
     MoveControllerServiceSuccess,
     DeleteControllerServiceRequest,
@@ -32,7 +33,6 @@ import {
     CreateControllerServiceRequest,
     DisableControllerServiceDialogRequest,
     EditControllerServiceDialogRequest,
-    MoveControllerServiceDialogRequest,
     FetchComponentVersionsRequest,
     SetEnableControllerServiceDialogRequest
 } from '../../../../state/shared';

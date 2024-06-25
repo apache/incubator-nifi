@@ -16,7 +16,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { EMPTY, Observable } from 'rxjs';
+import { EMPTY, Observable, of } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Client } from '../../../service/client.service';
 import { NiFiCommon } from '@nifi/shared';
@@ -26,7 +26,11 @@ import {
     CreateControllerServiceRequest,
     PropertyDescriptorRetriever
 } from '../../../state/shared';
-import { ConfigureControllerServiceRequest, DeleteControllerServiceRequest, MoveControllerServiceRequest } from '../state/controller-services';
+import {
+    ConfigureControllerServiceRequest,
+    DeleteControllerServiceRequest,
+    MoveControllerServiceRequest
+} from '../state/controller-services';
 import { ClusterConnectionService } from '../../../service/cluster-connection.service';
 
 @Injectable({ providedIn: 'root' })
@@ -41,13 +45,17 @@ export class ControllerServiceService implements ControllerServiceCreator, Prope
     ) {}
 
     getControllerServices(processGroupId: string): Observable<any> {
-        const uiOnly: any = { uiOnly: true };
-        return this.httpClient.get(
-            `${ControllerServiceService.API}/flow/process-groups/${processGroupId}/controller-services`,
-            {
-                params: uiOnly
-            }
-        );
+        if (processGroupId != '') {
+            const uiOnly: any = { uiOnly: true };
+            return this.httpClient.get(
+                `${ControllerServiceService.API}/flow/process-groups/${processGroupId}/controller-services`,
+                {
+                    params: uiOnly
+                }
+            );
+        } else {
+            return of([]);
+        }
     }
 
     getFlow(processGroupId: string): Observable<any> {

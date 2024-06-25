@@ -16,7 +16,6 @@
   -->
 
 <h2 mat-dialog-title>Move Controller Service</h2>
-@if ((controllerService$ | async)!; as controllerService) {
 <form class="controller-service-enable-form" [formGroup]="moveControllerServiceForm">
     <mat-dialog-content>
         <div class="py-4 flex gap-x-4">
@@ -32,12 +31,26 @@
                 <div>
                     <mat-form-field>
                         <mat-label>Process Group:</mat-label>
-                        <mat-select formControlName="processGroups" >
+                        <mat-select formControlName="processGroups">
                             @for (option of controllerServiceActionProcessGroups; track option) {
-                            <mat-option
-                                [value]="option.value">
-                                {{ option.text }}
-                            </mat-option>
+                                <div
+                                    nifiTooltip
+                                    [tooltipDisabled]="!option.disabled"
+                                    [tooltipComponentType]="TextTip"
+                                    [tooltipInputData]="option.description"
+                                    [delayClose]="false">
+                                    <mat-option [value]="option.value" [disabled]="option.disabled">
+                                        <div
+                                            *ngIf="option.description != undefined; else valid"
+                                            class="pointer fa fa-warning has-errors caution-color"
+                                            style="padding: 3px"></div>
+                                        <ng-template #valid>
+                                            <div nifiTooltip [delayClose]="false"></div>
+                                        </ng-template>
+
+                                        {{ option.text }}
+                                    </mat-option>
+                                </div>
                             }
                         </mat-select>
                     </mat-form-field>
@@ -56,9 +69,7 @@
                     <div class="absolute inset-0 overflow-y-auto p-1">
                         <controller-service-references
                             [serviceReferences]="controllerService.component.referencingComponents"
-                            [goToReferencingComponent]="
-                                            goToReferencingComponent
-                                        "></controller-service-references>
+                            [goToReferencingComponent]="goToReferencingComponent"></controller-service-references>
                     </div>
                 </div>
             </div>
@@ -69,14 +80,3 @@
         <button type="button" color="primary" (click)="submitForm()" mat-button>Move</button>
     </mat-dialog-actions>
 </form>
-}
-<ng-template #stepInProgress>
-    <div class="fa fa-spin fa-circle-o-notch primary-color"></div>
-</ng-template>
-<ng-template #stepComplete>
-    <div class="complete fa fa-check success-color"></div>
-</ng-template>
-<ng-template #stepError>
-    <div class="fa fa-times warn-color"></div>
-</ng-template>
-<ng-template #stepNotStarted><div class="w-3.5"></div></ng-template>

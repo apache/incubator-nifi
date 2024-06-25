@@ -70,6 +70,7 @@ export const controllerServicesReducer = createReducer(
         breadcrumb: response.breadcrumb,
         parameterContext: response.parameterContext,
         loadedTimestamp: response.loadedTimestamp,
+        processGroupFlow: response.processGroupFlow,
         status: 'success' as const
     })),
     on(controllerServicesBannerApiError, (state) => ({
@@ -102,9 +103,11 @@ export const controllerServicesReducer = createReducer(
     }),
     on(moveControllerServiceSuccess, (state, { response }) => {
         return produce(state, (draftState) => {
-            const componentIndex: number = draftState.controllerServices.findIndex((f: any) => response.controllerService.id === f.id);
+            const componentIndex: number = draftState.controllerServices.findIndex(
+                (f: any) => response.controllerService.id === f.id
+            );
             if (componentIndex > -1) {
-                draftState.controllerServices[componentIndex] = response.controllerService;
+                draftState.controllerServices.splice(componentIndex, 1);
             }
             draftState.saving = false;
         });
