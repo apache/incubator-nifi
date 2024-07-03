@@ -22,335 +22,48 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { provideMockStore } from '@ngrx/store/testing';
 import { initialState } from '../../../../state/contoller-service-state/controller-service-state.reducer';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { ComponentType } from '../../../../state/shared';
 import { MoveControllerServiceDialogRequest } from '../../state/controller-services';
-import { ProcessGroupFlow } from './../../state/flow/index';
+import { BreadcrumbEntity } from '../../state/shared';
+import { ComponentType, SelectOption } from '@nifi/shared';
 
 describe('MoveControllerService', () => {
     let component: MoveControllerService;
     let fixture: ComponentFixture<MoveControllerService>;
-    const flow: ProcessGroupFlow = {
+    const breadrumb: BreadcrumbEntity = {
         id: 'cc4eefda-018d-1000-35ee-194d439257e4',
-        parameterContext: null,
-        uri: 'http://localhost/nifi-api/flow/process-groups/cc4eefda-018d-1000-35ee-194d439257e4',
-        parentGroupId: '96456bc3-018b-1000-05d8-51720bebae4b',
+        permissions: {
+            canRead: true,
+            canWrite: true
+        },
         breadcrumb: {
             id: 'cc4eefda-018d-1000-35ee-194d439257e4',
+            name: 'pg1'
+        },
+        parentBreadcrumb: {
+            id: '96456bc3-018b-1000-05d8-51720bebae4b',
             permissions: {
                 canRead: true,
                 canWrite: true
             },
             breadcrumb: {
-                id: 'cc4eefda-018d-1000-35ee-194d439257e4',
-                name: 'pg1'
-            },
-            parentBreadcrumb: {
                 id: '96456bc3-018b-1000-05d8-51720bebae4b',
-                permissions: {
-                    canRead: true,
-                    canWrite: true
-                },
-                breadcrumb: {
-                    id: '96456bc3-018b-1000-05d8-51720bebae4b',
-                    name: 'NiFi Flow'
-                },
-                versionedFlowState: ''
+                name: 'NiFi Flow'
             },
             versionedFlowState: ''
         },
-        flow: {
-            processGroups: [
-                {
-                    revision: {
-                        version: 0
-                    },
-                    id: 'cc4f110c-018d-1000-d4b6-d933a69c9d53',
-                    position: {
-                        x: 450.00000073872457,
-                        y: 89.00000213800337
-                    },
-                    permissions: {
-                        canRead: true,
-                        canWrite: true
-                    },
-                    component: {
-                        id: 'cc4f110c-018d-1000-d4b6-d933a69c9d53',
-                        versionedComponentId: '11610e12-1853-3179-9e6b-714a77c470e2',
-                        parentGroupId: 'cc4eefda-018d-1000-35ee-194d439257e4',
-                        position: {
-                            x: 450.00000073872457,
-                            y: 89.00000213800337
-                        },
-                        name: 'pg2',
-                        comments: '',
-                        flowfileConcurrency: 'UNBOUNDED',
-                        flowfileOutboundPolicy: 'STREAM_WHEN_AVAILABLE',
-                        defaultFlowFileExpiration: '0 sec',
-                        defaultBackPressureObjectThreshold: 10000,
-                        defaultBackPressureDataSizeThreshold: '1 GB',
-                        executionEngine: 'INHERITED',
-                        maxConcurrentTasks: 1,
-                        statelessFlowTimeout: '1 min',
-                        runningCount: 0,
-                        stoppedCount: 0,
-                        invalidCount: 0,
-                        disabledCount: 0,
-                        activeRemotePortCount: 0,
-                        inactiveRemotePortCount: 0,
-                        upToDateCount: 0,
-                        locallyModifiedCount: 0,
-                        staleCount: 0,
-                        locallyModifiedAndStaleCount: 0,
-                        syncFailureCount: 0,
-                        localInputPortCount: 0,
-                        localOutputPortCount: 0,
-                        publicInputPortCount: 0,
-                        publicOutputPortCount: 0,
-                        statelessGroupScheduledState: 'STOPPED',
-                        inputPortCount: 0,
-                        outputPortCount: 0
-                    }
-                }
-            ],
-            remoteProcessGroups: [],
-            processors: [
-                {
-                    revision: {
-                        version: 0
-                    },
-                    id: '018e1000-93c7-1b09-09f3-8e5a070f0381',
-                    position: {
-                        x: 760,
-                        y: 272
-                    },
-                    permissions: {
-                        canRead: true,
-                        canWrite: true
-                    },
-                    component: {
-                        id: '018e1000-93c7-1b09-09f3-8e5a070f0381',
-                        versionedComponentId: '401e9313-5c31-3bb8-ac48-c34af331b2af',
-                        parentGroupId: 'cc4eefda-018d-1000-35ee-194d439257e4',
-                        position: {
-                            x: 760,
-                            y: 272
-                        },
-                        name: 'ConsumeKafkaRecord_2_6 t1',
-                        type: 'org.apache.nifi.processors.kafka.pubsub.ConsumeKafkaRecord_2_6',
-                        bundle: {
-                            group: 'org.apache.nifi',
-                            artifact: 'nifi-kafka-2-6-nar',
-                            version: '2.0.0-SNAPSHOT'
-                        },
-                        state: 'STOPPED',
-                        style: {},
-                        relationships: [
-                            {
-                                name: 'parse.failure',
-                                description:
-                                    'If a message from Kafka cannot be parsed using the configured Record Reader, the contents of the message will be routed to this Relationship as its own individual FlowFile.',
-                                autoTerminate: true,
-                                retry: false
-                            },
-                            {
-                                name: 'success',
-                                description:
-                                    'FlowFiles received from Kafka.  Depending on demarcation strategy it is a flow file per message or a bundle of messages grouped by topic and partition.',
-                                autoTerminate: true,
-                                retry: false
-                            }
-                        ],
-                        supportsParallelProcessing: true,
-                        supportsBatching: false,
-                        supportsSensitiveDynamicProperties: false,
-                        persistsState: false,
-                        restricted: false,
-                        deprecated: false,
-                        executionNodeRestricted: false,
-                        multipleVersionsAvailable: false,
-                        inputRequirement: 'INPUT_FORBIDDEN',
-                        config: {
-                            schedulingPeriod: '0 sec',
-                            schedulingStrategy: 'TIMER_DRIVEN',
-                            executionNode: 'ALL',
-                            penaltyDuration: '30 sec',
-                            yieldDuration: '1 sec',
-                            bulletinLevel: 'WARN',
-                            runDurationMillis: 0,
-                            concurrentlySchedulableTaskCount: 1,
-                            autoTerminatedRelationships: ['parse.failure', 'success'],
-                            comments: '',
-                            lossTolerant: false,
-                            retryCount: 10,
-                            retriedRelationships: [],
-                            backoffMechanism: 'PENALIZE_FLOWFILE',
-                            maxBackoffPeriod: '10 mins'
-                        },
-                        validationStatus: 'VALID',
-                        extensionMissing: false
-                    }
-                },
-                {
-                    revision: {
-                        version: 0
-                    },
-                    id: '018e1002-93c7-1b09-913c-8102bce39edb',
-                    position: {
-                        x: 855,
-                        y: 655
-                    },
-                    permissions: {
-                        canRead: true,
-                        canWrite: true
-                    },
-                    component: {
-                        id: '018e1002-93c7-1b09-913c-8102bce39edb',
-                        versionedComponentId: '1bd9430e-e943-33bd-9eca-40fc4187c17c',
-                        parentGroupId: 'cc4eefda-018d-1000-35ee-194d439257e4',
-                        position: {
-                            x: 855,
-                            y: 655
-                        },
-                        name: 'Budokai',
-                        type: 'org.apache.nifi.processors.kafka.pubsub.ConsumeKafkaRecord_2_6',
-                        bundle: {
-                            group: 'org.apache.nifi',
-                            artifact: 'nifi-kafka-2-6-nar',
-                            version: '2.0.0-SNAPSHOT'
-                        },
-                        state: 'STOPPED',
-                        style: {},
-                        relationships: [
-                            {
-                                name: 'parse.failure',
-                                description:
-                                    'If a message from Kafka cannot be parsed using the configured Record Reader, the contents of the message will be routed to this Relationship as its own individual FlowFile.',
-                                autoTerminate: true,
-                                retry: false
-                            },
-                            {
-                                name: 'success',
-                                description:
-                                    'FlowFiles received from Kafka.  Depending on demarcation strategy it is a flow file per message or a bundle of messages grouped by topic and partition.',
-                                autoTerminate: true,
-                                retry: false
-                            }
-                        ],
-                        supportsParallelProcessing: true,
-                        supportsBatching: false,
-                        supportsSensitiveDynamicProperties: false,
-                        persistsState: false,
-                        restricted: false,
-                        deprecated: false,
-                        executionNodeRestricted: false,
-                        multipleVersionsAvailable: false,
-                        inputRequirement: 'INPUT_FORBIDDEN',
-                        config: {
-                            schedulingPeriod: '0 sec',
-                            schedulingStrategy: 'TIMER_DRIVEN',
-                            executionNode: 'ALL',
-                            penaltyDuration: '30 sec',
-                            yieldDuration: '1 sec',
-                            bulletinLevel: 'WARN',
-                            runDurationMillis: 0,
-                            concurrentlySchedulableTaskCount: 1,
-                            autoTerminatedRelationships: ['parse.failure', 'success'],
-                            comments: '',
-                            lossTolerant: false,
-                            retryCount: 10,
-                            retriedRelationships: [],
-                            backoffMechanism: 'PENALIZE_FLOWFILE',
-                            maxBackoffPeriod: '10 mins'
-                        },
-                        validationStatus: 'VALID',
-                        extensionMissing: false
-                    }
-                },
-                {
-                    revision: {
-                        version: 0
-                    },
-                    id: '0b0993c7-018e-1000-34f0-eac5126a49d7',
-                    position: {
-                        x: 480,
-                        y: 408
-                    },
-                    permissions: {
-                        canRead: true,
-                        canWrite: true
-                    },
-                    component: {
-                        id: '0b0993c7-018e-1000-34f0-eac5126a49d7',
-                        versionedComponentId: '2f6b8ff4-218e-3a5c-8abc-8a8146852732',
-                        parentGroupId: 'cc4eefda-018d-1000-35ee-194d439257e4',
-                        position: {
-                            x: 480,
-                            y: 408
-                        },
-                        name: 'ConsumeKafkaRecord_2_6',
-                        type: 'org.apache.nifi.processors.kafka.pubsub.ConsumeKafkaRecord_2_6',
-                        bundle: {
-                            group: 'org.apache.nifi',
-                            artifact: 'nifi-kafka-2-6-nar',
-                            version: '2.0.0-SNAPSHOT'
-                        },
-                        state: 'RUNNING',
-                        style: {},
-                        relationships: [
-                            {
-                                name: 'parse.failure',
-                                description:
-                                    'If a message from Kafka cannot be parsed using the configured Record Reader, the contents of the message will be routed to this Relationship as its own individual FlowFile.',
-                                autoTerminate: true,
-                                retry: false
-                            },
-                            {
-                                name: 'success',
-                                description:
-                                    'FlowFiles received from Kafka.  Depending on demarcation strategy it is a flow file per message or a bundle of messages grouped by topic and partition.',
-                                autoTerminate: true,
-                                retry: false
-                            }
-                        ],
-                        supportsParallelProcessing: true,
-                        supportsBatching: false,
-                        supportsSensitiveDynamicProperties: false,
-                        persistsState: false,
-                        restricted: false,
-                        deprecated: false,
-                        executionNodeRestricted: false,
-                        multipleVersionsAvailable: false,
-                        inputRequirement: 'INPUT_FORBIDDEN',
-                        config: {
-                            schedulingPeriod: '0 sec',
-                            schedulingStrategy: 'TIMER_DRIVEN',
-                            executionNode: 'ALL',
-                            penaltyDuration: '30 sec',
-                            yieldDuration: '1 sec',
-                            bulletinLevel: 'WARN',
-                            runDurationMillis: 0,
-                            concurrentlySchedulableTaskCount: 1,
-                            autoTerminatedRelationships: ['parse.failure', 'success'],
-                            comments: '',
-                            lossTolerant: false,
-                            retryCount: 10,
-                            retriedRelationships: [],
-                            backoffMechanism: 'PENALIZE_FLOWFILE',
-                            maxBackoffPeriod: '10 mins'
-                        },
-                        validationStatus: 'VALID',
-                        extensionMissing: false
-                    }
-                }
-            ],
-            inputPorts: [],
-            outputPorts: [],
-            connections: [],
-            labels: [],
-            funnels: []
-        },
-        lastRefreshed: '13:19:03 UTC'
+        versionedFlowState: ''
     };
+
+    const chldren: SelectOption[] = [
+        {
+            text: 'pg2',
+            value: 'cc4f110c-018d-1000-d4b6-d933a69c9d53'
+        },
+        {
+            text: 'pg2',
+            value: 'cc4f110c-018d-1000-d4b6-d933a69c9d53'
+        }
+    ];
 
     const processGroupEntity = {
         revision: {
@@ -3719,7 +3432,8 @@ describe('MoveControllerService', () => {
 
     const data: MoveControllerServiceDialogRequest = {
         id: '92db6ee4-018c-1000-1061-e3476c3f4e9f',
-        processGroupFlow: flow,
+        breadcrumb: breadrumb,
+        childProcessGroupOptions: chldren,
         processGroupEntity: processGroupEntity,
         parentControllerServices: parentControllerServices,
         controllerService: controllerService

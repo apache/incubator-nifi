@@ -33,16 +33,14 @@ import { MatSelectModule } from '@angular/material/select';
 import { ControllerServiceApi } from '../../../../ui/common/controller-service/controller-service-api/controller-service-api.component';
 import { ControllerServiceReferences } from '../../../../ui/common/controller-service/controller-service-references/controller-service-references.component';
 import { NifiSpinnerDirective } from '../../../../ui/common/spinner/nifi-spinner.directive';
-import { TextTip } from '../../../../ui/common/tooltips/text-tip/text-tip.component';
-import { NifiTooltipDirective } from '../../../../ui/common/tooltips/nifi-tooltip.directive';
+import { TextTip, NifiTooltipDirective, SelectOption } from '@nifi/shared';
 import { Store } from '@ngrx/store';
 import { CloseOnEscapeDialog } from '../../../../ui/common/close-on-escape-dialog/close-on-escape-dialog.component';
 import { moveControllerService } from '../../state/controller-services/controller-services.actions';
-import { SelectOption } from '../../../../state/shared/index';
 import { NiFiState } from 'apps/nifi/src/app/state';
 import { MoveControllerServiceDialogRequest } from '../../state/controller-services';
-import { ComponentEntity, ProcessGroupFlow } from '../../state/flow';
 import { NgIf } from '@angular/common';
+import { BreadcrumbEntity } from '../../state/shared';
 
 @Component({
     selector: 'move-controller-service',
@@ -94,89 +92,51 @@ export class MoveControllerService extends CloseOnEscapeDialog {
             (cs) => cs.parentGroupId != request.controllerService.parentGroupId
         );
 
-        if (request.processGroupFlow != null) {
-            const processGroups: SelectOption[] = [];
-            this.loadParentOption(request.processGroupFlow, parentControllerServices, processGroups);
-            this.loadChildOptions(request.processGroupFlow, request.processGroupEntity, processGroups);
-            this.controllerServiceActionProcessGroups = processGroups;
+        const processGroups: SelectOption[] = [];
+        if (request.breadcrumb != undefined) {
+            this.loadParentOption(request.breadcrumb, parentControllerServices, processGroups);
+        }
+        this.loadChildOptions(request.childProcessGroupOptions, request.processGroupEntity, processGroups);
+        this.controllerServiceActionProcessGroups = processGroups;
 
-            const firstEnabled = processGroups.findIndex((pg) => !pg.disabled);
-            if (firstEnabled != -1) {
-                this.moveControllerServiceForm.controls['processGroups'].setValue(processGroups[firstEnabled].value);
-            }
+        const firstEnabled = processGroups.findIndex((pg) => !pg.disabled);
+        if (firstEnabled != -1) {
+            this.moveControllerServiceForm.controls['processGroups'].setValue(processGroups[firstEnabled].value);
         }
     }
 
     loadParentOption(
-        processGroupFlow: ProcessGroupFlow,
+        breadcrumb: BreadcrumbEntity,
         parentControllerServices: ControllerServiceEntity[],
         processGroups: SelectOption[]
     ) {
-        if (processGroupFlow.breadcrumb.parentBreadcrumb != undefined) {
-            if (processGroupFlow.breadcrumb.parentBreadcrumb != undefined) {
-                const parentBreadcrumb = processGroupFlow.breadcrumb.parentBreadcrumb;
-                if (parentBreadcrumb.permissions.canRead && parentBreadcrumb.permissions.canWrite) {
-                    const option: SelectOption = {
-                        text: parentBreadcrumb.breadcrumb.name + ' (Parent)',
-                        value: parentBreadcrumb.breadcrumb.id
-                    };
-
-                    let errorMsg = '';
-                    const descriptors = this.controllerService.component.descriptors;
-                    for (const descriptor in descriptors) {
-                        if (descriptors[descriptor].identifiesControllerService != undefined) {
-                            const controllerId =
-                                this.controllerService.component.properties[descriptors[descriptor].name];
-                            if (
-                                controllerId != null &&
-                                !parentControllerServices.some((service) => service.id == controllerId)
-                            ) {
-                                errorMsg += '[' + descriptors[descriptor].name + ']';
-                            }
-                        }
-                    }
-
-                    if (errorMsg != '') {
-                        option.description =
-                            'The following properties reference controller services that would be out of scope for this ' +
-                            'process group: ' +
-                            errorMsg;
-                        option.disabled = true;
-                    } else {
-                        option.disabled = false;
-                    }
-
-                    processGroups.push(option);
-                }
-            }
-        }
-    }
-
-    loadChildOptions(
-        processGroupFlow: ProcessGroupFlow,
-        currentProcessGroupEntity: any,
-        processGroups: SelectOption[]
-    ) {
-        const referencingComponents: ControllerServiceReferencingComponentEntity[] =
-            this.controllerService.component.referencingComponents;
-        processGroupFlow.flow.processGroups.forEach((child: ComponentEntity) => {
-            if (child.permissions.canRead && child.permissions.canWrite) {
+        if (breadcrumb.parentBreadcrumb != undefined) {
+            const parentBreadcrumb = breadcrumb.parentBreadcrumb;
+            if (parentBreadcrumb.permissions.canRead && parentBreadcrumb.permissions.canWrite) {
                 const option: SelectOption = {
-                    text: child.component.name,
-                    value: child.component.id
+                    text: parentBreadcrumb.breadcrumb.name + ' (Parent)',
+                    value: parentBreadcrumb.breadcrumb.id
                 };
 
-                const root = this.getProcessGroupById(currentProcessGroupEntity.component, child.component.id);
                 let errorMsg = '';
-                for (const component of referencingComponents) {
-                    if (!this.processGroupContainsComponent(root, component.component.groupId)) {
-                        errorMsg += '[' + component.component.name + ']';
+                const descriptors = this.controllerService.component.descriptors;
+                for (const descriptor in descriptors) {
+                    if (descriptors[descriptor].identifiesControllerService != undefined) {
+                        const controllerId = this.controllerService.component.properties[descriptors[descriptor].name];
+                        if (
+                            controllerId != null &&
+                            !parentControllerServices.some((service) => service.id == controllerId)
+                        ) {
+                            errorMsg += '[' + descriptors[descriptor].name + ']';
+                        }
                     }
                 }
 
                 if (errorMsg != '') {
                     option.description =
-                        'The following components would be out of scope for this ' + 'process group: ' + errorMsg;
+                        'The following properties reference controller services that would be out of scope for this ' +
+                        'process group: ' +
+                        errorMsg;
                     option.disabled = true;
                 } else {
                     option.disabled = false;
@@ -184,6 +144,39 @@ export class MoveControllerService extends CloseOnEscapeDialog {
 
                 processGroups.push(option);
             }
+        }
+    }
+
+    loadChildOptions(
+        childProcessGroupOptions: SelectOption[],
+        currentProcessGroupEntity: any,
+        processGroups: SelectOption[]
+    ) {
+        const referencingComponents: ControllerServiceReferencingComponentEntity[] =
+            this.controllerService.component.referencingComponents;
+        childProcessGroupOptions.forEach((child: SelectOption) => {
+            const option: SelectOption = {
+                text: child.text,
+                value: child.value
+            };
+
+            const root = this.getProcessGroupById(currentProcessGroupEntity.component, child.value ?? '');
+            let errorMsg = '';
+            for (const component of referencingComponents) {
+                if (!this.processGroupContainsComponent(root, component.component.groupId)) {
+                    errorMsg += '[' + component.component.name + ']';
+                }
+            }
+
+            if (errorMsg != '') {
+                option.description =
+                    'The following components would be out of scope for this ' + 'process group: ' + errorMsg;
+                option.disabled = true;
+            } else {
+                option.disabled = false;
+            }
+
+            processGroups.push(option);
         });
     }
 

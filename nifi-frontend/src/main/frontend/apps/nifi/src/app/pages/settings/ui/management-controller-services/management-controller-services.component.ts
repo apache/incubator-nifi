@@ -231,10 +231,6 @@ export class ManagementControllerServices implements OnInit, OnDestroy {
         );
     }
 
-    isManagementControllerService(): boolean {
-        return true;
-    }
-
     ngOnDestroy(): void {
         this.store.dispatch(resetManagementControllerServicesState());
     }

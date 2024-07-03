@@ -247,7 +247,8 @@ export class ControllerServices implements OnDestroy {
                 request: {
                     id: entity.id,
                     controllerService: entity,
-                    parentControllerServices: []
+                    parentControllerServices: [],
+                    childProcessGroupOptions: []
                 }
             })
         );
@@ -334,10 +335,6 @@ export class ControllerServices implements OnDestroy {
                 }
             })
         );
-    }
-
-    isManagementControllerService(): boolean {
-        return false;
     }
 
     ngOnDestroy(): void {

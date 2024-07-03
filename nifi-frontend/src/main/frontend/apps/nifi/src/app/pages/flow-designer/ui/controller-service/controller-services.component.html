@@ -47,7 +47,7 @@
                                 [selectedServiceId]="selectedServiceId$ | async"
                                 [controllerServices]="serviceState.controllerServices"
                                 [formatScope]="formatScope(serviceState.breadcrumb)"
-                                [isManagementControllerService]="isManagementControllerService"
+                                [showMoveOption]="true"
                                 [definedByCurrentGroup]="definedByCurrentGroup(serviceState.breadcrumb)"
                                 [currentUser]="(currentUser$ | async)!"
                                 [flowConfiguration]="flowConfiguration"
