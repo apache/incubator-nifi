@@ -35,7 +35,7 @@ import { ControllerServiceReferences } from '../../../../ui/common/controller-se
 import { NifiSpinnerDirective } from '../../../../ui/common/spinner/nifi-spinner.directive';
 import { TextTip, NifiTooltipDirective, SelectOption } from '@nifi/shared';
 import { Store } from '@ngrx/store';
-import { CloseOnEscapeDialog } from '../../../../ui/common/close-on-escape-dialog/close-on-escape-dialog.component';
+import { CloseOnEscapeDialog } from '@nifi/shared';
 import { moveControllerService } from '../../state/controller-services/controller-services.actions';
 import { NiFiState } from 'apps/nifi/src/app/state';
 import { MoveControllerServiceDialogRequest } from '../../state/controller-services';
