@@ -700,16 +700,17 @@ export class ControllerServicesEffects {
                         )
                 ),
                 tap((request) => {
-                    const clone = Object.assign({}, request.request);
-                    clone.processGroupEntity = request.processGroupEntity;
-                    clone.childProcessGroupOptions = request.childProcessGroupOptions;
-                    clone.parentControllerServices = request.controllerServices;
-                    clone.breadcrumb = request.breadcrumb;
-                    const serviceId: string = request.request.id;
                     const moveDialogReference = this.dialog.open(MoveControllerService, {
                         ...LARGE_DIALOG,
-                        data: clone,
-                        id: serviceId
+                        data: {
+                            id: request.request.id,
+                            controllerService: request.request.controllerService,
+                            childProcessGroupOptions: request.childProcessGroupOptions,
+                            processGroupEntity: request.processGroupEntity,
+                            parentControllerServices: request.controllerServices,
+                            breadcrumb: request.breadcrumb
+                        },
+                        id: request.request.id
                     });
 
                     moveDialogReference.componentInstance.goToReferencingComponent = (

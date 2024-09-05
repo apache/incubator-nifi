@@ -38,7 +38,7 @@ import { Store } from '@ngrx/store';
 import { CloseOnEscapeDialog } from '@nifi/shared';
 import { moveControllerService } from '../../state/controller-services/controller-services.actions';
 import { NiFiState } from 'apps/nifi/src/app/state';
-import { MoveControllerServiceDialogRequest } from '../../state/controller-services';
+import { MoveControllerServiceDialogRequestSuccess } from '../../state/controller-services';
 import { NgIf } from '@angular/common';
 import { BreadcrumbEntity } from '../../state/shared';
 
@@ -75,7 +75,7 @@ export class MoveControllerService extends CloseOnEscapeDialog {
     moveControllerServiceForm: FormGroup;
 
     constructor(
-        @Inject(MAT_DIALOG_DATA) public request: MoveControllerServiceDialogRequest,
+        @Inject(MAT_DIALOG_DATA) public request: MoveControllerServiceDialogRequestSuccess,
         private store: Store<NiFiState>,
         private formBuilder: FormBuilder
     ) {
@@ -93,9 +93,8 @@ export class MoveControllerService extends CloseOnEscapeDialog {
         );
 
         const processGroups: SelectOption[] = [];
-        if (request.breadcrumb != undefined) {
-            this.loadParentOption(request.breadcrumb, parentControllerServices, processGroups);
-        }
+        this.loadParentOption(request.breadcrumb, parentControllerServices, processGroups);
+
         this.loadChildOptions(request.childProcessGroupOptions, request.processGroupEntity, processGroups);
         this.controllerServiceActionProcessGroups = processGroups;
 
@@ -186,7 +185,9 @@ export class MoveControllerService extends CloseOnEscapeDialog {
                 return true;
             } else {
                 for (const pg of processGroup.contents.processGroups) {
-                    return this.processGroupContainsComponent(pg, groupId);
+                    if (this.processGroupContainsComponent(pg, groupId)) {
+                        return true;
+                    }
                 }
                 return false;
             }
@@ -195,13 +196,17 @@ export class MoveControllerService extends CloseOnEscapeDialog {
     }
 
     getProcessGroupById(root: any, processGroupId: string): any {
+        console.log('a');
         if (root != undefined) {
             if (root.id == processGroupId) {
                 return root;
             } else {
                 if (root.contents != undefined) {
                     for (const pg of root.contents.processGroups) {
-                        return this.getProcessGroupById(pg, processGroupId);
+                        const result = this.getProcessGroupById(pg, processGroupId);
+                        if (result != null) {
+                            return result;
+                        }
                     }
                 }
                 return null;

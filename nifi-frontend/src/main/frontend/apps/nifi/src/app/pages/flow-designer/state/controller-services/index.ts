@@ -56,10 +56,15 @@ export interface ConfigureControllerServiceSuccess {
 export interface MoveControllerServiceDialogRequest {
     id: string;
     controllerService: ControllerServiceEntity;
+}
+
+export interface MoveControllerServiceDialogRequestSuccess {
+    id: string;
+    controllerService: ControllerServiceEntity;
     childProcessGroupOptions: SelectOption[];
-    processGroupEntity?: any;
+    processGroupEntity: any;
     parentControllerServices: ControllerServiceEntity[];
-    breadcrumb?: BreadcrumbEntity;
+    breadcrumb: BreadcrumbEntity;
 }
 
 export interface MoveControllerServiceRequest {

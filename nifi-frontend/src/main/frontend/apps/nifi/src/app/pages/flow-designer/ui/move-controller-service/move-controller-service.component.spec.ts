@@ -22,7 +22,7 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { provideMockStore } from '@ngrx/store/testing';
 import { initialState } from '../../../../state/contoller-service-state/controller-service-state.reducer';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { MoveControllerServiceDialogRequest } from '../../state/controller-services';
+import { MoveControllerServiceDialogRequestSuccess } from '../../state/controller-services';
 import { BreadcrumbEntity } from '../../state/shared';
 import { ComponentType, SelectOption } from '@nifi/shared';
 
@@ -3430,7 +3430,7 @@ describe('MoveControllerService', () => {
         }
     };
 
-    const data: MoveControllerServiceDialogRequest = {
+    const data: MoveControllerServiceDialogRequestSuccess = {
         id: '92db6ee4-018c-1000-1061-e3476c3f4e9f',
         breadcrumb: breadrumb,
         childProcessGroupOptions: chldren,
