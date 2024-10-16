@@ -69,6 +69,7 @@ export class MoveControllerService extends CloseOnEscapeDialog {
     @Input() goToReferencingComponent!: (component: ControllerServiceReferencingComponent) => void;
     protected readonly TextTip = TextTip;
     protected controllerServiceActionProcessGroups: SelectOption[] = [];
+    protected disableSubmit: boolean = false;
 
     controllerService: ControllerServiceEntity;
 
@@ -101,6 +102,11 @@ export class MoveControllerService extends CloseOnEscapeDialog {
         const firstEnabled = processGroups.findIndex((pg) => !pg.disabled);
         if (firstEnabled != -1) {
             this.moveControllerServiceForm.controls['processGroups'].setValue(processGroups[firstEnabled].value);
+        } else {
+            if (processGroups.length > 0) {
+                this.moveControllerServiceForm.controls['processGroups'].setValue(processGroups[0].value);
+            }
+            this.disableSubmit = true;
         }
     }
 
@@ -161,21 +167,28 @@ export class MoveControllerService extends CloseOnEscapeDialog {
 
             const root = this.getProcessGroupById(currentProcessGroupEntity.component, child.value ?? '');
             let errorMsg = '';
-            for (const component of referencingComponents) {
-                if (!this.processGroupContainsComponent(root, component.component.groupId)) {
-                    errorMsg += '[' + component.component.name + ']';
-                }
-            }
 
-            if (errorMsg != '') {
-                option.description =
-                    'The following components would be out of scope for this ' + 'process group: ' + errorMsg;
+            if (root == null) {
+                option.description = 'Error loading process group root.';
                 option.disabled = true;
+                processGroups.push(option);
             } else {
-                option.disabled = false;
-            }
+                for (const component of referencingComponents) {
+                    if (!this.processGroupContainsComponent(root, component.component.groupId)) {
+                        errorMsg += '[' + component.component.name + ']';
+                    }
+                }
 
-            processGroups.push(option);
+                if (errorMsg != '') {
+                    option.description =
+                        'The following components would be out of scope for this process group: ' + errorMsg;
+                    option.disabled = true;
+                } else {
+                    option.disabled = false;
+                }
+
+                processGroups.push(option);
+            }
         });
     }
 
@@ -196,7 +209,6 @@ export class MoveControllerService extends CloseOnEscapeDialog {
     }
 
     getProcessGroupById(root: any, processGroupId: string): any {
-        console.log('a');
         if (root != undefined) {
             if (root.id == processGroupId) {
                 return root;
@@ -216,19 +228,17 @@ export class MoveControllerService extends CloseOnEscapeDialog {
     }
 
     submitForm() {
-        if (this.moveControllerServiceForm.get('processGroups')?.value != 'Process Group') {
-            this.store.dispatch(
-                moveControllerService({
-                    request: {
-                        controllerService: this.request.controllerService,
-                        data: {
-                            parentGroupId: this.moveControllerServiceForm.get('processGroups')?.value,
-                            revision: this.request.controllerService.revision
-                        }
+        this.store.dispatch(
+            moveControllerService({
+                request: {
+                    controllerService: this.request.controllerService,
+                    data: {
+                        parentGroupId: this.moveControllerServiceForm.get('processGroups')?.value,
+                        revision: this.request.controllerService.revision
                     }
-                })
-            );
-        }
+                }
+            })
+        );
     }
 
     override isDirty(): boolean {
