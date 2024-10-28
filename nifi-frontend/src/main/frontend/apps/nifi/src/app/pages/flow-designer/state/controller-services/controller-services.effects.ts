@@ -19,7 +19,7 @@ import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { concatLatestFrom } from '@ngrx/operators';
 import * as ControllerServicesActions from './controller-services.actions';
-import { catchError, combineLatest, concatMap, from, map, of, switchMap, take, takeUntil, tap } from 'rxjs';
+import { catchError, combineLatest, from, map, of, switchMap, take, takeUntil, tap } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { NiFiState } from '../../../../state';
@@ -36,17 +36,14 @@ import {
 } from '../../../../state/shared';
 import { Router } from '@angular/router';
 import {
-    selectChildProcessGroupOptions,
     selectCurrentProcessGroupId,
     selectParameterContext,
     selectSaving,
-    selectStatus,
-    selectServices,
-    selectBreadcrumb
+    selectStatus
 } from './controller-services.selectors';
 import { ControllerServiceService } from '../../service/controller-service.service';
 import { EnableControllerService } from '../../../../ui/common/controller-service/enable-controller-service/enable-controller-service.component';
-import { MoveControllerService } from '../../ui/move-controller-service/move-controller-service.component';
+import { MoveControllerService } from '../../ui/controller-service/move-controller-service/move-controller-service.component';
 import { DisableControllerService } from '../../../../ui/common/controller-service/disable-controller-service/disable-controller-service.component';
 import { PropertyTableHelperService } from '../../../../service/property-table-helper.service';
 import * as ErrorActions from '../../../../state/error/error.actions';
@@ -96,28 +93,17 @@ export class ControllerServicesEffects {
                     this.controllerServiceService.getControllerServices(request.processGroupId),
                     this.controllerServiceService.getFlow(request.processGroupId)
                 ]).pipe(
-                    map(([controllerServicesResponse, flowResponse]) => {
-                        const childProcessGroupOptions: SelectOption[] = [];
-                        flowResponse.processGroupFlow.flow.processGroups.forEach((child: ComponentEntity) => {
-                            if (child.permissions.canRead && child.permissions.canWrite) {
-                                childProcessGroupOptions.push({
-                                    text: child.component.name,
-                                    value: child.component.id
-                                });
-                            }
-                        });
-
-                        return ControllerServicesActions.loadControllerServicesSuccess({
+                    map(([controllerServicesResponse, flowResponse]) =>
+                        ControllerServicesActions.loadControllerServicesSuccess({
                             response: {
                                 processGroupId: flowResponse.processGroupFlow.id,
                                 controllerServices: controllerServicesResponse.controllerServices,
                                 loadedTimestamp: controllerServicesResponse.currentTime,
                                 breadcrumb: flowResponse.processGroupFlow.breadcrumb,
-                                parameterContext: flowResponse.processGroupFlow.parameterContext ?? null,
-                                childProcessGroupOptions: childProcessGroupOptions
+                                parameterContext: flowResponse.processGroupFlow.parameterContext ?? null
                             }
-                        });
-                    }),
+                        })
+                    ),
                     catchError((errorResponse: HttpErrorResponse) =>
                         of(this.errorHelper.handleLoadingError(status, errorResponse))
                     )
@@ -678,60 +664,44 @@ export class ControllerServicesEffects {
             this.actions$.pipe(
                 ofType(ControllerServicesActions.openMoveControllerServiceDialog),
                 map((action) => action.request),
-                concatLatestFrom(() => [
-                    this.store.select(selectCurrentProcessGroupId),
-                    this.store.select(selectChildProcessGroupOptions),
-                    this.store.select(selectServices),
-                    this.store.select(selectBreadcrumb)
-                ]),
-                concatMap(
-                    ([request, currentProcessGroupId, childProcessGroupOptions, controllerServices, breadcrumb]) =>
-                        combineLatest([this.flowService.getProcessGroupWithContent(currentProcessGroupId)]).pipe(
-                            map(([processGroupEntity]) => {
-                                return {
-                                    request,
-                                    currentProcessGroupId,
-                                    childProcessGroupOptions,
-                                    processGroupEntity,
-                                    controllerServices,
-                                    breadcrumb
-                                };
-                            })
-                        )
-                ),
-                tap((request) => {
-                    const moveDialogReference = this.dialog.open(MoveControllerService, {
-                        ...LARGE_DIALOG,
-                        data: {
-                            id: request.request.id,
-                            controllerService: request.request.controllerService,
-                            childProcessGroupOptions: request.childProcessGroupOptions,
-                            processGroupEntity: request.processGroupEntity,
-                            parentControllerServices: request.controllerServices,
-                            breadcrumb: request.breadcrumb
-                        },
-                        id: request.request.id
-                    });
+                switchMap((request) =>
+                    from(this.controllerServiceService.getMoveOptions(request.controllerService.id)).pipe(
+                        map((response: SelectOption[]) => {
+                            const moveDialogReference = this.dialog.open(MoveControllerService, {
+                                ...LARGE_DIALOG,
+                                data: {
+                                    controllerService: request.controllerService,
+                                    options: response
+                                }
+                            });
 
-                    moveDialogReference.componentInstance.goToReferencingComponent = (
-                        component: ControllerServiceReferencingComponent
-                    ) => {
-                        const route: string[] = this.getRouteForReference(component);
-                        this.router.navigate(route);
-                    };
+                            moveDialogReference.componentInstance.goToReferencingComponent = (
+                                component: ControllerServiceReferencingComponent
+                            ) => {
+                                const route: string[] = this.getRouteForReference(component);
+                                this.router.navigate(route);
+                            };
 
-                    moveDialogReference.afterClosed().subscribe((response) => {
-                        if (response != 'ROUTED') {
-                            this.store.dispatch(
-                                ControllerServicesActions.loadControllerServices({
-                                    request: {
-                                        processGroupId: request.currentProcessGroupId
-                                    }
-                                })
+                            moveDialogReference.afterClosed().subscribe((response) => {
+                                if (response != 'ROUTED') {
+                                    this.store.dispatch(
+                                        ControllerServicesActions.loadControllerServices({
+                                            request: {
+                                                processGroupId: request.controllerService.parentGroupId!
+                                            }
+                                        })
+                                    );
+                                }
+                            });
+                        }),
+                        catchError((errorResponse: HttpErrorResponse) => {
+                            this.dialog.closeAll();
+                            return of(
+                                ErrorActions.snackBarError({ error: this.errorHelper.getErrorString(errorResponse) })
                             );
-                        }
-                    });
-                })
+                        })
+                    )
+                )
             ),
         { dispatch: false }
     );

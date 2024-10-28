@@ -102,8 +102,14 @@ export class ControllerServiceService implements ControllerServiceCreator, Prope
 
     moveControllerService(moveControllerService: MoveControllerServiceRequest): Observable<any> {
         return this.httpClient.put(
-            this.nifiCommon.stripProtocol(moveControllerService.controllerService.uri + '/move'),
+            this.nifiCommon.stripProtocol(`${moveControllerService.controllerService.uri}/move`),
             moveControllerService.data
+        );
+    }
+
+    getMoveOptions(controllerServiceId: string): Observable<any> {
+        return this.httpClient.get(
+            `${ControllerServiceService.API}/controller-services/${controllerServiceId}/move-options`
         );
     }
 

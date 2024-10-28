@@ -1132,15 +1132,6 @@ public interface NiFiServiceFacade {
     ProcessGroupEntity getProcessGroup(String groupId);
 
     /**
-     * Returns the process group.
-     *
-     * @param groupId group
-     * @param recurse boolean
-     * @return ProcessGroup transfer object
-     */
-    ProcessGroupEntity getProcessGroup(String groupId, boolean recurse);
-
-    /**
      * Verifies that a Parameter Context matching the given DTO can be created
      * @param parameterContext the DTO that represents the Parameter Context
      * @throws IllegalStateException if a ParameterContext cannot be created for the given DTO

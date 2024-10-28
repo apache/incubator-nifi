@@ -31,7 +31,6 @@ export interface LoadControllerServicesResponse {
     controllerServices: ControllerServiceEntity[];
     parameterContext: ParameterContextReferenceEntity | null;
     loadedTimestamp: string;
-    childProcessGroupOptions: SelectOption[];
 }
 
 export interface CreateControllerServiceSuccess {
@@ -59,12 +58,8 @@ export interface MoveControllerServiceDialogRequest {
 }
 
 export interface MoveControllerServiceDialogRequestSuccess {
-    id: string;
     controllerService: ControllerServiceEntity;
-    childProcessGroupOptions: SelectOption[];
-    processGroupEntity: any;
-    parentControllerServices: ControllerServiceEntity[];
-    breadcrumb: BreadcrumbEntity;
+    options: SelectOption[];
 }
 
 export interface MoveControllerServiceRequest {
@@ -96,7 +91,6 @@ export interface SelectControllerServiceRequest {
 
 export interface ControllerServicesState {
     processGroupId: string;
-    childProcessGroupOptions: SelectOption[];
     breadcrumb: BreadcrumbEntity;
     controllerServices: ControllerServiceEntity[];
     parameterContext: ParameterContextReferenceEntity | null;

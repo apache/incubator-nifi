@@ -30,7 +30,7 @@
                     <mat-form-field>
                         <mat-label>Process Group:</mat-label>
                         <mat-select formControlName="processGroups">
-                            @for (option of controllerServiceActionProcessGroups; track option) {
+                            @for (option of processGroupOptions; track option) {
                                 <div
                                     nifiTooltip
                                     [tooltipDisabled]="!option.disabled"
@@ -75,6 +75,13 @@
     </mat-dialog-content>
     <mat-dialog-actions align="end">
         <button mat-button mat-dialog-close>Cancel</button>
-        <button type="button" color="primary" (click)="submitForm()" [disabled]="disableSubmit" mat-button>Move</button>
+        <button
+            type="button"
+            color="primary"
+            (click)="submitForm()"
+            [disabled]="moveControllerServiceForm.invalid"
+            mat-button>
+            Move
+        </button>
     </mat-dialog-actions>
 </form>

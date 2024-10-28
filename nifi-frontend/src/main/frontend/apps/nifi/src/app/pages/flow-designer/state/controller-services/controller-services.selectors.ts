@@ -41,16 +41,6 @@ export const selectCurrentProcessGroupId = createSelector(
     (state: ControllerServicesState) => state.processGroupId
 );
 
-export const selectChildProcessGroupOptions = createSelector(
-    selectControllerServicesState,
-    (state: ControllerServicesState) => state.childProcessGroupOptions
-);
-
-export const selectBreadcrumb = createSelector(
-    selectControllerServicesState,
-    (state: ControllerServicesState) => state.breadcrumb
-);
-
 export const selectParameterContext = createSelector(
     selectControllerServicesState,
     (state: ControllerServicesState) => state.parameterContext

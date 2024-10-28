@@ -253,9 +253,7 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     )
     public Response getProcessGroup(
             @Parameter(description = "The process group id.")
-            @PathParam("id") final String groupId,
-            @QueryParam("includeContent") @DefaultValue("false")
-            @Parameter(description = "Include content for process group") boolean includeContent)  {
+            @PathParam("id") final String groupId) {
 
         if (isReplicateRequest()) {
             return replicate(HttpMethod.GET);
@@ -268,10 +266,10 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
         });
 
         // get this process group contents
-        final ProcessGroupEntity entity = serviceFacade.getProcessGroup(groupId, includeContent);
+        final ProcessGroupEntity entity = serviceFacade.getProcessGroup(groupId);
         populateRemainingProcessGroupEntityContent(entity);
 
-        if (entity.getComponent() != null && !includeContent) {
+        if (entity.getComponent() != null) {
             entity.getComponent().setContents(null);
         }
 

@@ -35,7 +35,6 @@ import { ControllerServicesState } from './index';
 
 export const initialState: ControllerServicesState = {
     processGroupId: 'root',
-    childProcessGroupOptions: [],
     controllerServices: [],
     breadcrumb: {
         id: '',
@@ -71,7 +70,6 @@ export const controllerServicesReducer = createReducer(
         breadcrumb: response.breadcrumb,
         parameterContext: response.parameterContext,
         loadedTimestamp: response.loadedTimestamp,
-        childProcessGroupOptions: response.childProcessGroupOptions,
         status: 'success' as const
     })),
     on(controllerServicesBannerApiError, (state) => ({

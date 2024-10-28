@@ -107,11 +107,6 @@ export class FlowService implements PropertyDescriptorRetriever {
         return this.httpClient.get(`${FlowService.API}/process-groups/${id}`);
     }
 
-    getProcessGroupWithContent(id: string): Observable<any> {
-        const params = new HttpParams().set('includeContent', true);
-        return this.httpClient.get(`${FlowService.API}/process-groups/${id}`, { params: params });
-    }
-
     createFunnel(processGroupId = 'root', createFunnel: CreateComponentRequest): Observable<any> {
         return this.httpClient.post(`${FlowService.API}/process-groups/${processGroupId}/funnels`, {
             revision: createFunnel.revision,
