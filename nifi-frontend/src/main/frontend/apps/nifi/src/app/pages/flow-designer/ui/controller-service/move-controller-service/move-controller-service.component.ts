@@ -85,7 +85,7 @@ export class MoveControllerService extends CloseOnEscapeDialog {
 
         // build the form
         this.moveControllerServiceForm = this.formBuilder.group({
-            processGroups: new FormControl('Process Group', Validators.required)
+            processGroups: new FormControl('', Validators.required)
         });
 
         this.processGroupOptions = request.options;
