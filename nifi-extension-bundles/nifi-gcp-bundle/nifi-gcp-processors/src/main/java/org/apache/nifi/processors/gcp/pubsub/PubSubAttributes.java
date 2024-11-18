@@ -39,6 +39,9 @@ public class PubSubAttributes {
     public static final String MSG_PUBLISH_TIME_ATTRIBUTE = "gcp.pubsub.publishTime";
     public static final String MSG_PUBLISH_TIME_DESCRIPTION = "Timestamp value when the message was published";
 
+    public static final String SUBSCRIPTION_NAME_ATTRIBUTE = "gcp.pubsub.subscription";
+    public static final String SUBSCRIPTION_NAME_DESCRIPTION = "Name of the PubSub subscription";
+
     public static final String DYNAMIC_ATTRIBUTES_ATTRIBUTE = "Dynamic Attributes";
     public static final String DYNAMIC_ATTRIBUTES_DESCRIPTION = "Other than the listed attributes, this processor may write zero or more attributes, " +
             "if the original Google Cloud Publisher client added any attributes to the message while sending";
