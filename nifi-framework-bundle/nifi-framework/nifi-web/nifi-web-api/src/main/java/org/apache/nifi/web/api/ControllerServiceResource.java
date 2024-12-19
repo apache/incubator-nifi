@@ -39,6 +39,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.nifi.authorization.AuthorizableLookup;
 import org.apache.nifi.authorization.AuthorizeControllerServiceReference;
 import org.apache.nifi.authorization.AuthorizeParameterReference;
 import org.apache.nifi.authorization.Authorizer;
@@ -700,36 +701,64 @@ public class ControllerServiceResource extends ApplicationResource {
             final NiFiUser user = NiFiUserUtils.getNiFiUser();
 
             final ComponentAuthorizable authorizableControllerService = lookup.getControllerService(controllerServiceId);
-            authorizableControllerService.getAuthorizable().authorize(authorizer, RequestAction.WRITE, user);
+            boolean authorized = authorizableControllerService.getAuthorizable().isAuthorized(authorizer, RequestAction.WRITE, user);
 
             final ControllerServiceDTO controllerServiceDTO = serviceFacade.getControllerService(controllerServiceId, true).getComponent();
 
             final ProcessGroupAuthorizable authorizableProcessGroupCurrent = lookup.getProcessGroup(controllerServiceDTO.getParentGroupId());
-            authorizableProcessGroupCurrent.getAuthorizable().authorize(authorizer, RequestAction.WRITE, user);
+            authorized = authorized && authorizableProcessGroupCurrent.getAuthorizable().isAuthorized(authorizer, RequestAction.WRITE, user);
 
-            if (authorizableProcessGroupCurrent.getProcessGroup().getParent() != null) {
-                final ProcessGroupAuthorizable authorizableProcessGroupParent = lookup.getProcessGroup(authorizableProcessGroupCurrent.getProcessGroup().getParent().getIdentifier());
-                authorizableProcessGroupParent.getAuthorizable().authorize(authorizer, RequestAction.WRITE, user);
+            if (authorized) {
+                if (authorizableProcessGroupCurrent.getProcessGroup().getParent() != null) {
+                    final ProcessGroupAuthorizable authorizableProcessGroupParent = lookup.getProcessGroup(authorizableProcessGroupCurrent.getProcessGroup().getParent().getIdentifier());
+                    if (authorizableProcessGroupParent.getAuthorizable().isAuthorized(authorizer, RequestAction.READ, user)
+                            && authorizableProcessGroupParent.getAuthorizable().isAuthorized(authorizer, RequestAction.WRITE, user)) {
+                        options.add(generateProcessGroupOption(controllerServiceDTO, authorizableProcessGroupParent, lookup, user));
+                    }
+                }
 
-                options.add(generateProcessGroupOption(controllerServiceDTO, authorizableProcessGroupParent));
+                authorizableProcessGroupCurrent.getProcessGroup().getProcessGroups().forEach(processGroup -> {
+                    final ProcessGroupAuthorizable authorizableProcessGroup = lookup.getProcessGroup(processGroup.getIdentifier());
+                    if (authorizableProcessGroup.getAuthorizable().isAuthorized(authorizer, RequestAction.READ, user)
+                            && authorizableProcessGroup.getAuthorizable().isAuthorized(authorizer, RequestAction.WRITE, user)) {
+                        options.add(generateProcessGroupOption(controllerServiceDTO, authorizableProcessGroup, lookup, user));
+                    }
+                });
             }
-
-            authorizableProcessGroupCurrent.getProcessGroup().getProcessGroups().forEach(processGroup -> {
-                final ProcessGroupAuthorizable authorizableProcessGroup = lookup.getProcessGroup(processGroup.getIdentifier());
-                authorizableProcessGroup.getAuthorizable().authorize(authorizer, RequestAction.WRITE, user);
-                options.add(generateProcessGroupOption(controllerServiceDTO, authorizableProcessGroup));
-            });
         });
 
         return generateOkResponse(options).build();
     }
 
-    private ProcessGroupOptionEntity generateProcessGroupOption(ControllerServiceDTO controllerServiceDTO, ProcessGroupAuthorizable processGroup) {
+    private ProcessGroupOptionEntity generateProcessGroupOption(ControllerServiceDTO controllerServiceDTO, ProcessGroupAuthorizable processGroup, AuthorizableLookup lookup, NiFiUser user) {
+        List<String> conflictingComponents = getConflictingComponents(controllerServiceDTO, processGroup, lookup, user);
+
+        ProcessGroupOptionEntity option = new ProcessGroupOptionEntity();
+        option.setText(processGroup.getProcessGroup().getName());
+        option.setValue(processGroup.getProcessGroup().getIdentifier());
+        option.setDisabled(false);
+
+        if (!conflictingComponents.isEmpty()) {
+            String errorMessage = "Cannot move to this process group because the following components would be out of scope: ";
+            errorMessage += String.join(" ", conflictingComponents);
+            option.setDescription(errorMessage);
+            option.setDisabled(true);
+        }
+
+        return option;
+    }
+
+    private List<String> getConflictingComponents(ControllerServiceDTO controllerServiceDTO, ProcessGroupAuthorizable processGroup, AuthorizableLookup lookup, NiFiUser user) {
         List<String> conflictingComponents = new ArrayList<>();
-        controllerServiceDTO.getReferencingComponents().forEach(e -> {
-            if (processGroup.getProcessGroup().findProcessor(e.getId()) == null
-                    && processGroup.getProcessGroup().findControllerService(e.getId(), true, false) == null) {
-                conflictingComponents.add("[" + e.getComponent().getName() + "]");
+        controllerServiceDTO.getReferencingComponents().forEach(referencingComponent -> {
+            if (processGroup.getProcessGroup().findProcessor(referencingComponent.getId()) == null
+                    && processGroup.getProcessGroup().findControllerService(referencingComponent.getId(), true, false) == null) {
+                final Authorizable componentAuthorizable = lookup.getControllerServiceReferencingComponent(controllerServiceDTO.getId(), referencingComponent.getId());
+                if (componentAuthorizable.isAuthorized(authorizer, RequestAction.READ, user)) {
+                    conflictingComponents.add("[" + referencingComponent.getComponent().getName() + "]");
+                } else {
+                    conflictingComponents.add("[Unauthorized Component]");
+                }
             }
         });
 
@@ -738,25 +767,17 @@ public class ControllerServiceResource extends ApplicationResource {
                 ControllerServiceEntity refControllerService = serviceFacade.getControllerService(value, false);
                 if (refControllerService != null) {
                     if (processGroup.getProcessGroup().findControllerService(value, false, true) == null) {
-                        conflictingComponents.add("[" + refControllerService.getComponent().getName() + "]");
+                        ComponentAuthorizable componentAuthorizable = lookup.getControllerService(value);
+                        if (componentAuthorizable.getAuthorizable().isAuthorized(authorizer, RequestAction.READ, user)) {
+                            conflictingComponents.add("[" + refControllerService.getComponent().getName() + "]");
+                        } else {
+                            conflictingComponents.add("[Unauthorized Component]");
+                        }
                     }
                 }
             } catch (Exception ignored) { }
         });
-
-        ProcessGroupOptionEntity option = new ProcessGroupOptionEntity();
-        option.setText(processGroup.getProcessGroup().getName());
-        option.setValue(processGroup.getProcessGroup().getIdentifier());
-        option.setDisabled(false);
-
-        if (!conflictingComponents.isEmpty()) {
-            String errorMessage = "Could not move controller service because the following components would be out of scope: ";
-            errorMessage += String.join(" ", conflictingComponents);
-            option.setDescription(errorMessage);
-            option.setDisabled(true);
-        }
-
-        return option;
+        return conflictingComponents;
     }
 
     /**
@@ -810,47 +831,32 @@ public class ControllerServiceResource extends ApplicationResource {
             throw new IllegalArgumentException("ParentGroupId must be specified.");
         }
 
-        final ControllerServiceDTO requestControllerServiceDTO = serviceFacade.getControllerService(id, true).getComponent();
-
         final Revision requestRevision = getRevision(requestControllerServiceEntity, id);
         return withWriteLock(
                 serviceFacade,
                 serviceFacade.getControllerService(id, true),
                 requestRevision,
                 lookup -> {
+                    NiFiUser user = NiFiUserUtils.getNiFiUser();
                     // authorize the service
-                    final ComponentAuthorizable authorizable = lookup.getControllerService(requestControllerServiceDTO.getId());
-                    authorizable.getAuthorizable().authorize(authorizer, RequestAction.WRITE, NiFiUserUtils.getNiFiUser());
+                    final ComponentAuthorizable authorizableControllerService = lookup.getControllerService(id);
+
+                    if (authorizableControllerService.getAuthorizable().isAuthorized(authorizer, RequestAction.WRITE, user)) {
+                        throw new IllegalStateException("You do not have permission to perform this action.");
+                    }
+
+                    authorizableControllerService.getAuthorizable().authorize(authorizer, RequestAction.WRITE, user);
+                    final ControllerServiceDTO requestControllerServiceDTO = serviceFacade.getControllerService(id, true).getComponent();
 
                     // authorize the current and new process groups
                     final ProcessGroupAuthorizable authorizableProcessGroupNew = lookup.getProcessGroup(requestControllerServiceEntity.getParentGroupId());
-                    authorizableProcessGroupNew.getAuthorizable().authorize(authorizer, RequestAction.WRITE, NiFiUserUtils.getNiFiUser());
+                    authorizableProcessGroupNew.getAuthorizable().authorize(authorizer, RequestAction.WRITE, user);
 
                     final ProcessGroupAuthorizable authorizableProcessGroupOld = lookup.getProcessGroup(requestControllerServiceDTO.getParentGroupId());
-                    authorizableProcessGroupOld.getAuthorizable().authorize(authorizer, RequestAction.WRITE, NiFiUserUtils.getNiFiUser());
+                    authorizableProcessGroupOld.getAuthorizable().authorize(authorizer, RequestAction.WRITE, user);
 
                     // Verify all referencing and referenced components are still within scope
-                    List<String> conflictingComponents = new ArrayList<>();
-                    requestControllerServiceDTO.getReferencingComponents().forEach(e -> {
-                        if (authorizableProcessGroupNew.getProcessGroup().findProcessor(e.getId()) == null
-                            && authorizableProcessGroupNew.getProcessGroup().findControllerService(e.getId(), true, false) == null) {
-                            conflictingComponents.add("[" + e.getComponent().getName() + "]");
-                        }
-
-                        final Authorizable referencingComponent = lookup.getControllerServiceReferencingComponent(requestControllerServiceDTO.getId(), e.getId());
-                        OperationAuthorizable.authorizeOperation(referencingComponent, authorizer, NiFiUserUtils.getNiFiUser());
-                    });
-
-                    requestControllerServiceDTO.getProperties().forEach((key, value) -> {
-                        try {
-                            ControllerServiceEntity refControllerService = serviceFacade.getControllerService(value, false);
-                            if (refControllerService != null) {
-                                if (authorizableProcessGroupNew.getProcessGroup().findControllerService(value, false, true) == null) {
-                                    conflictingComponents.add("[" + refControllerService.getComponent().getName() + "]");
-                                }
-                            }
-                        } catch (Exception ignored) { }
-                    });
+                    List<String> conflictingComponents = getConflictingComponents(requestControllerServiceDTO, authorizableProcessGroupNew, lookup, user);
 
                     if (!conflictingComponents.isEmpty()) {
                         String errorMessage = "Could not move controller service because the following components would be out of scope: ";

@@ -16,52 +16,45 @@
  */
 
 import { Component, Inject, Input } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import {
+    MAT_DIALOG_DATA,
+    MatDialogActions,
+    MatDialogClose,
+    MatDialogContent,
+    MatDialogTitle
+} from '@angular/material/dialog';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-
-import { MatInputModule } from '@angular/material/input';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatButtonModule } from '@angular/material/button';
-import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatOptionModule } from '@angular/material/core';
-import { MatSelectModule } from '@angular/material/select';
+import { MatFormField } from '@angular/material/input';
+import { MatButton } from '@angular/material/button';
+import { MatOption } from '@angular/material/core';
+import { MatLabel, MatSelect } from '@angular/material/select';
 import { TextTip, NifiTooltipDirective, SelectOption } from '@nifi/shared';
 import { Store } from '@ngrx/store';
 import { CloseOnEscapeDialog } from '@nifi/shared';
 import { NiFiState } from 'apps/nifi/src/app/state';
 import { NgIf } from '@angular/common';
-import {
-    ControllerServiceEntity,
-    ControllerServiceReferencingComponent,
-    ControllerServiceReferencingComponentEntity
-} from 'apps/nifi/src/app/state/shared';
-import { ControllerServiceApi } from 'apps/nifi/src/app/ui/common/controller-service/controller-service-api/controller-service-api.component';
+import { ControllerServiceEntity, ControllerServiceReferencingComponent } from 'apps/nifi/src/app/state/shared';
 import { ControllerServiceReferences } from 'apps/nifi/src/app/ui/common/controller-service/controller-service-references/controller-service-references.component';
-import { NifiSpinnerDirective } from 'apps/nifi/src/app/ui/common/spinner/nifi-spinner.directive';
 import { MoveControllerServiceDialogRequestSuccess } from '../../../state/controller-services';
 import { moveControllerService } from '../../../state/controller-services/controller-services.actions';
-import { BreadcrumbEntity } from '../../../state/shared';
 
 @Component({
     selector: 'move-controller-service',
     standalone: true,
     templateUrl: './move-controller-service.component.html',
     imports: [
+        MatDialogContent,
         ReactiveFormsModule,
-        MatDialogModule,
-        MatInputModule,
-        MatCheckboxModule,
-        MatButtonModule,
-        MatTabsModule,
-        MatOptionModule,
-        MatSelectModule,
-        ControllerServiceApi,
-        ControllerServiceReferences,
-        AsyncPipe,
-        NifiSpinnerDirective,
+        MatFormField,
+        MatSelect,
+        MatDialogTitle,
+        MatLabel,
         NifiTooltipDirective,
-        NgTemplateOutlet,
+        MatOption,
+        ControllerServiceReferences,
+        MatDialogActions,
+        MatButton,
+        MatDialogClose,
         NgIf
     ],
     styleUrls: ['./move-controller-service.component.scss']

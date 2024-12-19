@@ -51,11 +51,6 @@ export const selectCurrentParameterContext = createSelector(
 
 export const selectCanvasPermissions = createSelector(selectFlowState, (state: FlowState) => state.flow.permissions);
 
-export const selectProcessGroupFlow = createSelector(
-    selectFlowState,
-    (state: FlowState) => state.flow.processGroupFlow
-);
-
 export const selectBreadcrumbs = createSelector(
     selectFlowState,
     (state: FlowState) => state.flow.processGroupFlow.breadcrumb
