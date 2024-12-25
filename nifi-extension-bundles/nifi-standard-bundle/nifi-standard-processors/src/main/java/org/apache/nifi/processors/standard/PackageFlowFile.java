@@ -32,10 +32,13 @@ import org.apache.nifi.flowfile.FlowFile;
 import org.apache.nifi.flowfile.attributes.CoreAttributes;
 import org.apache.nifi.flowfile.attributes.StandardFlowFileMediaType;
 import org.apache.nifi.processor.AbstractProcessor;
+import org.apache.nifi.processor.DataUnit;
+import org.apache.nifi.processor.FlowFileFilter;
 import org.apache.nifi.processor.ProcessContext;
 import org.apache.nifi.processor.ProcessSession;
 import org.apache.nifi.processor.Relationship;
 import org.apache.nifi.processor.exception.ProcessException;
+import org.apache.nifi.processor.util.FlowFileFilters;
 import org.apache.nifi.processor.util.StandardValidators;
 import org.apache.nifi.util.FlowFilePackager;
 import org.apache.nifi.util.FlowFilePackagerV3;
@@ -123,14 +126,21 @@ public class PackageFlowFile extends AbstractProcessor {
     public static final PropertyDescriptor BATCH_SIZE = new PropertyDescriptor.Builder()
             .name("max-batch-size")
             .displayName("Maximum Batch Size")
-            .description("Maximum number of FlowFiles to package into one output FlowFile using a best effort, non guaranteed approach."
-                    + " Multiple input queues can produce unexpected batching behavior.")
+            .description("Maximum number of FlowFiles to package into one output FlowFile.")
             .required(true)
             .defaultValue("1")
             .addValidator(StandardValidators.createLongValidator(1, 10_000, true))
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(BATCH_SIZE);
+    public static final PropertyDescriptor BATCH_CONTENT_SIZE = new PropertyDescriptor.Builder()
+            .name("Maximum Batch Content Size")
+            .description("Maximum combined content size of FlowFiles to package into one output FlowFile.")
+            .required(true)
+            .defaultValue("1 GB")
+            .addValidator(StandardValidators.DATA_SIZE_VALIDATOR)
+            .build();
+
+    private static final List<PropertyDescriptor> PROPERTIES = List.of(BATCH_SIZE, BATCH_CONTENT_SIZE);
 
     static final Relationship REL_SUCCESS = new Relationship.Builder()
             .name("success")
@@ -158,7 +168,13 @@ public class PackageFlowFile extends AbstractProcessor {
 
     @Override
     public void onTrigger(ProcessContext context, ProcessSession session) throws ProcessException {
-        final List<FlowFile> flowFiles = session.get(context.getProperty(BATCH_SIZE).asInteger());
+        final FlowFileFilter filter = FlowFileFilters.newSizeBasedFilter(
+                context.getProperty(BATCH_CONTENT_SIZE).asDataSize(DataUnit.B),
+                DataUnit.B,
+                context.getProperty(BATCH_SIZE).asInteger()
+        );
+
+        final List<FlowFile> flowFiles = session.get(filter);
         if (flowFiles.isEmpty()) {
             return;
         }

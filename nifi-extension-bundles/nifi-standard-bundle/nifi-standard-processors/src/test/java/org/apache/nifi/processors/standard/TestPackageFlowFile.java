@@ -40,9 +40,10 @@ public class TestPackageFlowFile {
     private static final String EXTRA_ATTR_KEY = "myAttribute";
     private static final String EXTRA_ATTR_VALUE = "my value";
 
+    private final TestRunner runner = TestRunners.newTestRunner(new PackageFlowFile());
+
     @Test
     public void testOne() throws IOException {
-        TestRunner runner = TestRunners.newTestRunner(new PackageFlowFile());
         Map<String, String> attributes = new HashMap<>();
         attributes.put(CoreAttributes.FILENAME.key(), SAMPLE_ATTR_FILENAME);
         attributes.put(CoreAttributes.MIME_TYPE.key(), SAMPLE_ATTR_MIME_TYPE);
@@ -53,7 +54,7 @@ public class TestPackageFlowFile {
 
         runner.assertTransferCount(PackageFlowFile.REL_SUCCESS, 1);
         runner.assertTransferCount(PackageFlowFile.REL_ORIGINAL, 1);
-        final MockFlowFile outputFlowFile = runner.getFlowFilesForRelationship(PackageFlowFile.REL_SUCCESS).get(0);
+        final MockFlowFile outputFlowFile = runner.getFlowFilesForRelationship(PackageFlowFile.REL_SUCCESS).getFirst();
 
         // mime.type has changed
         Assertions.assertEquals(StandardFlowFileMediaType.VERSION_3.getMediaType(),
@@ -79,7 +80,6 @@ public class TestPackageFlowFile {
     @Test
     public void testMany() throws IOException {
         int FILE_COUNT = 10;
-        TestRunner runner = TestRunners.newTestRunner(new PackageFlowFile());
         runner.setProperty(PackageFlowFile.BATCH_SIZE, Integer.toString(FILE_COUNT));
         Map<String, String> attributes = new HashMap<>();
         attributes.put(CoreAttributes.MIME_TYPE.key(), SAMPLE_ATTR_MIME_TYPE);
@@ -92,7 +92,7 @@ public class TestPackageFlowFile {
 
         runner.assertTransferCount(PackageFlowFile.REL_SUCCESS, 1);
         runner.assertTransferCount(PackageFlowFile.REL_ORIGINAL, FILE_COUNT);
-        final MockFlowFile outputFlowFile = runner.getFlowFilesForRelationship(PackageFlowFile.REL_SUCCESS).get(0);
+        final MockFlowFile outputFlowFile = runner.getFlowFilesForRelationship(PackageFlowFile.REL_SUCCESS).getFirst();
 
         // mime.type has changed
         Assertions.assertEquals(StandardFlowFileMediaType.VERSION_3.getMediaType(),
@@ -118,10 +118,9 @@ public class TestPackageFlowFile {
     }
 
     @Test
-    public void testBatchSize() throws IOException {
+    public void testBatchSize() {
         int FILE_COUNT = 10;
         int BATCH_SIZE = 2;
-        TestRunner runner = TestRunners.newTestRunner(new PackageFlowFile());
         runner.setProperty(PackageFlowFile.BATCH_SIZE, Integer.toString(BATCH_SIZE));
         Map<String, String> attributes = new HashMap<>();
         attributes.put(CoreAttributes.MIME_TYPE.key(), SAMPLE_ATTR_MIME_TYPE);
@@ -134,6 +133,26 @@ public class TestPackageFlowFile {
 
         runner.assertTransferCount(PackageFlowFile.REL_SUCCESS, 1);
         runner.assertTransferCount(PackageFlowFile.REL_ORIGINAL, BATCH_SIZE);
+        runner.assertQueueNotEmpty();
+    }
+
+    @Test
+    public void testBatchContentSize() {
+        int FILE_COUNT = 10;
+        int BATCH_CONTENT_SIZE = 7 * SAMPLE_CONTENT.length();
+        runner.setProperty(PackageFlowFile.BATCH_SIZE, Integer.toString(FILE_COUNT));
+        runner.setProperty(PackageFlowFile.BATCH_CONTENT_SIZE, BATCH_CONTENT_SIZE + " B");
+        Map<String, String> attributes = new HashMap<>();
+        attributes.put(CoreAttributes.MIME_TYPE.key(), SAMPLE_ATTR_MIME_TYPE);
+
+        for (int i = 0; i < FILE_COUNT; i++) {
+            attributes.put(CoreAttributes.FILENAME.key(), i + SAMPLE_ATTR_FILENAME);
+            runner.enqueue(SAMPLE_CONTENT, attributes);
+        }
+        runner.run();
+
+        runner.assertTransferCount(PackageFlowFile.REL_SUCCESS, 1);
+        runner.assertTransferCount(PackageFlowFile.REL_ORIGINAL, 7);
         runner.assertQueueNotEmpty();
     }
 }
