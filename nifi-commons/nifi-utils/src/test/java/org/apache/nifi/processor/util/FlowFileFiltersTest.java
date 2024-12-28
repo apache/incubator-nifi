@@ -71,7 +71,8 @@ class FlowFileFiltersTest {
             assertEquals(ACCEPT_AND_CONTINUE, filter.filter(emptyFlowFile()));
 
             assertEquals(REJECT_AND_TERMINATE, filter.filter(flowFileOfSize(1)));
-
+            // empty content FlowFiles are no longer accepted
+            assertEquals(REJECT_AND_TERMINATE, filter.filter(emptyFlowFile()));
         }
 
         private FlowFile emptyFlowFile() {
