@@ -457,7 +457,9 @@ public abstract class AbstractJsonQueryElasticsearchTest<P extends AbstractJsonQ
         }
         runner.setProperty("refresh", "true");
         runner.setProperty("slices", "${slices}");
+        runner.setProperty(ElasticsearchRestProcessor.DYNAMIC_PROPERTY_PREFIX_REQUEST_HEADER + "Accept", "${accept}");
         runner.setEnvironmentVariableValue("slices", "auto");
+        runner.setEnvironmentVariableValue("accept", "application/json");
 
         runOnce(runner);
 
@@ -471,6 +473,9 @@ public abstract class AbstractJsonQueryElasticsearchTest<P extends AbstractJsonQ
 
         assertEquals("true", service.getRequestParameters().get("refresh"));
         assertEquals("auto", service.getRequestParameters().get("slices"));
+
+        assertEquals(1, service.getRequestHeaders().size());
+        assertEquals("application/json", service.getRequestHeaders().get("Accept"));
     }
 
     @ParameterizedTest

@@ -44,61 +44,62 @@ public class TestElasticSearchClientService extends AbstractControllerService im
     }
 
     @Override
-    public IndexOperationResponse add(IndexOperationRequest operation, Map<String, String> requestParameters) {
+    public IndexOperationResponse add(IndexOperationRequest operation, Map<String, String> requestParameters, Map<String, String> requestHeaders) {
         return null;
     }
 
     @Override
-    public IndexOperationResponse bulk(List<IndexOperationRequest> operations, Map<String, String> requestParameters) {
+    public IndexOperationResponse bulk(List<IndexOperationRequest> operations, Map<String, String> requestParameters, Map<String, String> requestHeaders) {
         return null;
     }
 
     @Override
-    public Long count(String query, String index, String type, Map<String, String> requestParameters) {
+    public Long count(String query, String index, String type, Map<String, String> requestParameters, Map<String, String> requestHeaders) {
         return null;
     }
 
     @Override
-    public DeleteOperationResponse deleteById(String index, String type, String id, Map<String, String> requestParameters) {
+    public DeleteOperationResponse deleteById(String index, String type, String id, Map<String, String> requestParameters, Map<String, String> requestHeaders) {
         return null;
     }
 
     @Override
-    public DeleteOperationResponse deleteById(String index, String type, List<String> ids, Map<String, String> requestParameters) {
+    public DeleteOperationResponse deleteById(String index, String type, List<String> ids, Map<String, String> requestParameters, Map<String, String> requestHeaders) {
         return null;
     }
 
     @Override
-    public DeleteOperationResponse deleteByQuery(String query, String index, String type, Map<String, String> requestParameters) {
+    public DeleteOperationResponse deleteByQuery(String query, String index, String type, Map<String, String> requestParameters, Map<String, String> requestHeaders) {
         return null;
     }
 
     @Override
-    public UpdateOperationResponse updateByQuery(String query, String index, String type, Map<String, String> requestParameters) {
+    public UpdateOperationResponse updateByQuery(String query, String index, String type, Map<String, String> requestParameters, Map<String, String> requestHeaders) {
         return null;
     }
 
     @Override
-    public void refresh(final String index, final Map<String, String> requestParameters) {
+    public void refresh(final String index, final Map<String, String> requestParameters, Map<String, String> requestHeaders) {
+        // intentionally blank
     }
 
     @Override
-    public boolean exists(final String index, final Map<String, String> requestParameters) {
+    public boolean exists(final String index, final Map<String, String> requestParameters, Map<String, String> requestHeaders) {
         return true;
     }
 
     @Override
-    public boolean documentExists(String index, String type, String id, Map<String, String> requestParameters) {
+    public boolean documentExists(String index, String type, String id, Map<String, String> requestParameters, Map<String, String> requestHeaders) {
         return true;
     }
 
     @Override
-    public Map<String, Object> get(String index, String type, String id, Map<String, String> requestParameters) {
+    public Map<String, Object> get(String index, String type, String id, Map<String, String> requestParameters, Map<String, String> requestHeaders) {
         return data;
     }
 
     @Override
-    public SearchResponse search(String query, String index, String type, Map<String, String> requestParameters) {
+    public SearchResponse search(String query, String index, String type, Map<String, String> requestParameters, Map<String, String> requestHeaders) {
         List<Map<String, Object>> hits = new ArrayList<>();
         Map<String, Object> source = new HashMap<>();
         source.put("_source", data);
@@ -108,22 +109,22 @@ public class TestElasticSearchClientService extends AbstractControllerService im
     }
 
     @Override
-    public SearchResponse scroll(String scroll) {
-        return search(null, null, null, null);
+    public SearchResponse scroll(String scroll, Map<String, String> requestHeaders) {
+        return search(null, null, null, null, requestHeaders);
     }
 
     @Override
-    public String initialisePointInTime(String index, String keepAlive) {
+    public String initialisePointInTime(String index, String keepAlive, Map<String, String> requestHeaders) {
         return null;
     }
 
     @Override
-    public DeleteOperationResponse deletePointInTime(String pitId) {
+    public DeleteOperationResponse deletePointInTime(String pitId, Map<String, String> requestHeaders) {
         return null;
     }
 
     @Override
-    public DeleteOperationResponse deleteScroll(String scrollId) {
+    public DeleteOperationResponse deleteScroll(String scrollId, Map<String, String> requestHeaders) {
         return null;
     }
 

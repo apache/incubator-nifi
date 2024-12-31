@@ -71,7 +71,7 @@ public abstract class AbstractByQueryElasticsearch extends AbstractProcessor imp
 
     abstract OperationResponse performOperation(final ElasticSearchClientService clientService, final String query,
                                                 final String index, final String type,
-                                                final Map<String, String> requestParameters);
+                                                final Map<String, String> requestParameters, final Map<String, String> requestHeaders);
 
     @Override
     public Set<Relationship> getRelationships() {
@@ -131,7 +131,8 @@ public abstract class AbstractByQueryElasticsearch extends AbstractProcessor imp
                     ? context.getProperty(QUERY_ATTRIBUTE).evaluateAttributeExpressions(input).getValue()
                     : null;
 
-            final OperationResponse or = performOperation(clientService.get(), query, index, type, getDynamicProperties(context, input));
+            final OperationResponse or = performOperation(clientService.get(), query, index, type,
+                    getRequestParametersFromDynamicProperties(context, input), getRequestHeadersFromDynamicProperties(context, input));
 
             if (input == null) {
                 input = session.create();

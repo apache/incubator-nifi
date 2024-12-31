@@ -17,6 +17,7 @@
 
 package org.apache.nifi.processors.elasticsearch;
 
+import org.apache.nifi.annotation.behavior.DynamicProperties;
 import org.apache.nifi.annotation.behavior.DynamicProperty;
 import org.apache.nifi.annotation.behavior.InputRequirement;
 import org.apache.nifi.annotation.behavior.WritesAttribute;
@@ -39,12 +40,21 @@ import java.util.Map;
 @Tags({ "elastic", "elasticsearch", "elasticsearch5", "elasticsearch6", "elasticsearch7", "elasticsearch8", "delete", "query"})
 @CapabilityDescription("Delete from an Elasticsearch index using a query. The query can be loaded from a flowfile body " +
         "or from the Query parameter.")
-@DynamicProperty(
-        name = "The name of a URL query parameter to add",
-        value = "The value of the URL query parameter",
-        expressionLanguageScope = ExpressionLanguageScope.FLOWFILE_ATTRIBUTES,
-        description = "Adds the specified property name/value as a query parameter in the Elasticsearch URL used for processing. " +
-                "These parameters will override any matching parameters in the query request body")
+@DynamicProperties({
+        @DynamicProperty(
+                name = "The name of the HTTP request header",
+                value = "A Record Path expression to retrieve the HTTP request header value",
+                expressionLanguageScope = ExpressionLanguageScope.FLOWFILE_ATTRIBUTES,
+                description = "Prefix: " + ElasticsearchRestProcessor.DYNAMIC_PROPERTY_PREFIX_REQUEST_HEADER +
+                        " - adds the specified property name/value as a HTTP request header in the Elasticsearch request. " +
+                        "If the Record Path expression results in a null or blank value, the HTTP request header will be omitted."),
+        @DynamicProperty(
+                name = "The name of a URL query parameter to add",
+                value = "The value of the URL query parameter",
+                expressionLanguageScope = ExpressionLanguageScope.FLOWFILE_ATTRIBUTES,
+                description = "Adds the specified property name/value as a query parameter in the Elasticsearch URL used for processing. " +
+                        "These parameters will override any matching parameters in the query request body")
+})
 public class DeleteByQueryElasticsearch extends AbstractByQueryElasticsearch {
     static final String TOOK_ATTRIBUTE = "elasticsearch.delete.took";
     static final String ERROR_ATTRIBUTE = "elasticsearch.delete.error";
@@ -69,7 +79,8 @@ public class DeleteByQueryElasticsearch extends AbstractByQueryElasticsearch {
 
     @Override
     OperationResponse performOperation(final ElasticSearchClientService clientService, final String query,
-                                       final String index, final String type, final Map<String, String> requestParameters) {
-        return clientService.deleteByQuery(query, index, type, requestParameters);
+                                       final String index, final String type, final Map<String, String> requestParameters,
+                                       final Map<String, String> requestHeaders) {
+        return clientService.deleteByQuery(query, index, type, requestParameters, requestHeaders);
     }
 }
