@@ -72,9 +72,9 @@ import java.util.Set;
         configurations = {
             @ProcessorConfiguration(
                 processorClass = PackageFlowFile.class,
-                configuration = """
-                    "Maximum Batch Size" > 1 can help improve performance by batching many flowfiles together into 1 larger file that is transmitted by InvokeHTTP.
+                configuration = PackageFlowFile.BATCHING_BEHAVIOUR_DESCRIPTION + """
 
+                    It can be more efficient to transmit one larger package of batched FlowFiles than each FlowFile packaged separately.
                     Connect the success relationship of PackageFlowFile to the input of InvokeHTTP.
                 """
             ),
@@ -103,8 +103,7 @@ import java.util.Set;
         configurations = {
             @ProcessorConfiguration(
                 processorClass = PackageFlowFile.class,
-                configuration = """
-                    "Maximum Batch Size" > 1 can improve storage efficiency by batching many FlowFiles together into 1 larger file that is stored.
+                configuration = PackageFlowFile.BATCHING_BEHAVIOUR_DESCRIPTION + """
 
                     Connect the success relationship to the input of any NiFi egress processor for offline storage.
                 """
@@ -123,6 +122,15 @@ import java.util.Set;
 })
 public class PackageFlowFile extends AbstractProcessor {
 
+    public static final String BATCHING_BEHAVIOUR_DESCRIPTION = """
+                "Maximum Batch Size" > 1 can improve storage or transmission efficiency by batching many FlowFiles together into 1 larger file.
+                "Maximum Batch Content Size" can be used to enforce a soft upper limit on the overall package size.
+
+                Note, that the Batch properties only restrict the maximum amount of FlowFiles to incorporate into a single package.
+                In case less FlowFiles are queued than the properties allow for,
+                the processor will not wait for the limits to be reached but create smaller packages instead.
+            """;
+
     public static final PropertyDescriptor BATCH_SIZE = new PropertyDescriptor.Builder()
             .name("max-batch-size")
             .displayName("Maximum Batch Size")
@@ -134,7 +142,8 @@ public class PackageFlowFile extends AbstractProcessor {
 
     public static final PropertyDescriptor BATCH_CONTENT_SIZE = new PropertyDescriptor.Builder()
             .name("Maximum Batch Content Size")
-            .description("Maximum combined content size of FlowFiles to package into one output FlowFile.")
+            .description("Maximum combined content size of FlowFiles to package into one output FlowFile. " +
+                    "Note, that FlowFiles whose content exceeds this limit are packaged separately.")
             .required(true)
             .defaultValue("1 GB")
             .addValidator(StandardValidators.DATA_SIZE_VALIDATOR)
