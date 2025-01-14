@@ -26,6 +26,8 @@ import org.apache.nifi.annotation.lifecycle.OnScheduled;
 import org.apache.nifi.annotation.lifecycle.OnShutdown;
 import org.apache.nifi.annotation.lifecycle.OnStopped;
 import org.apache.nifi.annotation.lifecycle.OnUnscheduled;
+import org.apache.nifi.annotation.notification.OnPrimaryNodeStateChange;
+import org.apache.nifi.annotation.notification.PrimaryNodeState;
 import org.apache.nifi.components.DescribedValue;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.ValidationContext;
@@ -979,6 +981,14 @@ public class StandardProcessorTestRunner implements TestRunner {
 
     @Override
     public void setPrimaryNode(boolean primaryNode) {
+        if (context.isPrimary() != primaryNode) {
+            try {
+                ReflectionUtils.invokeMethodsWithAnnotation(OnPrimaryNodeStateChange.class, processor,
+                        primaryNode ? PrimaryNodeState.ELECTED_PRIMARY_NODE : PrimaryNodeState.PRIMARY_NODE_REVOKED);
+            } catch (final Exception e) {
+                Assertions.fail("Could not invoke methods annotated with @OnPrimaryNodeStateChange annotation due to: " + e);
+            }
+        }
         context.setPrimaryNode(primaryNode);
     }
 

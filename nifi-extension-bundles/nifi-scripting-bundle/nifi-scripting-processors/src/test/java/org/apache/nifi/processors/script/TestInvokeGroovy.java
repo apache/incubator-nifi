@@ -241,6 +241,31 @@ public class TestInvokeGroovy extends BaseScriptTest {
         ff.assertContentEquals("48\n47\n14\n");
     }
 
+    /**
+     * Tests a script that has a Groovy Processor that implements its own onPrimaryNodeStateChange
+     *
+     * @throws Exception Any error encountered while testing
+     */
+    @Test
+    public void testOnPrimaryNodeStateChange() {
+        runner.setProperty(scriptingComponent.getScriptingComponentHelper().SCRIPT_ENGINE, "Groovy");
+        runner.setProperty(ScriptingComponentUtils.SCRIPT_FILE, "target/test/resources/groovy/test_OnPrimaryStateChange.groovy");
+        runner.setProperty(ScriptingComponentUtils.MODULES, "target/test/resources/groovy");
+        InvokeScriptedProcessor invokeScriptedProcessor = ((InvokeScriptedProcessor) scriptingComponent);
+        invokeScriptedProcessor.setup(runner.getProcessContext());
+        runner.setIsConfiguredForClustering(true);
+        runner.run(1, false, true);
+        runner.setPrimaryNode(true);
+        runner.clearTransferState();
+        runner.run(1, true, false);
+        runner.assertAllFlowFilesTransferred("success");
+        List<MockFlowFile> flowFiles = runner.getFlowFilesForRelationship("success");
+        assertNotNull(flowFiles);
+        assertEquals(1, flowFiles.size());
+        MockFlowFile flowFile = flowFiles.get(0);
+        flowFile.assertAttributeEquals("isPrimaryNode", "true");
+    }
+
     private static class OverrideInvokeScriptedProcessor extends InvokeScriptedProcessor {
 
         private int numTimesModifiedCalled = 0;
@@ -257,5 +282,9 @@ public class TestInvokeGroovy extends BaseScriptTest {
             super.onPropertyModified(descriptor, oldValue, newValue);
             numTimesModifiedCalled++;
         }
+    }
+
+    private static class OnPrimaryNodeStateChangeMethodWasCalledException extends RuntimeException {
+
     }
 }
