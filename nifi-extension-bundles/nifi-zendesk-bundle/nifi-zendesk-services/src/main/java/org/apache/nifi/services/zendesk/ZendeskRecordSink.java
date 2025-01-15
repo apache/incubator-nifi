@@ -102,7 +102,7 @@ public class ZendeskRecordSink extends AbstractControllerService implements Reco
             .required(true)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             WEB_CLIENT_SERVICE_PROVIDER,
             ZENDESK_SUBDOMAIN,
             ZENDESK_USER,
@@ -129,7 +129,7 @@ public class ZendeskRecordSink extends AbstractControllerService implements Reco
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

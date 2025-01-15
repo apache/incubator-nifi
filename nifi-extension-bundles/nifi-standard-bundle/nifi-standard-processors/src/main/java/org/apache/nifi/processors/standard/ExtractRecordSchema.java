@@ -77,7 +77,7 @@ public class ExtractRecordSchema extends AbstractProcessor {
             .required(true)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             RECORD_READER,
             SCHEMA_CACHE_SIZE
     );
@@ -101,7 +101,7 @@ public class ExtractRecordSchema extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

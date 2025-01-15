@@ -298,7 +298,7 @@ public class ListenHTTP extends AbstractSessionFactoryProcessor {
             .dependsOn(RECORD_READER)
             .build();
 
-    protected static final List<PropertyDescriptor> PROPERTIES = List.of(
+    protected static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             BASE_PATH,
             PORT,
             HEALTH_CHECK_PORT,
@@ -324,7 +324,9 @@ public class ListenHTTP extends AbstractSessionFactoryProcessor {
             .description("Relationship for successfully received FlowFiles")
             .build();
 
-    private static final Set<Relationship> RELATIONSHIPS = Set.of(RELATIONSHIP_SUCCESS);
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+            RELATIONSHIP_SUCCESS
+    );
 
     public static final String CONTEXT_ATTRIBUTE_PROCESSOR = "processor";
     public static final String CONTEXT_ATTRIBUTE_LOGGER = "logger";
@@ -377,7 +379,7 @@ public class ListenHTTP extends AbstractSessionFactoryProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnStopped

@@ -22,7 +22,6 @@ import org.apache.nifi.controller.AbstractControllerService;
 import org.apache.nifi.controller.ConfigurationContext;
 import org.apache.nifi.processor.util.StandardValidators;
 
-import java.util.Collections;
 import java.util.List;
 
 public class ClassloaderIsolationKeyProviderService extends AbstractControllerService implements KeyProviderService {
@@ -36,11 +35,13 @@ public class ClassloaderIsolationKeyProviderService extends AbstractControllerSe
 
     private volatile String keyField;
 
-    private static final List<PropertyDescriptor> PROPERTIES = Collections.singletonList(KEY_FIELD);
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        KEY_FIELD
+    );
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnEnabled

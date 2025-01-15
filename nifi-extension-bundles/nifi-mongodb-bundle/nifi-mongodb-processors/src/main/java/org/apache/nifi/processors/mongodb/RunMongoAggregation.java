@@ -104,8 +104,8 @@ public class RunMongoAggregation extends AbstractMongoProcessor {
             REL_FAILURE
     );
 
-    private final static List<PropertyDescriptor> PROPERTIES = Stream.concat(
-            AbstractMongoProcessor.DESCRIPTORS.stream(),
+    private final static List<PropertyDescriptor> PROPERTY_DESCRIPTORS = Stream.concat(
+            getCommonPropertyDescriptors().stream(),
             Stream.of(
                     CHARSET,
                     QUERY,
@@ -125,7 +125,7 @@ public class RunMongoAggregation extends AbstractMongoProcessor {
 
     @Override
     public final List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     private String buildBatch(List<Document> batch) {

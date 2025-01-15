@@ -111,7 +111,7 @@ public class SplitPCAP extends AbstractProcessor {
             .description("The individual PCAP 'segments' of the original PCAP FlowFile will be routed to this relationship.")
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             PCAP_MAX_SIZE
     );
 
@@ -128,7 +128,7 @@ public class SplitPCAP extends AbstractProcessor {
 
     @Override
     public final List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     /**

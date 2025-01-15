@@ -274,7 +274,7 @@ public class ReplaceText extends AbstractProcessor {
         .required(false)
         .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             REPLACEMENT_STRATEGY,
             SEARCH_VALUE,
             REPLACEMENT_VALUE,
@@ -306,7 +306,7 @@ public class ReplaceText extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

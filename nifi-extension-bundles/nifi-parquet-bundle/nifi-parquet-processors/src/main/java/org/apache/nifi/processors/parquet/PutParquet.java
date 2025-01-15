@@ -17,8 +17,6 @@
 package org.apache.nifi.processors.parquet;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
@@ -84,6 +82,19 @@ public class PutParquet extends AbstractPutHDFSRecord {
             .defaultValue("false")
             .build();
 
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        ParquetUtils.ROW_GROUP_SIZE,
+        ParquetUtils.PAGE_SIZE,
+        ParquetUtils.DICTIONARY_PAGE_SIZE,
+        ParquetUtils.MAX_PADDING_SIZE,
+        ParquetUtils.ENABLE_DICTIONARY_ENCODING,
+        ParquetUtils.ENABLE_VALIDATION,
+        ParquetUtils.WRITER_VERSION,
+        ParquetUtils.AVRO_WRITE_OLD_LIST_STRUCTURE,
+        ParquetUtils.AVRO_ADD_LIST_ELEMENT_RECORDS,
+        REMOVE_CRC_FILES
+    );
+
     @Override
     public List<AllowableValue> getCompressionTypes(final ProcessorInitializationContext context) {
         return ParquetUtils.COMPRESSION_TYPES;
@@ -96,18 +107,7 @@ public class PutParquet extends AbstractPutHDFSRecord {
 
     @Override
     public List<PropertyDescriptor> getAdditionalProperties() {
-        final List<PropertyDescriptor> props = new ArrayList<>();
-        props.add(ParquetUtils.ROW_GROUP_SIZE);
-        props.add(ParquetUtils.PAGE_SIZE);
-        props.add(ParquetUtils.DICTIONARY_PAGE_SIZE);
-        props.add(ParquetUtils.MAX_PADDING_SIZE);
-        props.add(ParquetUtils.ENABLE_DICTIONARY_ENCODING);
-        props.add(ParquetUtils.ENABLE_VALIDATION);
-        props.add(ParquetUtils.WRITER_VERSION);
-        props.add(ParquetUtils.AVRO_WRITE_OLD_LIST_STRUCTURE);
-        props.add(ParquetUtils.AVRO_ADD_LIST_ELEMENT_RECORDS);
-        props.add(REMOVE_CRC_FILES);
-        return Collections.unmodifiableList(props);
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

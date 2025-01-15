@@ -59,7 +59,10 @@ public abstract class GetFileTransfer extends AbstractProcessor {
             .name("success")
             .description("All FlowFiles that are received are routed to success")
             .build();
-    private final Set<Relationship> relationships;
+
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+        REL_SUCCESS
+    );
 
     public static final String FILE_LAST_MODIFY_TIME_ATTRIBUTE = "file.lastModifiedTime";
     public static final String FILE_OWNER_ATTRIBUTE = "file.owner";
@@ -81,15 +84,9 @@ public abstract class GetFileTransfer extends AbstractProcessor {
     private final Lock sharableTransferLock = transferLock.readLock();
     private final Lock mutuallyExclusiveTransferLock = transferLock.writeLock();
 
-    public GetFileTransfer() {
-        final Set<Relationship> relationships = new HashSet<>();
-        relationships.add(REL_SUCCESS);
-        this.relationships = Collections.unmodifiableSet(relationships);
-    }
-
     @Override
     public Set<Relationship> getRelationships() {
-        return relationships;
+        return RELATIONSHIPS;
     }
 
     protected abstract FileTransfer getFileTransfer(final ProcessContext context);

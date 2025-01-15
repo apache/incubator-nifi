@@ -109,7 +109,7 @@ public class DeleteFile extends AbstractProcessor {
             .expressionLanguageSupported(ExpressionLanguageScope.FLOWFILE_ATTRIBUTES)
             .build();
 
-    private final static List<PropertyDescriptor> PROPERTIES = List.of(
+    private final static List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             DIRECTORY_PATH,
             FILENAME
     );
@@ -121,7 +121,7 @@ public class DeleteFile extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

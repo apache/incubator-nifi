@@ -120,7 +120,7 @@ public class DecryptContentAge extends AbstractProcessor implements VerifiablePr
             FAILURE
     );
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             PRIVATE_KEY_SOURCE,
             PRIVATE_KEY_IDENTITIES,
             PRIVATE_KEY_IDENTITY_RESOURCES
@@ -163,7 +163,7 @@ public class DecryptContentAge extends AbstractProcessor implements VerifiablePr
      */
     @Override
     public final List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     /**

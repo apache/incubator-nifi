@@ -20,7 +20,6 @@ import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.processor.util.StandardValidators;
 import org.apache.nifi.websocket.AbstractWebSocketService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractJettyWebSocketService extends AbstractWebSocketService {
@@ -52,11 +51,13 @@ public abstract class AbstractJettyWebSocketService extends AbstractWebSocketSer
             .addValidator(StandardValidators.DATA_SIZE_VALIDATOR)
             .build();
 
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+            INPUT_BUFFER_SIZE,
+            MAX_TEXT_MESSAGE_SIZE,
+            MAX_BINARY_MESSAGE_SIZE
+    );
+
     static List<PropertyDescriptor> getAbstractPropertyDescriptors() {
-        final List<PropertyDescriptor> descriptors = new ArrayList<>();
-        descriptors.add(INPUT_BUFFER_SIZE);
-        descriptors.add(MAX_TEXT_MESSAGE_SIZE);
-        descriptors.add(MAX_BINARY_MESSAGE_SIZE);
-        return descriptors;
+        return PROPERTY_DESCRIPTORS;
     }
 }

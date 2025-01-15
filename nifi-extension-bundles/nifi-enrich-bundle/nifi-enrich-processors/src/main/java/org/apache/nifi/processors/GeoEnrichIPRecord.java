@@ -154,7 +154,7 @@ public class GeoEnrichIPRecord extends AbstractEnrichIP {
             REL_NOT_FOUND
     );
 
-    public static final List<PropertyDescriptor> GEO_PROPERTIES = List.of(
+    public static final List<PropertyDescriptor> GEO_PROPERTY_DESCRIPTORS = List.of(
             GEO_CITY,
             GEO_LATITUDE,
             GEO_LONGITUDE,
@@ -163,7 +163,7 @@ public class GeoEnrichIPRecord extends AbstractEnrichIP {
             GEO_POSTAL_CODE
     );
 
-    private static final List<PropertyDescriptor> DESCRIPTORS = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             GEO_DATABASE_FILE,
             READER,
             WRITER,
@@ -185,7 +185,7 @@ public class GeoEnrichIPRecord extends AbstractEnrichIP {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return DESCRIPTORS;
+        return PROPERTY_DESCRIPTORS;
     }
 
     protected volatile RecordReaderFactory readerFactory;
@@ -234,9 +234,9 @@ public class GeoEnrichIPRecord extends AbstractEnrichIP {
         try (InputStream is = session.read(input);
              OutputStream os = session.write(output);
              OutputStream osNotFound = splitOutput ? session.write(notFound) : null) {
-            RecordPathCache cache = new RecordPathCache(GEO_PROPERTIES.size() + 1);
+            RecordPathCache cache = new RecordPathCache(GEO_PROPERTY_DESCRIPTORS.size() + 1);
             Map<PropertyDescriptor, RecordPath> paths = new HashMap<>();
-            for (PropertyDescriptor descriptor : GEO_PROPERTIES) {
+            for (PropertyDescriptor descriptor : GEO_PROPERTY_DESCRIPTORS) {
                 if (!context.getProperty(descriptor).isSet()) {
                     continue;
                 }

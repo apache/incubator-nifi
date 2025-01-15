@@ -264,7 +264,7 @@ public class DeduplicateRecord extends AbstractProcessor {
             .required(false)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             DEDUPLICATION_STRATEGY,
             DISTRIBUTED_MAP_CACHE,
             CACHE_IDENTIFIER,
@@ -312,7 +312,7 @@ public class DeduplicateRecord extends AbstractProcessor {
 
     @Override
     public final List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

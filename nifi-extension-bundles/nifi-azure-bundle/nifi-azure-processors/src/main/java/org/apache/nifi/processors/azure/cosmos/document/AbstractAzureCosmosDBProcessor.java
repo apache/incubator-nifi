@@ -87,7 +87,7 @@ public abstract class AbstractAzureCosmosDBProcessor extends AbstractProcessor {
         .addValidator(StandardValidators.NON_BLANK_VALIDATOR)
         .build();
 
-    static final List<PropertyDescriptor> descriptors = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             CONNECTION_SERVICE,
             AzureCosmosDBUtils.URI,
             AzureCosmosDBUtils.DB_ACCESS_KEY,
@@ -100,6 +100,10 @@ public abstract class AbstractAzureCosmosDBProcessor extends AbstractProcessor {
     private CosmosClient cosmosClient;
     private CosmosContainer container;
     private AzureCosmosDBConnectionService connectionService;
+
+    protected static List<PropertyDescriptor> getCommonPropertyDescriptors() {
+        return PROPERTY_DESCRIPTORS;
+    }
 
     @OnScheduled
     public void onScheduled(final ProcessContext context) throws CosmosException {

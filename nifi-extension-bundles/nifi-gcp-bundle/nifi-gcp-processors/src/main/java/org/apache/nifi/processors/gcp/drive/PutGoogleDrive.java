@@ -158,7 +158,7 @@ public class PutGoogleDrive extends AbstractProcessor implements GoogleDriveTrai
             .required(false)
             .build();
 
-    public static final List<PropertyDescriptor> PROPERTIES = List.of(
+    public static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             GCP_CREDENTIALS_PROVIDER_SERVICE,
             FOLDER_ID,
             FILE_NAME,
@@ -196,7 +196,7 @@ public class PutGoogleDrive extends AbstractProcessor implements GoogleDriveTrai
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

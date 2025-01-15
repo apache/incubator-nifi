@@ -55,7 +55,7 @@ import java.util.List;
 @SeeAlso(PutSFTP.class)
 public class GetSFTP extends GetFileTransfer {
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             SFTPTransfer.HOSTNAME,
             SFTPTransfer.PORT,
             SFTPTransfer.USERNAME,
@@ -88,7 +88,7 @@ public class GetSFTP extends GetFileTransfer {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

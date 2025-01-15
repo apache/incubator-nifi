@@ -95,7 +95,7 @@ public class ConsumeGCPubSub extends AbstractGCPubSubWithProxyProcessor {
             .expressionLanguageSupported(ExpressionLanguageScope.ENVIRONMENT)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             GCP_CREDENTIALS_PROVIDER_SERVICE,
             PROJECT_ID,
             SUBSCRIPTION,
@@ -115,7 +115,7 @@ public class ConsumeGCPubSub extends AbstractGCPubSubWithProxyProcessor {
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

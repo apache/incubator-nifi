@@ -75,7 +75,7 @@ public abstract class ScriptedRouterProcessor<T> extends ScriptedRecordProcessor
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return DESCRIPTORS;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

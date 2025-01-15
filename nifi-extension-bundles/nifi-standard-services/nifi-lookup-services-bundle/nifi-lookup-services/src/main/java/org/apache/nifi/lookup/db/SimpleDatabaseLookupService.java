@@ -37,8 +37,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -62,17 +60,19 @@ public class SimpleDatabaseLookupService extends AbstractDatabaseLookupService i
                     .expressionLanguageSupported(ExpressionLanguageScope.ENVIRONMENT)
                     .build();
 
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        DBCP_SERVICE,
+        TABLE_NAME,
+        LOOKUP_KEY_COLUMN,
+        LOOKUP_VALUE_COLUMN,
+        CACHE_SIZE,
+        CLEAR_CACHE_ON_ENABLED,
+        CACHE_EXPIRATION
+    );
+
     @Override
     protected void init(final ControllerServiceInitializationContext context) {
-        final List<PropertyDescriptor> properties = new ArrayList<>();
-        properties.add(DBCP_SERVICE);
-        properties.add(TABLE_NAME);
-        properties.add(LOOKUP_KEY_COLUMN);
-        properties.add(LOOKUP_VALUE_COLUMN);
-        properties.add(CACHE_SIZE);
-        properties.add(CLEAR_CACHE_ON_ENABLED);
-        properties.add(CACHE_EXPIRATION);
-        this.properties = Collections.unmodifiableList(properties);
+        this.properties = PROPERTY_DESCRIPTORS;
     }
 
     @OnEnabled

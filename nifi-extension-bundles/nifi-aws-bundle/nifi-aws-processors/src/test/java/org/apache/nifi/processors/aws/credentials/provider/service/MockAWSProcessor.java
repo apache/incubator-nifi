@@ -48,7 +48,7 @@ import static org.apache.nifi.processors.aws.credentials.provider.service.AWSCre
  */
 public class MockAWSProcessor extends AbstractAWSCredentialsProviderProcessor<AmazonS3Client> {
 
-    public static final List<PropertyDescriptor> PROPERTIES = List.of(
+    public static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             USE_DEFAULT_CREDENTIALS,
             PROFILE_NAME,
             USE_ANONYMOUS_CREDENTIALS,
@@ -66,7 +66,7 @@ public class MockAWSProcessor extends AbstractAWSCredentialsProviderProcessor<Am
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

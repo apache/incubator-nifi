@@ -57,9 +57,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSo
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -219,7 +217,7 @@ public class TinkerpopClientService extends AbstractControllerService implements
             .identifiesControllerService(SSLContextProvider.class)
             .build();
 
-    public static final List<PropertyDescriptor> DESCRIPTORS = Collections.unmodifiableList(Arrays.asList(
+    public static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             SUBMISSION_TYPE,
             CONNECTION_SETTINGS,
             REMOTE_OBJECTS_FILE,
@@ -232,7 +230,7 @@ public class TinkerpopClientService extends AbstractControllerService implements
             USER_NAME,
             PASSWORD,
             SSL_CONTEXT_SERVICE
-    ));
+    );
 
     private GroovyShell groovyShell;
     private Map<String, Script> compiledCode;
@@ -298,7 +296,7 @@ public class TinkerpopClientService extends AbstractControllerService implements
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return DESCRIPTORS;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

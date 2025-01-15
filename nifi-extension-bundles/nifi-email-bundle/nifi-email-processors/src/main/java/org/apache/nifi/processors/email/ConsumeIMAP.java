@@ -51,8 +51,8 @@ public class ConsumeIMAP extends AbstractEmailProcessor<ImapMailReceiver> {
             .addValidator(StandardValidators.BOOLEAN_VALIDATOR)
             .build();
 
-    static final List<PropertyDescriptor> DESCRIPTORS = Stream.concat(
-            SHARED_DESCRIPTORS.stream(),
+    static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = Stream.concat(
+            getCommonPropertyDescriptors().stream(),
             Stream.of(
                     SHOULD_MARK_READ,
                     USE_SSL
@@ -75,6 +75,6 @@ public class ConsumeIMAP extends AbstractEmailProcessor<ImapMailReceiver> {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return DESCRIPTORS;
+        return PROPERTY_DESCRIPTORS;
     }
 }

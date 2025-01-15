@@ -41,7 +41,6 @@ import org.apache.nifi.proxy.ProxyConfiguration;
 import org.apache.nifi.reporting.InitializationException;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -73,24 +72,20 @@ import static org.apache.nifi.processors.gcp.credentials.factory.CredentialPrope
 )
 public class GCPCredentialsControllerService extends AbstractControllerService implements GCPCredentialsService, VerifiableControllerService {
 
-    private static final List<PropertyDescriptor> properties;
-
-    static {
-        final List<PropertyDescriptor> props = new ArrayList<>();
-        props.add(USE_APPLICATION_DEFAULT_CREDENTIALS);
-        props.add(USE_COMPUTE_ENGINE_CREDENTIALS);
-        props.add(SERVICE_ACCOUNT_JSON_FILE);
-        props.add(SERVICE_ACCOUNT_JSON);
-        props.add(ProxyConfiguration.createProxyConfigPropertyDescriptor(ProxyAwareTransportFactory.PROXY_SPECS));
-        properties = Collections.unmodifiableList(props);
-    }
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+            USE_APPLICATION_DEFAULT_CREDENTIALS,
+            USE_COMPUTE_ENGINE_CREDENTIALS,
+            SERVICE_ACCOUNT_JSON_FILE,
+            SERVICE_ACCOUNT_JSON,
+            ProxyConfiguration.createProxyConfigPropertyDescriptor(ProxyAwareTransportFactory.PROXY_SPECS)
+    );
 
     private volatile GoogleCredentials googleCredentials;
     protected final CredentialsFactory credentialsProviderFactory = new CredentialsFactory();
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return properties;
+        return PROPERTY_DESCRIPTORS;
     }
 
     public GoogleCredentials getGoogleCredentials() throws ProcessException {

@@ -57,7 +57,6 @@ import java.io.InputStream;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -68,6 +67,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 @TriggerWhenEmpty
 @InputRequirement(Requirement.INPUT_FORBIDDEN)
@@ -178,11 +178,27 @@ public class GetHDFS extends AbstractHadoopProcessor {
     .addValidator(StandardValidators.DATA_SIZE_VALIDATOR)
     .build();
 
-    private static final Set<Relationship> relationships;
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+            REL_SUCCESS
+    );
 
-    static {
-        relationships = Collections.singleton(REL_SUCCESS);
-    }
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = Stream.concat(
+            getCommonPropertyDescriptors().stream(),
+            Stream.of(
+                    DIRECTORY,
+                    RECURSE_SUBDIRS,
+                    KEEP_SOURCE_FILE,
+                    FILE_FILTER_REGEX,
+                    FILTER_MATCH_NAME_ONLY,
+                    IGNORE_DOTTED_FILES,
+                    MIN_AGE,
+                    MAX_AGE,
+                    POLLING_INTERVAL,
+                    BATCH_SIZE,
+                    BUFFER_SIZE,
+                    COMPRESSION_CODEC
+            )
+    ).toList();
 
     protected ProcessorConfiguration processorConfig;
     private final AtomicLong logEmptyListing = new AtomicLong(2L);
@@ -196,25 +212,12 @@ public class GetHDFS extends AbstractHadoopProcessor {
 
     @Override
     public Set<Relationship> getRelationships() {
-        return relationships;
+        return RELATIONSHIPS;
     }
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        List<PropertyDescriptor> props = new ArrayList<>(properties);
-        props.add(DIRECTORY);
-        props.add(RECURSE_SUBDIRS);
-        props.add(KEEP_SOURCE_FILE);
-        props.add(FILE_FILTER_REGEX);
-        props.add(FILTER_MATCH_NAME_ONLY);
-        props.add(IGNORE_DOTTED_FILES);
-        props.add(MIN_AGE);
-        props.add(MAX_AGE);
-        props.add(POLLING_INTERVAL);
-        props.add(BATCH_SIZE);
-        props.add(BUFFER_SIZE);
-        props.add(COMPRESSION_CODEC);
-        return props;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

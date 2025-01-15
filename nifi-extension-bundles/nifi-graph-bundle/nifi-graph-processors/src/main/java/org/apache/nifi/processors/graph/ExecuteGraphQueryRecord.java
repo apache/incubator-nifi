@@ -51,9 +51,7 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -120,10 +118,6 @@ public class ExecuteGraphQueryRecord extends  AbstractGraphExecutor {
                 .dynamic(true).addValidator(StandardValidators.NON_EMPTY_VALIDATOR).build();
     }
 
-    public static final List<PropertyDescriptor> DESCRIPTORS = Collections.unmodifiableList(Arrays.asList(
-            CLIENT_SERVICE, READER_SERVICE, WRITER_SERVICE, SUBMISSION_SCRIPT
-    ));
-
     public static final Relationship SUCCESS = new Relationship.Builder().name("original")
                                                     .description("Original flow files that successfully interacted with " +
                                                             "graph server.")
@@ -136,9 +130,18 @@ public class ExecuteGraphQueryRecord extends  AbstractGraphExecutor {
                                                     .autoTerminateDefault(true)
                                                     .build();
 
-    public static final Set<Relationship> RELATIONSHIPS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-            SUCCESS, FAILURE, GRAPH
-    )));
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+            CLIENT_SERVICE,
+            READER_SERVICE,
+            WRITER_SERVICE,
+            SUBMISSION_SCRIPT
+    );
+
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+            SUCCESS,
+            FAILURE,
+            GRAPH
+    );
 
     public static final String RECORD_COUNT = "record.count";
     public static final String GRAPH_OPERATION_TIME = "graph.operations.took";
@@ -151,7 +154,7 @@ public class ExecuteGraphQueryRecord extends  AbstractGraphExecutor {
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return DESCRIPTORS;
+        return PROPERTY_DESCRIPTORS;
     }
 
     private GraphClientService clientService;

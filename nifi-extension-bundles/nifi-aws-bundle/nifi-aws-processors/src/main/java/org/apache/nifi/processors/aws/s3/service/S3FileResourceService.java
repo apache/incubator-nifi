@@ -78,7 +78,7 @@ public class S3FileResourceService extends AbstractControllerService implements 
             .fromPropertyDescriptor(RegionUtilV1.S3_REGION)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             BUCKET_WITH_DEFAULT_VALUE,
             KEY,
             S3_REGION,
@@ -90,7 +90,7 @@ public class S3FileResourceService extends AbstractControllerService implements 
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnEnabled

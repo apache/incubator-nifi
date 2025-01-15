@@ -99,7 +99,7 @@ public class JndiJmsConnectionFactoryProperties {
             .sensitive(true)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = Arrays.asList(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             JndiJmsConnectionFactoryProperties.JNDI_INITIAL_CONTEXT_FACTORY,
             JndiJmsConnectionFactoryProperties.JNDI_PROVIDER_URL,
             JndiJmsConnectionFactoryProperties.JNDI_CONNECTION_FACTORY_NAME,

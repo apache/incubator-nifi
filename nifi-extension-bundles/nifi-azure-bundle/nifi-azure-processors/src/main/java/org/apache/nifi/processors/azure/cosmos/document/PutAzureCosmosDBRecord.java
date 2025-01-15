@@ -97,9 +97,13 @@ public class PutAzureCosmosDBRecord extends AbstractAzureCosmosDBProcessor {
             REL_FAILURE
     );
 
-    private final static List<PropertyDescriptor> PROPERTIES = Stream.concat(
-            descriptors.stream(),
-            Stream.of(RECORD_READER_FACTORY, INSERT_BATCH_SIZE, CONFLICT_HANDLE_STRATEGY)
+    private final static List<PropertyDescriptor> PROPERTY_DESCRIPTORS = Stream.concat(
+            getCommonPropertyDescriptors().stream(),
+            Stream.of(
+                    RECORD_READER_FACTORY,
+                    INSERT_BATCH_SIZE,
+                    CONFLICT_HANDLE_STRATEGY
+            )
     ).toList();
 
     @Override
@@ -109,7 +113,7 @@ public class PutAzureCosmosDBRecord extends AbstractAzureCosmosDBProcessor {
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     protected void bulkInsert(final List<Map<String, Object>> records) throws CosmosException {

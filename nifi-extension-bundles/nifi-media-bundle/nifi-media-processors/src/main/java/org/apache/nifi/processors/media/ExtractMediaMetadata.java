@@ -18,10 +18,7 @@ package org.apache.nifi.processors.media;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,7 +40,6 @@ import org.apache.nifi.logging.ComponentLog;
 import org.apache.nifi.processor.AbstractProcessor;
 import org.apache.nifi.processor.ProcessContext;
 import org.apache.nifi.processor.ProcessSession;
-import org.apache.nifi.processor.ProcessorInitializationContext;
 import org.apache.nifi.processor.Relationship;
 import org.apache.nifi.processor.exception.ProcessException;
 import org.apache.nifi.processor.util.StandardValidators;
@@ -119,37 +115,30 @@ public class ExtractMediaMetadata extends AbstractProcessor {
             .description("Any FlowFile that fails to have media metadata extracted will be routed to failure")
             .build();
 
-    private Set<Relationship> relationships;
-    private List<PropertyDescriptor> properties;
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        MAX_NUMBER_OF_ATTRIBUTES,
+        MAX_ATTRIBUTE_LENGTH,
+        METADATA_KEY_FILTER,
+        METADATA_KEY_PREFIX
+    );
+
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+            SUCCESS,
+            FAILURE
+    );
 
     private final AtomicReference<Pattern> metadataKeyFilterRef = new AtomicReference<>();
 
     private volatile AutoDetectParser autoDetectParser;
 
     @Override
-    protected void init(final ProcessorInitializationContext context) {
-
-        final List<PropertyDescriptor> properties = new ArrayList<>();
-        properties.add(MAX_NUMBER_OF_ATTRIBUTES);
-        properties.add(MAX_ATTRIBUTE_LENGTH);
-        properties.add(METADATA_KEY_FILTER);
-        properties.add(METADATA_KEY_PREFIX);
-        this.properties = Collections.unmodifiableList(properties);
-
-        final Set<Relationship> relationships = new HashSet<>();
-        relationships.add(SUCCESS);
-        relationships.add(FAILURE);
-        this.relationships = Collections.unmodifiableSet(relationships);
-    }
-
-    @Override
     public Set<Relationship> getRelationships() {
-        return this.relationships;
+        return RELATIONSHIPS;
     }
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return this.properties;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @SuppressWarnings("unused")

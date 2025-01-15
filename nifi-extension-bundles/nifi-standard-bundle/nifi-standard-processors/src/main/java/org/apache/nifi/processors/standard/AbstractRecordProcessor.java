@@ -78,17 +78,24 @@ public abstract class AbstractRecordProcessor extends AbstractProcessor {
             + "the unchanged FlowFile will be routed to this relationship")
         .build();
 
-    private static final List<PropertyDescriptor> properties = List.of(RECORD_READER, RECORD_WRITER);
-    private static final Set<Relationship> relationships = Set.of(REL_SUCCESS, REL_FAILURE);
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+            RECORD_READER,
+            RECORD_WRITER
+    );
+
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+            REL_SUCCESS,
+            REL_FAILURE
+    );
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return properties;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override
     public Set<Relationship> getRelationships() {
-        return relationships;
+        return RELATIONSHIPS;
     }
 
     @Override

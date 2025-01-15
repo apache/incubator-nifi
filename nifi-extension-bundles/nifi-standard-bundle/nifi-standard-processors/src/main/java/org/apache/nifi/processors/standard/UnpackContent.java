@@ -206,7 +206,7 @@ public class UnpackContent extends AbstractProcessor {
             .addValidator(StandardValidators.BOOLEAN_VALIDATOR)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             PACKAGING_FORMAT,
             ZIP_FILENAME_CHARSET,
             FILE_FILTER,
@@ -245,7 +245,7 @@ public class UnpackContent extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnStopped

@@ -149,7 +149,7 @@ public class EvaluateXQuery extends AbstractProcessor {
             .defaultValue("false")
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             DESTINATION,
             XML_OUTPUT_METHOD,
             XML_OUTPUT_OMIT_XML_DECLARATION,
@@ -208,7 +208,7 @@ public class EvaluateXQuery extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

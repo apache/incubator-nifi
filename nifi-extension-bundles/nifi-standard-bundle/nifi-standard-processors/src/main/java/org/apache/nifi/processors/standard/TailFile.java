@@ -294,7 +294,7 @@ public class TailFile extends AbstractProcessor {
             .defaultValue("65536 B")
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             MODE,
             FILENAME,
             ROLLING_FILENAME_PATTERN,
@@ -316,7 +316,9 @@ public class TailFile extends AbstractProcessor {
             .description("All FlowFiles are routed to this Relationship.")
             .build();
 
-    private static final Set<Relationship> RELATIONSHIPS = Set.of(REL_SUCCESS);
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+        REL_SUCCESS
+    );
 
     private volatile Map<String, TailFileObject> states = new HashMap<>();
     private final AtomicLong lastLookup = new AtomicLong(0L);
@@ -330,7 +332,7 @@ public class TailFile extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

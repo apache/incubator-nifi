@@ -40,8 +40,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
@@ -84,11 +82,11 @@ public class DatabaseTableSchemaRegistry extends AbstractControllerService imple
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .build();
 
-    protected List<PropertyDescriptor> propDescriptors = Collections.unmodifiableList(Arrays.asList(
-            DBCP_SERVICE,
-            CATALOG_NAME,
-            SCHEMA_NAME
-    ));
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        DBCP_SERVICE,
+        CATALOG_NAME,
+        SCHEMA_NAME
+    );
 
     private volatile DBCPService dbcpService;
     private volatile String dbCatalogName;
@@ -96,7 +94,7 @@ public class DatabaseTableSchemaRegistry extends AbstractControllerService imple
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return propDescriptors;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnEnabled

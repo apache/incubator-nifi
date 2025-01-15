@@ -142,7 +142,7 @@ public class SnowflakeComputingConnectionPool extends AbstractDBCPConnectionPool
             .expressionLanguageSupported(ExpressionLanguageScope.ENVIRONMENT)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             CONNECTION_URL_FORMAT,
             SNOWFLAKE_URL,
             SNOWFLAKE_ACCOUNT_LOCATOR,
@@ -169,7 +169,7 @@ public class SnowflakeComputingConnectionPool extends AbstractDBCPConnectionPool
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

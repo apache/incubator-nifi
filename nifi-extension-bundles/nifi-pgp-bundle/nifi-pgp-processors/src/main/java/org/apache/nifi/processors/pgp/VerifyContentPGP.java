@@ -99,7 +99,7 @@ public class VerifyContentPGP extends AbstractProcessor {
             FAILURE
     );
 
-    private static final List<PropertyDescriptor> DESCRIPTORS = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             PUBLIC_KEY_SERVICE
     );
 
@@ -124,7 +124,7 @@ public class VerifyContentPGP extends AbstractProcessor {
      */
     @Override
     public final List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return DESCRIPTORS;
+        return PROPERTY_DESCRIPTORS;
     }
 
     /**

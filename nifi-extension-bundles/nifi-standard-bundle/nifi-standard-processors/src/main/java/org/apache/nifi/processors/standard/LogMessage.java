@@ -75,10 +75,10 @@ public class LogMessage extends AbstractProcessor {
             .expressionLanguageSupported(ExpressionLanguageScope.FLOWFILE_ATTRIBUTES)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
-            LOG_LEVEL,
-            LOG_PREFIX,
-            LOG_MESSAGE
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        LOG_LEVEL,
+        LOG_PREFIX,
+        LOG_MESSAGE
     );
 
     public static final Relationship REL_SUCCESS = new Relationship.Builder()
@@ -86,7 +86,9 @@ public class LogMessage extends AbstractProcessor {
             .description("All FlowFiles are routed to this relationship")
             .build();
 
-    private static final Set<Relationship> RELATIONSHIPS = Set.of(REL_SUCCESS);
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+        REL_SUCCESS
+    );
 
     enum MessageLogLevel {
         trace, debug, info, warn, error
@@ -99,7 +101,7 @@ public class LogMessage extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

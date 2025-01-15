@@ -117,7 +117,7 @@ public class ReplaceTextWithMapping extends AbstractProcessor {
             .defaultValue("1 MB")
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             REGEX,
             MATCHING_GROUP_FOR_LOOKUP_KEY,
             MAPPING_FILE,
@@ -168,7 +168,7 @@ public class ReplaceTextWithMapping extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

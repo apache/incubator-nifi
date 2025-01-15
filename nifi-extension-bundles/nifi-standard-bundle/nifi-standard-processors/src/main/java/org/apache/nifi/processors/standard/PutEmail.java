@@ -296,7 +296,7 @@ public class PutEmail extends AbstractProcessor {
             .defaultValue(StandardCharsets.UTF_8.name())
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             SMTP_HOSTNAME,
             SMTP_PORT,
             AUTHORIZATION_MODE,
@@ -357,7 +357,7 @@ public class PutEmail extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

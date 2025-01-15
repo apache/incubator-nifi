@@ -142,8 +142,8 @@ public class PutMongoRecord extends AbstractMongoProcessor {
             REL_FAILURE
     );
 
-    private final static List<PropertyDescriptor> PROPERTIES = Stream.concat(
-            AbstractMongoProcessor.DESCRIPTORS.stream(),
+    private final static List<PropertyDescriptor> PROPERTY_DESCRIPTORS = Stream.concat(
+            getCommonPropertyDescriptors().stream(),
             Stream.of(
                     RECORD_READER_FACTORY,
                     INSERT_COUNT,
@@ -161,7 +161,7 @@ public class PutMongoRecord extends AbstractMongoProcessor {
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

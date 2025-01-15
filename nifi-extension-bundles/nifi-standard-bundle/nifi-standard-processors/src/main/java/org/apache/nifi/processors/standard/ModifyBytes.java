@@ -52,7 +52,10 @@ public class ModifyBytes extends AbstractProcessor {
             .name("success")
             .description("Processed flowfiles.")
             .build();
-    private static final Set<Relationship> RELATIONSHIPS = Set.of(REL_SUCCESS);
+
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+            REL_SUCCESS
+    );
 
     public static final PropertyDescriptor START_OFFSET = new PropertyDescriptor.Builder()
             .name("Start Offset")
@@ -80,7 +83,8 @@ public class ModifyBytes extends AbstractProcessor {
             .allowableValues("true", "false")
             .defaultValue("false")
             .build();
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             START_OFFSET,
             END_OFFSET,
             REMOVE_ALL
@@ -93,7 +97,7 @@ public class ModifyBytes extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

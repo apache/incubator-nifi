@@ -143,7 +143,7 @@ public class ListDropbox extends AbstractListProcessor<DropboxFileInfo> implemen
             .dependsOn(LISTING_STRATEGY, BY_ENTITIES)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             CREDENTIAL_SERVICE,
             FOLDER,
             RECURSIVE_SEARCH,
@@ -165,7 +165,7 @@ public class ListDropbox extends AbstractListProcessor<DropboxFileInfo> implemen
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

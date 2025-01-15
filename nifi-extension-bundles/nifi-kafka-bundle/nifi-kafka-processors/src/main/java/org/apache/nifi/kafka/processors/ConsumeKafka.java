@@ -276,7 +276,7 @@ public class ConsumeKafka extends AbstractProcessor implements VerifiableProcess
             .description("If configured to use a Record Reader, a Kafka message that cannot be parsed using the configured Record Reader will be routed to this relationship")
             .build();
 
-    private static final List<PropertyDescriptor> DESCRIPTORS = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             CONNECTION_SERVICE,
             GROUP_ID,
             TOPIC_FORMAT,
@@ -313,7 +313,7 @@ public class ConsumeKafka extends AbstractProcessor implements VerifiableProcess
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return DESCRIPTORS;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

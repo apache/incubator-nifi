@@ -117,11 +117,11 @@ public class QuerySplunkIndexingStatus extends SplunkAPICall {
             .addValidator(StandardValidators.POSITIVE_INTEGER_VALIDATOR)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = Stream.concat(
-            SplunkAPICall.PROPERTIES.stream(),
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = Stream.concat(
+            getCommonPropertyDescriptors().stream(),
             Stream.of(
-                    TTL,
-                    MAX_QUERY_SIZE
+                TTL,
+                MAX_QUERY_SIZE
             )
     ).toList();
 
@@ -130,7 +130,7 @@ public class QuerySplunkIndexingStatus extends SplunkAPICall {
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

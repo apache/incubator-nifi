@@ -25,7 +25,6 @@ import org.apache.nifi.controller.AbstractControllerService;
 import org.apache.nifi.controller.ConfigurationContext;
 import org.apache.nifi.processor.util.StandardValidators;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -69,13 +68,13 @@ public class StandardSleepService extends AbstractControllerService implements S
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        final List<PropertyDescriptor> properties = new ArrayList<>();
-        properties.add(VALIDATE_SLEEP_TIME);
-        properties.add(ON_ENABLED_SLEEP_TIME);
-        properties.add(TRIGGER_SLEEP_TIME);
-        properties.add(ON_DISABLED_SLEEP_TIME);
-        properties.add(DEPENDENT_SERVICE);
-        return properties;
+        return List.of(
+            VALIDATE_SLEEP_TIME,
+            ON_ENABLED_SLEEP_TIME,
+            TRIGGER_SLEEP_TIME,
+            ON_DISABLED_SLEEP_TIME,
+            DEPENDENT_SERVICE
+        );
     }
 
     @Override

@@ -21,12 +21,12 @@ import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
@@ -230,6 +230,29 @@ public class GetHDFSFileInfo extends AbstractHadoopProcessor {
             .description("All failed attempts to access HDFS will be routed to this relationship")
             .build();
 
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = Stream.concat(
+            getCommonPropertyDescriptors().stream(),
+            Stream.of(
+                FULL_PATH,
+                RECURSE_SUBDIRS,
+                DIR_FILTER,
+                FILE_FILTER,
+                FILE_EXCLUDE_FILTER,
+                IGNORE_DOTTED_DIRS,
+                IGNORE_DOTTED_FILES,
+                GROUPING,
+                BATCH_SIZE,
+                DESTINATION
+            )
+    ).toList();
+
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+            REL_SUCCESS,
+            REL_NOT_FOUND,
+            REL_ORIGINAL,
+            REL_FAILURE
+    );
+
     @Override
     protected void init(final ProcessorInitializationContext context) {
         super.init(context);
@@ -237,28 +260,12 @@ public class GetHDFSFileInfo extends AbstractHadoopProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        final List<PropertyDescriptor> props = new ArrayList<>(properties);
-        props.add(FULL_PATH);
-        props.add(RECURSE_SUBDIRS);
-        props.add(DIR_FILTER);
-        props.add(FILE_FILTER);
-        props.add(FILE_EXCLUDE_FILTER);
-        props.add(IGNORE_DOTTED_DIRS);
-        props.add(IGNORE_DOTTED_FILES);
-        props.add(GROUPING);
-        props.add(BATCH_SIZE);
-        props.add(DESTINATION);
-        return props;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override
     public Set<Relationship> getRelationships() {
-        final Set<Relationship> relationships = new HashSet<>();
-        relationships.add(REL_SUCCESS);
-        relationships.add(REL_NOT_FOUND);
-        relationships.add(REL_ORIGINAL);
-        relationships.add(REL_FAILURE);
-        return relationships;
+        return RELATIONSHIPS;
     }
 
     @Override

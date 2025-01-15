@@ -48,7 +48,6 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -84,7 +83,7 @@ public class StandardPGPPublicKeyService extends AbstractControllerService imple
 
     private static final boolean PARALLEL_DISABLED = false;
 
-    private static final List<PropertyDescriptor> DESCRIPTORS = Arrays.asList(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             KEYRING_FILE,
             KEYRING
     );
@@ -135,7 +134,7 @@ public class StandardPGPPublicKeyService extends AbstractControllerService imple
      */
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return DESCRIPTORS;
+        return PROPERTY_DESCRIPTORS;
     }
 
     /**

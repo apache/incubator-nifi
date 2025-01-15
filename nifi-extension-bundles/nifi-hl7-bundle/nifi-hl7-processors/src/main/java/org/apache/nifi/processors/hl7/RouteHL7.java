@@ -90,7 +90,7 @@ public class RouteHL7 extends AbstractProcessor {
             .description("The original FlowFile that comes into this processor will be routed to this relationship, unless it is routed to 'failure'")
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             CHARACTER_SET
     );
 
@@ -114,7 +114,7 @@ public class RouteHL7 extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

@@ -123,7 +123,7 @@ public class PutRedisHashRecord extends AbstractProcessor {
             .description("FlowFiles containing Records with processing errors will be routed to this relationship")
             .build();
 
-    static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             RECORD_READER_FACTORY,
             REDIS_CONNECTION_POOL,
             HASH_VALUE_RECORD_PATH,
@@ -138,7 +138,7 @@ public class PutRedisHashRecord extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

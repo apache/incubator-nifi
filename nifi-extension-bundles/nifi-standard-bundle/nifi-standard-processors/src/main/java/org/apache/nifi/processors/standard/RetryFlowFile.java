@@ -140,7 +140,7 @@ public class RetryFlowFile extends AbstractProcessor {
             .defaultValue(FAIL_ON_REUSE.getValue())
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             RETRY_ATTRIBUTE,
             MAXIMUM_RETRIES,
             PENALIZE_RETRIED,
@@ -199,7 +199,7 @@ public class RetryFlowFile extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnScheduled

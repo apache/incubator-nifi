@@ -154,7 +154,7 @@ public class ExtractGrok extends AbstractProcessor {
         .defaultValue("false")
         .build();
 
-    private final static List<PropertyDescriptor> PROPERTIES = List.of(
+    private final static List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             GROK_EXPRESSION,
             GROK_PATTERNS,
             DESTINATION,
@@ -191,7 +191,7 @@ public class ExtractGrok extends AbstractProcessor {
 
     @Override
     public final List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnStopped

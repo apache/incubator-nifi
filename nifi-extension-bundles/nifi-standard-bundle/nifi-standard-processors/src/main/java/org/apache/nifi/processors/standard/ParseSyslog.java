@@ -74,7 +74,9 @@ public class ParseSyslog extends AbstractProcessor {
         .addValidator(StandardValidators.CHARACTER_SET_VALIDATOR)
         .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(CHARSET);
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        CHARSET
+    );
 
     static final Relationship REL_FAILURE = new Relationship.Builder()
         .name("failure")
@@ -94,7 +96,7 @@ public class ParseSyslog extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

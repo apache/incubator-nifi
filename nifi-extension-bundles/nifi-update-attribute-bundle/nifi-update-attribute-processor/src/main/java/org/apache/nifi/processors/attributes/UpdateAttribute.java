@@ -231,7 +231,7 @@ public class UpdateAttribute extends AbstractProcessor implements Searchable {
             .required(true)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             DELETE_ATTRIBUTES,
             STORE_STATE,
             STATEFUL_VARIABLES_INIT_VALUE,
@@ -254,7 +254,7 @@ public class UpdateAttribute extends AbstractProcessor implements Searchable {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

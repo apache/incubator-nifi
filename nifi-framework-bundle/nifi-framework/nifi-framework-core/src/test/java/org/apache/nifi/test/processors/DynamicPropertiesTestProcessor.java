@@ -30,7 +30,6 @@ import org.apache.nifi.processor.util.StandardValidators;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -59,9 +58,9 @@ public class DynamicPropertiesTestProcessor extends AbstractProcessor {
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .build();
 
-    public static final List<PropertyDescriptor> PROPERTIES = Collections.unmodifiableList(Arrays.asList(
-            STATIC_PROPERTY
-    ));
+    public static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        STATIC_PROPERTY
+    );
 
     private ProcessorNode processorNode;
 
@@ -88,7 +87,7 @@ public class DynamicPropertiesTestProcessor extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

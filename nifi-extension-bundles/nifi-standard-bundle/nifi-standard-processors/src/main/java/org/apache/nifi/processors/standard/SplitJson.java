@@ -89,7 +89,7 @@ public class SplitJson extends AbstractJsonPathProcessor {
             .required(true)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             ARRAY_JSON_PATH_EXPRESSION,
             NULL_VALUE_DEFAULT_REPRESENTATION,
             MAX_STRING_LENGTH
@@ -127,7 +127,7 @@ public class SplitJson extends AbstractJsonPathProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

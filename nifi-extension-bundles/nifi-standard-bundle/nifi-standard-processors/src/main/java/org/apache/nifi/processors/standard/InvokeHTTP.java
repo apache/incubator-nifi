@@ -483,7 +483,7 @@ public class InvokeHTTP extends AbstractProcessor {
 
     private static final PropertyDescriptor PROXY_CONFIGURATION_SERVICE = ProxyConfiguration.createProxyConfigPropertyDescriptor(PROXY_SPECS);
 
-    public static final List<PropertyDescriptor> PROPERTIES = List.of(
+    public static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             HTTP_METHOD,
             HTTP_URL,
             HTTP2_DISABLED,
@@ -571,7 +571,7 @@ public class InvokeHTTP extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

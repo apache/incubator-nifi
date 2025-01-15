@@ -55,7 +55,6 @@ import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -147,14 +146,13 @@ public abstract class AbstractPutHDFSRecord extends AbstractHadoopProcessor {
     @Override
     protected final void init(final ProcessorInitializationContext context) {
         super.init(context);
+        this.putHdfsRecordRelationships = Set.of(
+                REL_SUCCESS,
+                REL_RETRY,
+                REL_FAILURE
+        );
 
-        final Set<Relationship> rels = new HashSet<>();
-        rels.add(REL_SUCCESS);
-        rels.add(REL_RETRY);
-        rels.add(REL_FAILURE);
-        this.putHdfsRecordRelationships = Collections.unmodifiableSet(rels);
-
-        final List<PropertyDescriptor> props = new ArrayList<>(properties);
+        final List<PropertyDescriptor> props = new ArrayList<>(getCommonPropertyDescriptors());
         props.add(RECORD_READER);
 
         props.add(new PropertyDescriptor.Builder()

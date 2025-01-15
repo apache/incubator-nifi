@@ -118,7 +118,7 @@ public class FetchSmb extends AbstractProcessor {
             REL_FAILURE
     );
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             SMB_CLIENT_PROVIDER_SERVICE,
             REMOTE_FILE,
             COMPLETION_STRATEGY,
@@ -135,7 +135,7 @@ public class FetchSmb extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

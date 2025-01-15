@@ -182,7 +182,7 @@ public class GetHubSpot extends AbstractProcessor {
     private volatile WebClientServiceProvider webClientServiceProvider;
     private volatile boolean isObjectTypeModified;
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             OBJECT_TYPE,
             ACCESS_TOKEN,
             RESULT_LIMIT,
@@ -198,7 +198,7 @@ public class GetHubSpot extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

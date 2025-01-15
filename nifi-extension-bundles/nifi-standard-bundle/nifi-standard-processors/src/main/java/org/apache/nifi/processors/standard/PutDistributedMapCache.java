@@ -105,7 +105,7 @@ public class PutDistributedMapCache extends AbstractProcessor {
         .expressionLanguageSupported(ExpressionLanguageScope.NONE)
         .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             CACHE_ENTRY_IDENTIFIER,
             DISTRIBUTED_CACHE_SERVICE,
             CACHE_UPDATE_STRATEGY,
@@ -133,7 +133,7 @@ public class PutDistributedMapCache extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

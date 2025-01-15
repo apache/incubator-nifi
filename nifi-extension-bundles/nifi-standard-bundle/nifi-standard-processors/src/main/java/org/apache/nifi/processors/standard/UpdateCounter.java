@@ -60,7 +60,7 @@ public class UpdateCounter extends AbstractProcessor {
             .expressionLanguageSupported(ExpressionLanguageScope.FLOWFILE_ATTRIBUTES)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             COUNTER_NAME,
             DELTA
     );
@@ -70,7 +70,9 @@ public class UpdateCounter extends AbstractProcessor {
             .description("Counter was updated/retrieved")
             .build();
 
-    private static final Set<Relationship> RELATIONSHIPS = Set.of(SUCCESS);
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+            SUCCESS
+    );
 
     @Override
     public Set<Relationship> getRelationships() {
@@ -79,7 +81,7 @@ public class UpdateCounter extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

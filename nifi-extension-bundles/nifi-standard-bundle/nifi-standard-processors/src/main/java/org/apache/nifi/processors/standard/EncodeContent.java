@@ -101,7 +101,7 @@ public class EncodeContent extends AbstractProcessor {
             .dependsOn(LINE_OUTPUT_MODE, LineOutputMode.MULTIPLE_LINES)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             MODE,
             ENCODING,
             LINE_OUTPUT_MODE,
@@ -134,7 +134,7 @@ public class EncodeContent extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

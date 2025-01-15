@@ -312,7 +312,7 @@ public class ConsumeAzureEventHub extends AbstractSessionFactoryProcessor implem
             REL_PARSE_FAILURE
     );
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             NAMESPACE,
             EVENT_HUB_NAME,
             SERVICE_BUS_ENDPOINT,
@@ -347,7 +347,7 @@ public class ConsumeAzureEventHub extends AbstractSessionFactoryProcessor implem
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

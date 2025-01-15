@@ -125,7 +125,7 @@ public class PutWebSocket extends AbstractProcessor {
             .description("FlowFiles that failed to send to the destination are transferred to this relationship.")
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             PROP_WS_SESSION_ID,
             PROP_WS_CONTROLLER_SERVICE_ID,
             PROP_WS_CONTROLLER_SERVICE_ENDPOINT,
@@ -144,7 +144,7 @@ public class PutWebSocket extends AbstractProcessor {
 
     @Override
     public final List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

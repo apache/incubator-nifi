@@ -80,7 +80,7 @@ abstract class ScriptedRecordProcessor extends AbstractProcessor implements Sear
             .required(true)
             .build();
 
-    protected static final List<PropertyDescriptor> DESCRIPTORS = List.of(
+    protected static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             RECORD_READER,
             RECORD_WRITER,
             LANGUAGE,

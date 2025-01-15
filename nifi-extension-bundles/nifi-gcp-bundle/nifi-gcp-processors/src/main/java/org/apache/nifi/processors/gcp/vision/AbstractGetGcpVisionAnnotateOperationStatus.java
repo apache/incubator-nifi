@@ -57,12 +57,12 @@ abstract public class AbstractGetGcpVisionAnnotateOperationStatus extends Abstra
             .description("Upon successful completion, the original FlowFile will be routed to this relationship.")
             .autoTerminateDefault(true)
             .build();
-    private static final List<PropertyDescriptor> PROPERTIES = Stream.concat(
-            COMMON_PROPERTIES.stream(),
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = Stream.concat(
+            getCommonPropertyDescriptors().stream(),
             Stream.of(OPERATION_KEY)
     ).toList();
 
-    private static final Set<Relationship> COMMON_RELATIONSHIPS = Set.of(
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
             REL_ORIGINAL,
             REL_SUCCESS,
             REL_FAILURE,
@@ -71,12 +71,12 @@ abstract public class AbstractGetGcpVisionAnnotateOperationStatus extends Abstra
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override
     public Set<Relationship> getRelationships() {
-        return COMMON_RELATIONSHIPS;
+        return RELATIONSHIPS;
     }
 
     @Override

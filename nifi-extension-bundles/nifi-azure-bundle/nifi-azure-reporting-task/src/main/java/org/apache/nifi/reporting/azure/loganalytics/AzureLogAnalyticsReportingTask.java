@@ -58,7 +58,7 @@ public class AzureLogAnalyticsReportingTask extends AbstractAzureLogAnalyticsRep
             .defaultValue("nifimetrics").addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .expressionLanguageSupported(ExpressionLanguageScope.ENVIRONMENT).build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             SEND_JVM_METRICS,
             LOG_ANALYTICS_WORKSPACE_ID,
             LOG_ANALYTICS_CUSTOM_LOG_NAME,
@@ -72,7 +72,7 @@ public class AzureLogAnalyticsReportingTask extends AbstractAzureLogAnalyticsRep
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

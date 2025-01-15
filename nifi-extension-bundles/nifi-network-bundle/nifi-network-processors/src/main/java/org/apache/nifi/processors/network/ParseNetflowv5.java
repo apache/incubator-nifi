@@ -84,7 +84,7 @@ public class ParseNetflowv5 extends AbstractProcessor {
     public static final Relationship REL_SUCCESS = new Relationship.Builder().name("success")
             .description("Any FlowFile that is successfully parsed as a netflowv5 data will be transferred to this Relationship.").build();
 
-    public static final List<PropertyDescriptor> PROPERTIES = List.of(
+    public static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             FIELDS_DESTINATION
     );
 
@@ -101,7 +101,7 @@ public class ParseNetflowv5 extends AbstractProcessor {
 
     @Override
     public final List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnScheduled

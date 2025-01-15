@@ -91,7 +91,7 @@ public class PutSalesforceObject extends AbstractProcessor {
             .description("For FlowFiles created as a result of an execution error.")
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             SALESFORCE_INSTANCE_URL,
             API_VERSION,
             READ_TIMEOUT,
@@ -109,7 +109,7 @@ public class PutSalesforceObject extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

@@ -97,8 +97,8 @@ public class PutMongoBulkOperations extends AbstractMongoProcessor {
             REL_FAILURE
     );
 
-    private final static List<PropertyDescriptor> PROPERTIES = Stream.concat(
-            AbstractMongoProcessor.DESCRIPTORS.stream(),
+    private final static List<PropertyDescriptor> PROPERTY_DESCRIPTORS = Stream.concat(
+            getCommonPropertyDescriptors().stream(),
             Stream.of(ORDERED, CHARACTER_SET)
     ).toList();
 
@@ -109,7 +109,7 @@ public class PutMongoBulkOperations extends AbstractMongoProcessor {
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

@@ -50,7 +50,6 @@ import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -109,13 +108,13 @@ public abstract class AbstractFetchHDFSRecord extends AbstractHadoopProcessor {
     protected final void init(final ProcessorInitializationContext context) {
         super.init(context);
 
-        final Set<Relationship> rels = new HashSet<>();
-        rels.add(REL_SUCCESS);
-        rels.add(REL_RETRY);
-        rels.add(REL_FAILURE);
-        this.fetchHdfsRecordRelationships = Collections.unmodifiableSet(rels);
+        this.fetchHdfsRecordRelationships = Set.of(
+                REL_SUCCESS,
+                REL_RETRY,
+                REL_FAILURE
+        );
 
-        final List<PropertyDescriptor> props = new ArrayList<>(properties);
+        final List<PropertyDescriptor> props = new ArrayList<>(getCommonPropertyDescriptors());
         props.add(FILENAME);
         props.add(RECORD_WRITER);
         props.addAll(getAdditionalProperties());

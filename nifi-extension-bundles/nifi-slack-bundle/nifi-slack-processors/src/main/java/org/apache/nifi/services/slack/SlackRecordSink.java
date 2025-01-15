@@ -36,8 +36,6 @@ import org.apache.nifi.web.client.provider.api.WebClientServiceProvider;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -93,19 +91,21 @@ public class SlackRecordSink extends AbstractControllerService implements Record
             .identifiesControllerService(WebClientServiceProvider.class)
             .build();
 
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        API_URL,
+        ACCESS_TOKEN,
+        CHANNEL_ID,
+        INPUT_CHARACTER_SET,
+        RECORD_WRITER_FACTORY,
+        WEB_SERVICE_CLIENT_PROVIDER
+    );
+
     private volatile RecordSetWriterFactory writerFactory;
     private SlackRestService service;
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return Collections.unmodifiableList(Arrays.asList(
-                API_URL,
-                ACCESS_TOKEN,
-                CHANNEL_ID,
-                INPUT_CHARACTER_SET,
-                RECORD_WRITER_FACTORY,
-                WEB_SERVICE_CLIENT_PROVIDER
-        ));
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnEnabled

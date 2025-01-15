@@ -39,7 +39,6 @@ import org.apache.nifi.processor.util.StandardValidators;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -66,7 +65,7 @@ public class StandardFileResourceService extends AbstractControllerService imple
             .addValidator(StandardValidators.NON_BLANK_VALIDATOR)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = Arrays.asList(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             FILE_PATH
     );
 
@@ -74,7 +73,7 @@ public class StandardFileResourceService extends AbstractControllerService imple
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnEnabled

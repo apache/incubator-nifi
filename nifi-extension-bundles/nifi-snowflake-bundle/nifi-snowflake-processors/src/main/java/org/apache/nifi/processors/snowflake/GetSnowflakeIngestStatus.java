@@ -79,13 +79,19 @@ public class GetSnowflakeIngestStatus extends AbstractProcessor {
             .description("For FlowFiles whose file is still not ingested. These FlowFiles should be routed back to this processor to try again later")
             .build();
 
-    static final List<PropertyDescriptor> PROPERTIES = List.of(INGEST_MANAGER_PROVIDER);
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        INGEST_MANAGER_PROVIDER
+    );
 
-    private static final Set<Relationship> RELATIONSHIPS = Set.of(REL_SUCCESS, REL_RETRY, REL_FAILURE);
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+        REL_SUCCESS,
+        REL_RETRY,
+        REL_FAILURE
+    );
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

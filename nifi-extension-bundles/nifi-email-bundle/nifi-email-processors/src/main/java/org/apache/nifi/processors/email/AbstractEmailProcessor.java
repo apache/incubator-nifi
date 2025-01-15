@@ -165,7 +165,7 @@ abstract class AbstractEmailProcessor<T extends AbstractMailReceiver> extends Ab
      * Will ensure that list of PropertyDescriptors is build only once, since
      * all other lifecycle methods are invoked multiple times.
      */
-    final static List<PropertyDescriptor> SHARED_DESCRIPTORS = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             HOST,
             PORT,
             AUTHORIZATION_MODE,
@@ -194,6 +194,10 @@ abstract class AbstractEmailProcessor<T extends AbstractMailReceiver> extends Ab
 
     protected volatile Optional<OAuth2AccessTokenProvider> oauth2AccessTokenProviderOptional;
     protected volatile AccessToken oauth2AccessDetails;
+
+    protected static List<PropertyDescriptor> getCommonPropertyDescriptors() {
+        return PROPERTY_DESCRIPTORS;
+    }
 
     @OnScheduled
     public void onScheduled(final ProcessContext context) {

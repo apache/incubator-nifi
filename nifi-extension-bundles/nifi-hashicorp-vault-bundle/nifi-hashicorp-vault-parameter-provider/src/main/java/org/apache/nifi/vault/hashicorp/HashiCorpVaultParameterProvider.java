@@ -32,8 +32,6 @@ import org.apache.nifi.parameter.VerifiableParameterProvider;
 import org.apache.nifi.processor.util.StandardValidators;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -81,17 +79,18 @@ public class HashiCorpVaultParameterProvider extends AbstractParameterProvider i
             .defaultValue(".*")
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = Collections.unmodifiableList(Arrays.asList(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             VAULT_CLIENT_SERVICE,
             KV_PATH,
             KV_VERSION,
-            SECRET_NAME_PATTERN));
+            SECRET_NAME_PATTERN
+    );
 
     private HashiCorpVaultCommunicationService vaultCommunicationService;
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

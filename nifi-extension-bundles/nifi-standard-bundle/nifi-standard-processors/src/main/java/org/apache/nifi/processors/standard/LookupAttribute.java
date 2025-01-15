@@ -85,7 +85,7 @@ public class LookupAttribute extends AbstractProcessor {
             .required(true)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             LOOKUP_SERVICE,
             INCLUDE_EMPTY_VALUES
     );
@@ -143,7 +143,7 @@ public class LookupAttribute extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

@@ -151,7 +151,7 @@ public class CountText extends AbstractProcessor {
             .addValidator(StandardValidators.BOOLEAN_VALIDATOR)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             TEXT_LINE_COUNT_PD,
             TEXT_LINE_NONEMPTY_COUNT_PD,
             TEXT_WORD_COUNT_PD,
@@ -331,6 +331,6 @@ public class CountText extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 }

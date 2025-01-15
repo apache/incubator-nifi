@@ -35,7 +35,6 @@ import org.apache.nifi.components.ValidationResult;
 import org.apache.nifi.components.resource.ResourceCardinality;
 import org.apache.nifi.components.resource.ResourceType;
 import org.apache.nifi.controller.ConfigurationContext;
-import org.apache.nifi.controller.ControllerServiceInitializationContext;
 import org.apache.nifi.dbcp.utils.DBCPProperties;
 import org.apache.nifi.dbcp.utils.DataSourceConfiguration;
 import org.apache.nifi.expression.ExpressionLanguageScope;
@@ -49,7 +48,6 @@ import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -115,34 +113,29 @@ public class HadoopDBCPConnectionPool extends AbstractDBCPConnectionPool {
             .dynamicallyModifiesClasspath(true)
             .build();
 
-    private List<PropertyDescriptor> properties;
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        DATABASE_URL,
+        DB_DRIVERNAME,
+        DB_DRIVER_LOCATION,
+        HADOOP_CONFIGURATION_RESOURCES,
+        KERBEROS_USER_SERVICE,
+        DB_USER,
+        DB_PASSWORD,
+        MAX_WAIT_TIME,
+        MAX_TOTAL_CONNECTIONS,
+        VALIDATION_QUERY,
+        MIN_IDLE,
+        MAX_IDLE,
+        MAX_CONN_LIFETIME,
+        EVICTION_RUN_PERIOD,
+        MIN_EVICTABLE_IDLE_TIME,
+        SOFT_MIN_EVICTABLE_IDLE_TIME
+    );
 
     private volatile Boolean foundHadoopDependencies;
 
     // Holder of cached Configuration information so validation does not reload the same config over and over
     private final AtomicReference<ValidationResources> validationResourceHolder = new AtomicReference<>(null);
-
-    @Override
-    protected void init(final ControllerServiceInitializationContext context) {
-        properties = Arrays.asList(
-                DATABASE_URL,
-                DB_DRIVERNAME,
-                DB_DRIVER_LOCATION,
-                HADOOP_CONFIGURATION_RESOURCES,
-                KERBEROS_USER_SERVICE,
-                DB_USER,
-                DB_PASSWORD,
-                MAX_WAIT_TIME,
-                MAX_TOTAL_CONNECTIONS,
-                VALIDATION_QUERY,
-                MIN_IDLE,
-                MAX_IDLE,
-                MAX_CONN_LIFETIME,
-                EVICTION_RUN_PERIOD,
-                MIN_EVICTABLE_IDLE_TIME,
-                SOFT_MIN_EVICTABLE_IDLE_TIME
-        );
-    }
 
     @Override
     public void migrateProperties(final PropertyConfiguration config) {
@@ -154,7 +147,7 @@ public class HadoopDBCPConnectionPool extends AbstractDBCPConnectionPool {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return properties;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

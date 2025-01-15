@@ -143,7 +143,7 @@ public class SignContentPGP extends AbstractProcessor {
             FAILURE
     );
 
-    private static final List<PropertyDescriptor> DESCRIPTORS = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             FILE_ENCODING,
             HASH_ALGORITHM,
             SIGNING_STRATEGY,
@@ -173,7 +173,7 @@ public class SignContentPGP extends AbstractProcessor {
      */
     @Override
     public final List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return DESCRIPTORS;
+        return PROPERTY_DESCRIPTORS;
     }
 
     /**

@@ -98,7 +98,7 @@ public class ScriptedTransformRecord extends ScriptedRecordProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return DESCRIPTORS;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

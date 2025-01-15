@@ -24,7 +24,6 @@ import org.apache.nifi.controller.AbstractControllerService;
 import org.apache.nifi.controller.ConfigurationContext;
 import org.apache.nifi.processor.util.StandardValidators;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -50,7 +49,10 @@ public class LifecycleFailureService extends AbstractControllerService {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return Arrays.asList(ENABLE_FAILURE_COUNT, FAIL_ON_DISABLE);
+        return List.of(
+                ENABLE_FAILURE_COUNT,
+                FAIL_ON_DISABLE
+        );
     }
 
     @OnEnabled

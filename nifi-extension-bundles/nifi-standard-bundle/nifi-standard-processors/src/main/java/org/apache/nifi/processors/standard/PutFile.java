@@ -159,7 +159,7 @@ public class PutFile extends AbstractProcessor {
             .defaultValue("true")
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             DIRECTORY,
             CONFLICT_RESOLUTION,
             CREATE_DIRS,
@@ -192,7 +192,7 @@ public class PutFile extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

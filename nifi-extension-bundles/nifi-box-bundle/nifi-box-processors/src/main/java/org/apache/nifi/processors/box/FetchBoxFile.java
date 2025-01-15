@@ -99,7 +99,7 @@ public class FetchBoxFile extends AbstractProcessor {
             REL_FAILURE
     );
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             BoxClientService.BOX_CLIENT_SERVICE,
             FILE_ID
     );
@@ -108,7 +108,7 @@ public class FetchBoxFile extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

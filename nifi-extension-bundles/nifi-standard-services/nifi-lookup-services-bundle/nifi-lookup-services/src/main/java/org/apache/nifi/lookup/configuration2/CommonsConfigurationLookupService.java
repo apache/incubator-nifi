@@ -30,7 +30,6 @@ import org.apache.nifi.components.resource.ResourceCardinality;
 import org.apache.nifi.components.resource.ResourceType;
 import org.apache.nifi.controller.AbstractControllerService;
 import org.apache.nifi.controller.ConfigurationContext;
-import org.apache.nifi.controller.ControllerServiceInitializationContext;
 import org.apache.nifi.expression.ExpressionLanguageScope;
 import org.apache.nifi.lookup.LookupFailureException;
 import org.apache.nifi.lookup.StringLookupService;
@@ -38,7 +37,6 @@ import org.apache.nifi.reporting.InitializationException;
 
 import java.io.File;
 import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -69,9 +67,12 @@ public abstract class CommonsConfigurationLookupService<T extends FileBasedConfi
             .expressionLanguageSupported(ExpressionLanguageScope.ENVIRONMENT)
             .build();
 
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+            CONFIGURATION_FILE
+    );
+
     private final Class<T> resultClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 
-    private List<PropertyDescriptor> properties;
 
     private volatile ReloadingFileBasedConfigurationBuilder<T> builder;
 
@@ -88,14 +89,7 @@ public abstract class CommonsConfigurationLookupService<T extends FileBasedConfi
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return properties;
-    }
-
-    @Override
-    protected void init(final ControllerServiceInitializationContext context) throws InitializationException {
-        final List<PropertyDescriptor> properties = new ArrayList<>();
-        properties.add(CONFIGURATION_FILE);
-        this.properties = Collections.unmodifiableList(properties);
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnEnabled

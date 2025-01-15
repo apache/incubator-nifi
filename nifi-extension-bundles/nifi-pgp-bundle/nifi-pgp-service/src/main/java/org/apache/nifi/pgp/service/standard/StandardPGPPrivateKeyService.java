@@ -52,7 +52,6 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -95,7 +94,7 @@ public class StandardPGPPrivateKeyService extends AbstractControllerService impl
 
     private static final Charset KEY_CHARSET = StandardCharsets.US_ASCII;
 
-    private static final List<PropertyDescriptor> DESCRIPTORS = Arrays.asList(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             KEYRING_FILE,
             KEYRING,
             KEY_PASSWORD
@@ -154,7 +153,7 @@ public class StandardPGPPrivateKeyService extends AbstractControllerService impl
      */
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return DESCRIPTORS;
+        return PROPERTY_DESCRIPTORS;
     }
 
     /**

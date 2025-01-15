@@ -89,18 +89,20 @@ public class StandardProxyConfigurationService extends AbstractControllerService
             .sensitive(true)
             .build();
 
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        PROXY_TYPE,
+        SOCKS_VERSION,
+        PROXY_SERVER_HOST,
+        PROXY_SERVER_PORT,
+        PROXY_USER_NAME,
+        PROXY_USER_PASSWORD
+    );
+
     private volatile ProxyConfiguration configuration = ProxyConfiguration.DIRECT_CONFIGURATION;
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        final List<PropertyDescriptor> properties = new ArrayList<>();
-        properties.add(PROXY_TYPE);
-        properties.add(SOCKS_VERSION);
-        properties.add(PROXY_SERVER_HOST);
-        properties.add(PROXY_SERVER_PORT);
-        properties.add(PROXY_USER_NAME);
-        properties.add(PROXY_USER_PASSWORD);
-        return properties;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnEnabled

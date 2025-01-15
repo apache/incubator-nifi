@@ -113,7 +113,7 @@ public class FilterAttribute extends AbstractProcessor {
             .expressionLanguageSupported(ExpressionLanguageScope.FLOWFILE_ATTRIBUTES)
             .build();
 
-    private final static List<PropertyDescriptor> PROPERTIES = List.of(
+    private final static List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             FILTER_MODE,
             MATCHING_STRATEGY,
             ATTRIBUTE_ENUMERATION,
@@ -131,7 +131,7 @@ public class FilterAttribute extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
 

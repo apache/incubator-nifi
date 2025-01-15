@@ -126,7 +126,7 @@ public class PublishMQTT extends AbstractMQTTProcessor {
             .description("FlowFiles that failed to send to the destination are transferred to this relationship.")
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             PROP_BROKER_URI,
             PROP_MQTT_VERSION,
             PROP_USERNAME,
@@ -170,7 +170,7 @@ public class PublishMQTT extends AbstractMQTTProcessor {
 
     @Override
     public final List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnScheduled

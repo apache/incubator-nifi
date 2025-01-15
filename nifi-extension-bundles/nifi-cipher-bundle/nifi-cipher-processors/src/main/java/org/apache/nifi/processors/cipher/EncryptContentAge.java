@@ -127,7 +127,7 @@ public class EncryptContentAge extends AbstractProcessor implements VerifiablePr
             FAILURE
     );
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             FILE_ENCODING,
             PUBLIC_KEY_SOURCE,
             PUBLIC_KEY_RECIPIENTS,
@@ -164,7 +164,7 @@ public class EncryptContentAge extends AbstractProcessor implements VerifiablePr
      */
     @Override
     public final List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     /**

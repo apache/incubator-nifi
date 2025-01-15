@@ -212,33 +212,29 @@ public class RestLookupService extends AbstractControllerService implements Reco
     static final String BODY_KEY = "request.body";
     static final String METHOD_KEY = "request.method";
 
-    static final List<PropertyDescriptor> DESCRIPTORS;
-    static final Set<String> KEYS;
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        URL,
+        RECORD_READER,
+        RECORD_PATH,
+        RESPONSE_HANDLING_STRATEGY,
+        SSL_CONTEXT_SERVICE,
+        AUTHENTICATION_STRATEGY,
+        OAUTH2_ACCESS_TOKEN_PROVIDER,
+        PROXY_CONFIGURATION_SERVICE,
+        PROP_BASIC_AUTH_USERNAME,
+        PROP_BASIC_AUTH_PASSWORD,
+        PROP_DIGEST_AUTH,
+        PROP_CONNECT_TIMEOUT,
+        PROP_READ_TIMEOUT
+    );
+
+    static final Set<String> KEYS = Set.of();
 
     static final List<String> VALID_VERBS = Arrays.asList("delete", "get", "post", "put");
 
-    static {
-        DESCRIPTORS = Collections.unmodifiableList(Arrays.asList(
-            URL,
-            RECORD_READER,
-            RECORD_PATH,
-            RESPONSE_HANDLING_STRATEGY,
-            SSL_CONTEXT_SERVICE,
-            AUTHENTICATION_STRATEGY,
-            OAUTH2_ACCESS_TOKEN_PROVIDER,
-            PROXY_CONFIGURATION_SERVICE,
-            PROP_BASIC_AUTH_USERNAME,
-            PROP_BASIC_AUTH_PASSWORD,
-            PROP_DIGEST_AUTH,
-            PROP_CONNECT_TIMEOUT,
-            PROP_READ_TIMEOUT
-        ));
-        KEYS = Collections.emptySet();
-    }
-
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return DESCRIPTORS;
+        return PROPERTY_DESCRIPTORS;
     }
 
     private volatile ProxyConfigurationService proxyConfigurationService;

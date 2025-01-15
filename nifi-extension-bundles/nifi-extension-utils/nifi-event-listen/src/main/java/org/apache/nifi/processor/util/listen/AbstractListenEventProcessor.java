@@ -36,7 +36,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.charset.Charset;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -45,6 +44,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Stream;
 
 import static org.apache.nifi.processor.util.listen.ListenerProperties.NETWORK_INTF_NAME;
 
@@ -109,6 +109,15 @@ public abstract class AbstractListenEventProcessor<E extends Event> extends Abst
 
     public static final int POLL_TIMEOUT_MS = 20;
 
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        NETWORK_INTF_NAME,
+        PORT,
+        RECV_BUFFER_SIZE,
+        MAX_MESSAGE_QUEUE_SIZE,
+        MAX_SOCKET_BUFFER_SIZE,
+        CHARSET
+    );
+
     protected Set<Relationship> relationships;
     protected List<PropertyDescriptor> descriptors;
 
@@ -124,15 +133,10 @@ public abstract class AbstractListenEventProcessor<E extends Event> extends Abst
 
     @Override
     protected void init(final ProcessorInitializationContext context) {
-        final List<PropertyDescriptor> descriptors = new ArrayList<>();
-        descriptors.add(NETWORK_INTF_NAME);
-        descriptors.add(PORT);
-        descriptors.add(RECV_BUFFER_SIZE);
-        descriptors.add(MAX_MESSAGE_QUEUE_SIZE);
-        descriptors.add(MAX_SOCKET_BUFFER_SIZE);
-        descriptors.add(CHARSET);
-        descriptors.addAll(getAdditionalProperties());
-        this.descriptors = Collections.unmodifiableList(descriptors);
+        this.descriptors = Stream.concat(
+                PROPERTY_DESCRIPTORS.stream(),
+                getAdditionalProperties().stream()
+        ).toList();
 
         final Set<Relationship> relationships = new HashSet<>();
         relationships.add(REL_SUCCESS);

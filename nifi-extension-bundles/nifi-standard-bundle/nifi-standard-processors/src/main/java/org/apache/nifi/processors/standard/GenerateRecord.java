@@ -151,7 +151,7 @@ public class GenerateRecord extends AbstractProcessor {
             .required(false)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             RECORD_WRITER,
             NUM_RECORDS,
             NULLABLE_FIELDS,
@@ -164,13 +164,15 @@ public class GenerateRecord extends AbstractProcessor {
             .description("FlowFiles that are successfully created will be routed to this relationship")
             .build();
 
-    static final Set<Relationship> RELATIONSHIPS = Set.of(REL_SUCCESS);
+    static final Set<Relationship> RELATIONSHIPS = Set.of(
+            REL_SUCCESS
+    );
 
     private volatile Faker faker = new Faker();
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

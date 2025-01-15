@@ -68,13 +68,16 @@ public class ReaderLookup extends AbstractControllerService implements RecordRea
         .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
         .build();
 
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        SERVICE_TO_USE
+    );
 
     private volatile Map<String, RecordReaderFactory> recordReaderFactoryMap;
     private volatile PropertyValue serviceToUseValue;
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return Collections.singletonList(SERVICE_TO_USE);
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

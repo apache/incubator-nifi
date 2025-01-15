@@ -105,7 +105,7 @@ public class TagS3Object extends AbstractS3Processor {
             .required(false)
             .build();
 
-    public static final List<PropertyDescriptor> PROPERTIES = List.of(
+    public static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             BUCKET_WITH_DEFAULT_VALUE,
             KEY,
             S3_REGION,
@@ -120,11 +120,12 @@ public class TagS3Object extends AbstractS3Processor {
             SIGNER_OVERRIDE,
             S3_CUSTOM_SIGNER_CLASS_NAME,
             S3_CUSTOM_SIGNER_MODULE_LOCATION,
-        PROXY_CONFIGURATION_SERVICE);
+            PROXY_CONFIGURATION_SERVICE
+    );
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
 

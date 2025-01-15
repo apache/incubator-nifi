@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -80,6 +79,11 @@ public class DistributedMapCacheLookupService extends AbstractControllerService 
             .defaultValue(StandardCharsets.UTF_8.displayName())
             .build();
 
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        PROP_DISTRIBUTED_CACHE_SERVICE,
+        CHARACTER_ENCODING
+    );
+
     private static Set<String> getStandardCharsetNames() {
         return STANDARD_CHARSETS.stream().map(c -> c.displayName()).collect(Collectors.toSet());
     }
@@ -92,10 +96,7 @@ public class DistributedMapCacheLookupService extends AbstractControllerService 
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        final List<PropertyDescriptor> descriptors = new ArrayList<>();
-        descriptors.add(PROP_DISTRIBUTED_CACHE_SERVICE);
-        descriptors.add(CHARACTER_ENCODING);
-        return descriptors;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

@@ -76,7 +76,7 @@ public class GetMongoRecord extends AbstractMongoQueryProcessor {
         .required(true)
         .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             CLIENT_SERVICE,
             WRITER_FACTORY,
             DATABASE_NAME,
@@ -98,7 +98,7 @@ public class GetMongoRecord extends AbstractMongoQueryProcessor {
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

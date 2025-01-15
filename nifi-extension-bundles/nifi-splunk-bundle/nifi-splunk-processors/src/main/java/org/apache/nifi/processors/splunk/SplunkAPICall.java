@@ -35,7 +35,6 @@ import org.apache.nifi.processor.util.StandardValidators;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
 
 abstract class SplunkAPICall extends AbstractProcessor {
@@ -135,7 +134,7 @@ abstract class SplunkAPICall extends AbstractProcessor {
             .expressionLanguageSupported(ExpressionLanguageScope.ENVIRONMENT)
             .build();
 
-    protected static final List<PropertyDescriptor> PROPERTIES = Arrays.asList(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             SCHEME,
             HOSTNAME,
             PORT,
@@ -154,9 +153,13 @@ abstract class SplunkAPICall extends AbstractProcessor {
     private volatile Service splunkService;
     private volatile String requestChannel;
 
+    protected static List<PropertyDescriptor> getCommonPropertyDescriptors() {
+        return PROPERTY_DESCRIPTORS;
+    }
+
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return SplunkAPICall.PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnScheduled

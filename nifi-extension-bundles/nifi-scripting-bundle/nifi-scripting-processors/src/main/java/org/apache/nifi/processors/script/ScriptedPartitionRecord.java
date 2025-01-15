@@ -105,7 +105,7 @@ public class ScriptedPartitionRecord extends ScriptedRecordProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return DESCRIPTORS;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

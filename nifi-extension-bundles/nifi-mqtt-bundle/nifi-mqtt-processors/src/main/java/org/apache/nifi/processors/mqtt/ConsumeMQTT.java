@@ -206,7 +206,7 @@ public class ConsumeMQTT extends AbstractMQTTProcessor {
             .autoTerminateDefault(true) // to make sure flow are still valid after upgrades
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             PROP_BROKER_URI,
             PROP_MQTT_VERSION,
             PROP_USERNAME,
@@ -301,7 +301,7 @@ public class ConsumeMQTT extends AbstractMQTTProcessor {
 
     @Override
     public final List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

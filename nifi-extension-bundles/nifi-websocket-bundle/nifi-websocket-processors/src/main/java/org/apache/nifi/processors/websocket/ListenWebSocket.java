@@ -83,7 +83,7 @@ public class ListenWebSocket extends AbstractWebSocketGatewayProcessor {
             })
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             PROP_WEBSOCKET_SERVER_SERVICE,
             PROP_SERVER_URL_PATH
     );
@@ -97,7 +97,7 @@ public class ListenWebSocket extends AbstractWebSocketGatewayProcessor {
 
     @Override
     public final List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

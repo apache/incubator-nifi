@@ -76,7 +76,7 @@ public abstract class AbstractAwsMachineLearningJobStarter<
         config.renameProperty("aws-region", REGION.getName());
     }
 
-    protected static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             MANDATORY_AWS_CREDENTIALS_PROVIDER_SERVICE,
             REGION,
             TIMEOUT,
@@ -95,6 +95,10 @@ public abstract class AbstractAwsMachineLearningJobStarter<
             REL_FAILURE
     );
 
+    protected static List<PropertyDescriptor> getCommonPropertyDescriptors() {
+        return PROPERTY_DESCRIPTORS;
+    }
+
     @Override
     public Set<Relationship> getRelationships() {
         return RELATIONSHIPS;
@@ -102,7 +106,7 @@ public abstract class AbstractAwsMachineLearningJobStarter<
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

@@ -117,7 +117,7 @@ public class PutZendeskTicket extends AbstractZendesk {
             .dependsOn(RECORD_READER)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             WEB_CLIENT_SERVICE_PROVIDER,
             ZENDESK_SUBDOMAIN,
             ZENDESK_USER,
@@ -158,7 +158,7 @@ public class PutZendeskTicket extends AbstractZendesk {
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

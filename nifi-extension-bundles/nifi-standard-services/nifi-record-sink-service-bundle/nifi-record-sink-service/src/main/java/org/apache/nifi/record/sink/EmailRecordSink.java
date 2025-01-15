@@ -47,9 +47,7 @@ import org.apache.nifi.util.StringUtils;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -176,6 +174,23 @@ public class EmailRecordSink extends AbstractControllerService implements Record
             .defaultValue("NiFi")
             .build();
 
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+            FROM,
+            TO,
+            CC,
+            BCC,
+            SUBJECT,
+            SMTP_HOSTNAME,
+            SMTP_PORT,
+            SMTP_AUTH,
+            SMTP_USERNAME,
+            SMTP_PASSWORD,
+            SMTP_STARTTLS,
+            SMTP_SSL,
+            HEADER_XMAILER,
+            RecordSinkService.RECORD_WRITER_FACTORY
+    );
+
     private volatile RecordSetWriterFactory writerFactory;
 
     /**
@@ -197,22 +212,7 @@ public class EmailRecordSink extends AbstractControllerService implements Record
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return Collections.unmodifiableList(Arrays.asList(
-                FROM,
-                TO,
-                CC,
-                BCC,
-                SUBJECT,
-                SMTP_HOSTNAME,
-                SMTP_PORT,
-                SMTP_AUTH,
-                SMTP_USERNAME,
-                SMTP_PASSWORD,
-                SMTP_STARTTLS,
-                SMTP_SSL,
-                HEADER_XMAILER,
-                RecordSinkService.RECORD_WRITER_FACTORY
-        ));
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

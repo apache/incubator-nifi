@@ -25,8 +25,6 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -105,22 +103,26 @@ public class ResizeImage extends AbstractProcessor {
         .description("A FlowFile is routed to this relationship if it is not in the specified format")
         .build();
 
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        IMAGE_WIDTH,
+        IMAGE_HEIGHT,
+        SCALING_ALGORITHM,
+        KEEP_RATIO
+    );
+
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+        REL_SUCCESS,
+        REL_FAILURE
+    );
+
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        final List<PropertyDescriptor> properties = new ArrayList<>();
-        properties.add(IMAGE_WIDTH);
-        properties.add(IMAGE_HEIGHT);
-        properties.add(SCALING_ALGORITHM);
-        properties.add(KEEP_RATIO);
-        return properties;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override
     public Set<Relationship> getRelationships() {
-        final Set<Relationship> relationships = new HashSet<>();
-        relationships.add(REL_SUCCESS);
-        relationships.add(REL_FAILURE);
-        return relationships;
+        return RELATIONSHIPS;
     }
 
     @Override

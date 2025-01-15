@@ -40,13 +40,12 @@ import org.apache.nifi.processor.exception.ProcessException;
 import org.apache.nifi.processor.util.StandardValidators;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Tags({"amqp", "rabbit", "get", "message", "receive", "consume"})
 @InputRequirement(Requirement.INPUT_FORBIDDEN)
@@ -163,28 +162,24 @@ public class ConsumeAMQP extends AbstractAMQPProcessor<AMQPConsumer> {
         .description("All FlowFiles that are received from the AMQP queue are routed to this relationship")
         .build();
 
-    private static final List<PropertyDescriptor> propertyDescriptors;
-    private static final Set<Relationship> relationships;
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = Stream.concat(
+          Stream.of(
+              QUEUE,
+              AUTO_ACKNOWLEDGE,
+              BATCH_SIZE,
+              PREFETCH_COUNT,
+              HEADER_FORMAT,
+              HEADER_KEY_PREFIX,
+              HEADER_SEPARATOR,
+              REMOVE_CURLY_BRACES
+          ), getCommonPropertyDescriptors().stream()
+    ).toList();
 
-    private static final ObjectMapper objectMapper;
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+            REL_SUCCESS
+    );
 
-    static {
-        List<PropertyDescriptor> properties = new ArrayList<>();
-        properties.add(QUEUE);
-        properties.add(AUTO_ACKNOWLEDGE);
-        properties.add(BATCH_SIZE);
-        properties.add(PREFETCH_COUNT);
-        properties.add(HEADER_FORMAT);
-        properties.add(HEADER_KEY_PREFIX);
-        properties.add(HEADER_SEPARATOR);
-        properties.add(REMOVE_CURLY_BRACES);
-        properties.addAll(getCommonPropertyDescriptors());
-        propertyDescriptors = Collections.unmodifiableList(properties);
-
-        relationships = Set.of(REL_SUCCESS);
-
-        objectMapper = new ObjectMapper();
-    }
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     /**
      * Will construct a {@link FlowFile} containing the body of the consumed AMQP message (if {@link GetResponse} returned by {@link AMQPConsumer} is
@@ -303,7 +298,7 @@ public class ConsumeAMQP extends AbstractAMQPProcessor<AMQPConsumer> {
     }
 
     private static String convertMapToJSONString(Map<String, Object> headers) throws JsonProcessingException {
-        return objectMapper.writeValueAsString(headers);
+        return OBJECT_MAPPER.writeValueAsString(headers);
     }
 
     @Override
@@ -320,12 +315,12 @@ public class ConsumeAMQP extends AbstractAMQPProcessor<AMQPConsumer> {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return propertyDescriptors;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override
     public Set<Relationship> getRelationships() {
-        return relationships;
+        return RELATIONSHIPS;
     }
 
     public enum OutputHeaderFormat implements DescribedValue {

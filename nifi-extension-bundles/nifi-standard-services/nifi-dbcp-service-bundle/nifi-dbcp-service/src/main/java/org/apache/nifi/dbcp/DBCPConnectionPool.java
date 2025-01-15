@@ -20,8 +20,6 @@ import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -95,32 +93,27 @@ public class DBCPConnectionPool extends AbstractDBCPConnectionPool implements DB
      */
     protected static final String SENSITIVE_PROPERTY_PREFIX = "SENSITIVE.";
 
-    private static final List<PropertyDescriptor> PROPERTIES;
-
-    static {
-        final List<PropertyDescriptor> props = new ArrayList<>();
-        props.add(DATABASE_URL);
-        props.add(DB_DRIVERNAME);
-        props.add(DB_DRIVER_LOCATION);
-        props.add(KERBEROS_USER_SERVICE);
-        props.add(DB_USER);
-        props.add(DB_PASSWORD);
-        props.add(MAX_WAIT_TIME);
-        props.add(MAX_TOTAL_CONNECTIONS);
-        props.add(VALIDATION_QUERY);
-        props.add(MIN_IDLE);
-        props.add(MAX_IDLE);
-        props.add(MAX_CONN_LIFETIME);
-        props.add(EVICTION_RUN_PERIOD);
-        props.add(MIN_EVICTABLE_IDLE_TIME);
-        props.add(SOFT_MIN_EVICTABLE_IDLE_TIME);
-
-        PROPERTIES = Collections.unmodifiableList(props);
-    }
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        DATABASE_URL,
+        DB_DRIVERNAME,
+        DB_DRIVER_LOCATION,
+        KERBEROS_USER_SERVICE,
+        DB_USER,
+        DB_PASSWORD,
+        MAX_WAIT_TIME,
+        MAX_TOTAL_CONNECTIONS,
+        VALIDATION_QUERY,
+        MIN_IDLE,
+        MAX_IDLE,
+        MAX_CONN_LIFETIME,
+        EVICTION_RUN_PERIOD,
+        MIN_EVICTABLE_IDLE_TIME,
+        SOFT_MIN_EVICTABLE_IDLE_TIME
+    );
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

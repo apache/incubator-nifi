@@ -72,7 +72,7 @@ public class AzureBlobStorageFileResourceService extends AbstractControllerServi
             .defaultValue(String.format("${%s}", ATTR_NAME_BLOBNAME))
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             BLOB_STORAGE_CREDENTIALS_SERVICE,
             CONTAINER,
             BLOB_NAME
@@ -83,7 +83,7 @@ public class AzureBlobStorageFileResourceService extends AbstractControllerServi
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnEnabled

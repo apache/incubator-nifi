@@ -157,7 +157,7 @@ public abstract class AbstractMongoProcessor extends AbstractProcessor {
         .expressionLanguageSupported(ExpressionLanguageScope.FLOWFILE_ATTRIBUTES)
         .build();
 
-    static final List<PropertyDescriptor> DESCRIPTORS = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             CLIENT_SERVICE,
             DATABASE_NAME,
             COLLECTION_NAME
@@ -197,6 +197,10 @@ public abstract class AbstractMongoProcessor extends AbstractProcessor {
     protected ObjectMapper objectMapper;
     protected MongoClient mongoClient;
     protected MongoDBClientService clientService;
+
+    protected static List<PropertyDescriptor> getCommonPropertyDescriptors() {
+        return PROPERTY_DESCRIPTORS;
+    }
 
     @OnScheduled
     public final void createClient(ProcessContext context) {

@@ -126,7 +126,7 @@ public class StandardSnowflakeIngestManagerProviderService extends AbstractContr
             .required(true)
             .build();
 
-    static final List<PropertyDescriptor> PROPERTIES = List.of(
+    static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             ACCOUNT_IDENTIFIER_FORMAT,
             HOST_URL,
             ACCOUNT_LOCATOR,
@@ -143,7 +143,7 @@ public class StandardSnowflakeIngestManagerProviderService extends AbstractContr
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     private volatile String fullyQualifiedPipeName;

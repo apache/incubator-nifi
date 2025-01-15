@@ -36,9 +36,6 @@ import org.apache.nifi.util.StringUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -64,35 +61,29 @@ import java.util.Set;
     })
 public class ExecuteGraphQuery extends AbstractGraphExecutor {
 
-    private static final Set<Relationship> relationships;
-    private static final List<PropertyDescriptor> propertyDescriptors;
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+        REL_SUCCESS,
+        REL_ORIGINAL,
+        REL_FAILURE
+    );
+
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        CLIENT_SERVICE,
+        QUERY
+    );
 
     public static final String EXECUTION_TIME = "query.took";
-
-    static {
-        final Set<Relationship> tempRelationships = new HashSet<>();
-        tempRelationships.add(REL_SUCCESS);
-        tempRelationships.add(REL_ORIGINAL);
-        tempRelationships.add(REL_FAILURE);
-        relationships = Collections.unmodifiableSet(tempRelationships);
-
-        final List<PropertyDescriptor> tempDescriptors = new ArrayList<>();
-        tempDescriptors.add(CLIENT_SERVICE);
-        tempDescriptors.add(QUERY);
-
-        propertyDescriptors = Collections.unmodifiableList(tempDescriptors);
-    }
 
     protected ObjectMapper mapper = new ObjectMapper();
 
     @Override
     public Set<Relationship> getRelationships() {
-        return relationships;
+        return RELATIONSHIPS;
     }
 
     @Override
     public final List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return propertyDescriptors;
+        return PROPERTY_DESCRIPTORS;
     }
 
     private volatile GraphClientService clientService;

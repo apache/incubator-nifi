@@ -61,7 +61,9 @@ public class KubernetesConfigMapStateProvider extends AbstractConfigurableCompon
         .required(false)
         .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(CONFIG_MAP_NAME_PREFIX);
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+            CONFIG_MAP_NAME_PREFIX
+    );
 
     private static final int MAX_UPDATE_ATTEMPTS = 5;
 
@@ -100,7 +102,7 @@ public class KubernetesConfigMapStateProvider extends AbstractConfigurableCompon
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     /**

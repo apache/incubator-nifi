@@ -141,7 +141,7 @@ public class StandardSSLContextService extends AbstractControllerService impleme
             .sensitive(false)
             .build();
 
-    private static final List<PropertyDescriptor> properties = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             KEYSTORE,
             KEYSTORE_PASSWORD,
             KEY_PASSWORD,
@@ -185,7 +185,7 @@ public class StandardSSLContextService extends AbstractControllerService impleme
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return properties;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

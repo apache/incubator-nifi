@@ -72,13 +72,18 @@ public class StartSnowflakeIngest extends AbstractProcessor {
             .description("For FlowFiles of failed ingest request")
             .build();
 
-    static final List<PropertyDescriptor> PROPERTIES = List.of(INGEST_MANAGER_PROVIDER);
+    static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+            INGEST_MANAGER_PROVIDER
+    );
 
-    private static final Set<Relationship> RELATIONSHIPS = Set.of(REL_SUCCESS, REL_FAILURE);
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+            REL_SUCCESS,
+            REL_FAILURE
+    );
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

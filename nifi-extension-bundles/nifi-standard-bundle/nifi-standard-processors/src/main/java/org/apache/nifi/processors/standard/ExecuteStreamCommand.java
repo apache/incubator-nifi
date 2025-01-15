@@ -287,7 +287,7 @@ public class ExecuteStreamCommand extends AbstractProcessor {
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             WORKING_DIR,
             EXECUTION_COMMAND,
             ARGUMENTS_STRATEGY,
@@ -328,7 +328,7 @@ public class ExecuteStreamCommand extends AbstractProcessor {
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

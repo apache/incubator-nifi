@@ -184,7 +184,8 @@ public class ConsumeSlack extends AbstractProcessor implements VerifiableProcess
         .description("Slack messages that are successfully received will be routed to this relationship")
         .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(CHANNEL_IDS,
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+            CHANNEL_IDS,
             ACCESS_TOKEN,
             REPLY_MONITOR_WINDOW,
             REPLY_MONITOR_FREQUENCY,
@@ -204,7 +205,7 @@ public class ConsumeSlack extends AbstractProcessor implements VerifiableProcess
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

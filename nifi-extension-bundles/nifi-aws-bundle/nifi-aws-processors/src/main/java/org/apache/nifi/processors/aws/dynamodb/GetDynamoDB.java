@@ -83,7 +83,7 @@ public class GetDynamoDB extends AbstractDynamoDBProcessor {
             .required(false)
             .build();
 
-    public static final List<PropertyDescriptor> PROPERTIES = List.of(
+    public static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
         TABLE,
         REGION,
         AWS_CREDENTIALS_PROVIDER_SERVICE,
@@ -117,7 +117,7 @@ public class GetDynamoDB extends AbstractDynamoDBProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

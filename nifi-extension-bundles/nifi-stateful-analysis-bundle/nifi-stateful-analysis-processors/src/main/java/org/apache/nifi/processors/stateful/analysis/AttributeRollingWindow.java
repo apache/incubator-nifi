@@ -127,7 +127,7 @@ public class AttributeRollingWindow extends AbstractProcessor {
                 REL_FAILED_SET_STATE,
                 REL_FAILURE);
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             VALUE_TO_TRACK,
             TIME_WINDOW,
             SUB_WINDOW_LENGTH
@@ -143,7 +143,7 @@ public class AttributeRollingWindow extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnScheduled

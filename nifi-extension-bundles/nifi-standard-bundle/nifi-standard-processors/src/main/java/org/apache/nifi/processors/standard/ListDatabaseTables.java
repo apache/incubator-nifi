@@ -227,7 +227,7 @@ public class ListDatabaseTables extends AbstractProcessor {
         .identifiesControllerService(RecordSetWriterFactory.class)
         .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             DBCP_SERVICE,
             CATALOG,
             SCHEMA_PATTERN,
@@ -248,7 +248,7 @@ public class ListDatabaseTables extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

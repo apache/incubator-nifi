@@ -40,7 +40,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -142,6 +141,22 @@ public abstract class FetchFileTransfer extends AbstractProcessor {
         .description("Any FlowFile that could not be fetched from the remote server due to insufficient permissions will be transferred to this Relationship.")
         .build();
 
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        HOSTNAME,
+        UNDEFAULTED_PORT,
+        REMOTE_FILENAME,
+        COMPLETION_STRATEGY,
+        MOVE_DESTINATION_DIR,
+        MOVE_CREATE_DIRECTORY
+    );
+
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+        REL_SUCCESS,
+        REL_NOT_FOUND,
+        REL_PERMISSION_DENIED,
+        REL_COMMS_FAILURE
+    );
+
     private final Map<Tuple<String, Integer>, BlockingQueue<FileTransferIdleWrapper>> fileTransferMap = new HashMap<>();
     private final long IDLE_CONNECTION_MILLIS = TimeUnit.SECONDS.toMillis(10L); // amount of time to wait before closing an idle connection
     private volatile long lastClearTime = System.currentTimeMillis();
@@ -149,12 +164,7 @@ public abstract class FetchFileTransfer extends AbstractProcessor {
 
     @Override
     public Set<Relationship> getRelationships() {
-        final Set<Relationship> relationships = new HashSet<>();
-        relationships.add(REL_SUCCESS);
-        relationships.add(REL_NOT_FOUND);
-        relationships.add(REL_PERMISSION_DENIED);
-        relationships.add(REL_COMMS_FAILURE);
-        return relationships;
+        return RELATIONSHIPS;
     }
 
     @OnScheduled
@@ -203,14 +213,7 @@ public abstract class FetchFileTransfer extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        final List<PropertyDescriptor> properties = new ArrayList<>();
-        properties.add(HOSTNAME);
-        properties.add(UNDEFAULTED_PORT);
-        properties.add(REMOTE_FILENAME);
-        properties.add(COMPLETION_STRATEGY);
-        properties.add(MOVE_DESTINATION_DIR);
-        properties.add(MOVE_CREATE_DIRECTORY);
-        return properties;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

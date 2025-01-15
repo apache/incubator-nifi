@@ -150,7 +150,7 @@ public class SplitAvro extends AbstractProcessor {
             "avro.codec"
     );
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             SPLIT_STRATEGY,
             OUTPUT_SIZE,
             OUTPUT_STRATEGY,
@@ -170,7 +170,7 @@ public class SplitAvro extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

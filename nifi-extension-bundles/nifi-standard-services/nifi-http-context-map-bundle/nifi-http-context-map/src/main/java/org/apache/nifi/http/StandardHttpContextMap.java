@@ -16,7 +16,6 @@
  */
 package org.apache.nifi.http;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +65,11 @@ public class StandardHttpContextMap extends AbstractControllerService implements
             .addValidator(StandardValidators.TIME_PERIOD_VALIDATOR)
             .build();
 
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        MAX_OUTSTANDING_REQUESTS,
+        REQUEST_EXPIRATION
+    );
+
     private static final long CLEANUP_MAX_DELAY_NANOS = 5_000_000_000L;
 
     private final ConcurrentMap<String, Wrapper> wrapperMap = new ConcurrentHashMap<>();
@@ -76,10 +80,7 @@ public class StandardHttpContextMap extends AbstractControllerService implements
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        final List<PropertyDescriptor> properties = new ArrayList<>(2);
-        properties.add(MAX_OUTSTANDING_REQUESTS);
-        properties.add(REQUEST_EXPIRATION);
-        return properties;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnEnabled

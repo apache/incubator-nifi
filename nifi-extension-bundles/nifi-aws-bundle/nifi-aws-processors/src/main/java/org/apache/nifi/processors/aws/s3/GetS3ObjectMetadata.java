@@ -86,7 +86,7 @@ public class GetS3ObjectMetadata extends AbstractS3Processor {
             .dependsOn(METADATA_TARGET, TARGET_ATTRIBUTES)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             METADATA_TARGET,
             ATTRIBUTE_INCLUDE_PATTERN,
             BUCKET_WITH_DEFAULT_VALUE,
@@ -133,7 +133,7 @@ public class GetS3ObjectMetadata extends AbstractS3Processor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

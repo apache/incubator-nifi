@@ -178,7 +178,7 @@ public class EnforceOrder extends AbstractProcessor {
         .expressionLanguageSupported(ExpressionLanguageScope.NONE)
         .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             GROUP_IDENTIFIER,
             ORDER_ATTRIBUTE,
             INITIAL_ORDER,
@@ -223,7 +223,7 @@ public class EnforceOrder extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

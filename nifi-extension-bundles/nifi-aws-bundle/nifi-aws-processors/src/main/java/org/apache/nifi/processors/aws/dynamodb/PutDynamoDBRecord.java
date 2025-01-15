@@ -172,7 +172,7 @@ public class PutDynamoDBRecord extends AbstractDynamoDBProcessor {
             .description("Defines the name of the sort key field in the DynamoDB table. Sort key is also known as range key.")
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
         TABLE,
         REGION,
         AWS_CREDENTIALS_PROVIDER_SERVICE,
@@ -190,7 +190,7 @@ public class PutDynamoDBRecord extends AbstractDynamoDBProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

@@ -53,7 +53,6 @@ import java.net.Proxy;
 import java.net.URI;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
@@ -137,7 +136,7 @@ public class AmazonGlueSchemaRegistry extends AbstractControllerService implemen
 
     private static final PropertyDescriptor PROXY_CONFIGURATION_SERVICE = ProxyConfiguration.createProxyConfigPropertyDescriptor(PROXY_SPECS);
 
-    private static final List<PropertyDescriptor> PROPERTIES = new ArrayList<>(Arrays.asList(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             SCHEMA_REGISTRY_NAME,
             REGION,
             COMMUNICATIONS_TIMEOUT,
@@ -146,12 +145,12 @@ public class AmazonGlueSchemaRegistry extends AbstractControllerService implemen
             AWS_CREDENTIALS_PROVIDER_SERVICE,
             PROXY_CONFIGURATION_SERVICE,
             SSL_CONTEXT_SERVICE
-    ));
+    );
 
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     private volatile SchemaRegistryClient client;

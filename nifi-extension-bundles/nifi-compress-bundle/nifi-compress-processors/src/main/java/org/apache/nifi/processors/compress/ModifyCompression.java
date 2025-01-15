@@ -149,14 +149,17 @@ public class ModifyCompression extends AbstractProcessor {
             .description("FlowFiles will be transferred to the failure relationship on compression modification errors")
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             INPUT_COMPRESSION_STRATEGY,
             OUTPUT_COMPRESSION_STRATEGY,
             OUTPUT_COMPRESSION_LEVEL,
             OUTPUT_FILENAME_STRATEGY
     );
 
-    private static final Set<Relationship> RELATIONSHIPS = Set.of(REL_SUCCESS, REL_FAILURE);
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+            REL_SUCCESS,
+            REL_FAILURE
+    );
 
     private static final Map<String, CompressionStrategy> compressionFormatMimeTypeMap;
 
@@ -184,7 +187,7 @@ public class ModifyCompression extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

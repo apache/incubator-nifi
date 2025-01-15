@@ -135,7 +135,7 @@ public class SplitText extends AbstractProcessor {
             .defaultValue("true")
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             LINE_SPLIT_COUNT,
             FRAGMENT_MAX_SIZE,
             HEADER_LINE_COUNT,
@@ -268,7 +268,7 @@ public class SplitText extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     /**

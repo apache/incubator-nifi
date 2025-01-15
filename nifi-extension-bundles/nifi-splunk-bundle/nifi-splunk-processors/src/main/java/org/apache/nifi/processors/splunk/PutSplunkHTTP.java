@@ -43,15 +43,12 @@ import java.io.StringWriter;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 @InputRequirement(InputRequirement.Requirement.INPUT_REQUIRED)
 @Tags({"splunk", "logs", "http"})
@@ -133,9 +130,22 @@ public class PutSplunkHTTP extends SplunkAPICall {
             .description("FlowFiles that failed to send to the destination are sent to this relationship.")
             .build();
 
-    private static final Set<Relationship> RELATIONSHIPS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = Stream.concat(
+            getCommonPropertyDescriptors().stream(),
+            Stream.of(
+                SOURCE,
+                SOURCE_TYPE,
+                HOST,
+                INDEX,
+                CONTENT_TYPE,
+                CHARSET
+            )
+    ).toList();
+
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
             RELATIONSHIP_SUCCESS,
-            RELATIONSHIP_FAILURE)));
+            RELATIONSHIP_FAILURE
+    );
 
     @Override
     public Set<Relationship> getRelationships() {
@@ -144,14 +154,7 @@ public class PutSplunkHTTP extends SplunkAPICall {
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        final List<PropertyDescriptor> result = new ArrayList<>(super.getSupportedPropertyDescriptors());
-        result.add(SOURCE);
-        result.add(SOURCE_TYPE);
-        result.add(HOST);
-        result.add(INDEX);
-        result.add(CONTENT_TYPE);
-        result.add(CHARSET);
-        return result;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

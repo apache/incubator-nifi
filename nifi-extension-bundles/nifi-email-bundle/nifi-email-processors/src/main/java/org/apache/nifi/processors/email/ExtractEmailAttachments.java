@@ -83,7 +83,10 @@ public class ExtractEmailAttachments extends AbstractProcessor {
 
     private static final String ATTACHMENT_DISPOSITION = "attachment";
 
-    private static final Set<Relationship> relationships = Set.of(REL_ATTACHMENTS, REL_ORIGINAL, REL_FAILURE);
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+            REL_ATTACHMENTS,
+            REL_ORIGINAL,
+            REL_FAILURE);
 
     @Override
     public void onTrigger(final ProcessContext context, final ProcessSession session) {
@@ -171,7 +174,7 @@ public class ExtractEmailAttachments extends AbstractProcessor {
 
     @Override
     public Set<Relationship> getRelationships() {
-        return relationships;
+        return RELATIONSHIPS;
     }
 
     private void parseAttachments(final List<DataSource> attachments, final MimePart parentPart, final int depth) throws MessagingException, IOException {

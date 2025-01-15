@@ -153,7 +153,7 @@ public class EncryptContentPGP extends AbstractProcessor {
             FAILURE
     );
 
-    private static final List<PropertyDescriptor> DESCRIPTORS = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             SYMMETRIC_KEY_ALGORITHM,
             FILE_ENCODING,
             PASSPHRASE,
@@ -178,7 +178,7 @@ public class EncryptContentPGP extends AbstractProcessor {
      */
     @Override
     public final List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return DESCRIPTORS;
+        return PROPERTY_DESCRIPTORS;
     }
 
     /**

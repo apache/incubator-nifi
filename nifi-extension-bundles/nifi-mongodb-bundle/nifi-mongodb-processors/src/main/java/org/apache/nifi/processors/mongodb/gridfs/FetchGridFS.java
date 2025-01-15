@@ -43,13 +43,12 @@ import org.bson.Document;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @InputRequirement(InputRequirement.Requirement.INPUT_REQUIRED)
 @WritesAttributes(
@@ -75,27 +74,26 @@ public class FetchGridFS extends AbstractGridFSProcessor implements QueryHelper 
         .description("The original input flowfile goes to this relationship if the query does not cause an error")
         .build();
 
-    static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS;
-    static final Set<Relationship> RELATIONSHIP_SET;
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = Stream.concat(
+            getCommonPropertyDescriptors().stream(),
+            Stream.of(
+                FILE_NAME,
+                QUERY,
+                QUERY_ATTRIBUTE,
+                OPERATION_MODE
+            )
+    ).toList();
 
-    static {
-        List<PropertyDescriptor> _temp = new ArrayList<>();
-        _temp.addAll(PARENT_PROPERTIES);
-        _temp.add(FILE_NAME);
-        _temp.add(QUERY);
-        _temp.add(QUERY_ATTRIBUTE);
-        _temp.add(OPERATION_MODE);
-        PROPERTY_DESCRIPTORS = Collections.unmodifiableList(_temp);
-
-        Set<Relationship> _rels = new HashSet<>();
-        _rels.addAll(PARENT_RELATIONSHIPS);
-        _rels.add(REL_ORIGINAL);
-        RELATIONSHIP_SET = Collections.unmodifiableSet(_rels);
-    }
+    private static final Set<Relationship> RELATIONSHIPS = Stream.concat(
+            getCommonRelationships().stream(),
+            Stream.of(
+                REL_ORIGINAL
+            )
+    ).collect(Collectors.toUnmodifiableSet());
 
     @Override
     public Set<Relationship> getRelationships() {
-        return RELATIONSHIP_SET;
+        return RELATIONSHIPS;
     }
 
     @Override

@@ -88,17 +88,22 @@ public class GetFileResource extends AbstractProcessor {
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(FILE_RESOURCE, MIME_TYPE);
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        FILE_RESOURCE,
+        MIME_TYPE
+    );
 
     public static final Relationship SUCCESS = new Relationship.Builder()
             .name("success")
             .build();
 
-    private static final Set<Relationship> RELATIONSHIPS = Set.of(SUCCESS);
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+        SUCCESS
+    );
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

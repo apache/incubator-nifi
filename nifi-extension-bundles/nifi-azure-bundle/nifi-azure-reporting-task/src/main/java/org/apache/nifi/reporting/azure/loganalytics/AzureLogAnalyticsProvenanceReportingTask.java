@@ -167,7 +167,7 @@ public class AzureLogAnalyticsProvenanceReportingTask extends AbstractAzureLogAn
                         .description("Specifies how many records to send in a single batch, at most.").required(true)
                         .defaultValue("1000").addValidator(StandardValidators.POSITIVE_INTEGER_VALIDATOR).build();
 
-        private static final List<PropertyDescriptor> PROPERTIES = List.of(
+        private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
                 LOG_ANALYTICS_WORKSPACE_ID,
                 LOG_ANALYTICS_CUSTOM_LOG_NAME,
                 LOG_ANALYTICS_WORKSPACE_KEY,
@@ -194,7 +194,7 @@ public class AzureLogAnalyticsProvenanceReportingTask extends AbstractAzureLogAn
 
         @Override
         protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-                return PROPERTIES;
+                return PROPERTY_DESCRIPTORS;
         }
 
         public void CreateConsumer(final ReportingContext context) {

@@ -161,7 +161,7 @@ public class PutAzureDataExplorer extends AbstractProcessor {
             .defaultValue("5 s")
             .build();
 
-    private static final List<PropertyDescriptor> descriptors = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             INGEST_SERVICE,
             DATABASE_NAME,
             TABLE_NAME,
@@ -189,7 +189,7 @@ public class PutAzureDataExplorer extends AbstractProcessor {
 
     @Override
     public final List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return descriptors;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnScheduled

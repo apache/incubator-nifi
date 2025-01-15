@@ -56,7 +56,6 @@ import java.io.UncheckedIOException;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -69,6 +68,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /**
  * This processor renames files on HDFS.
@@ -97,8 +97,6 @@ public class MoveHDFS extends AbstractHadoopProcessor {
     public static final String REPLACE_RESOLUTION = "replace";
     public static final String IGNORE_RESOLUTION = "ignore";
     public static final String FAIL_RESOLUTION = "fail";
-
-    private static final Set<Relationship> relationships;
 
     public static final AllowableValue REPLACE_RESOLUTION_AV = new AllowableValue(REPLACE_RESOLUTION,
             REPLACE_RESOLUTION, "Replaces the existing file if any.");
@@ -185,12 +183,24 @@ public class MoveHDFS extends AbstractHadoopProcessor {
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .build();
 
-    static {
-        final Set<Relationship> rels = new HashSet<>();
-        rels.add(REL_SUCCESS);
-        rels.add(REL_FAILURE);
-        relationships = Collections.unmodifiableSet(rels);
-    }
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+            REL_SUCCESS,
+            REL_FAILURE
+    );
+
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = Stream.concat(
+            getCommonPropertyDescriptors().stream(),
+            Stream.of(
+                CONFLICT_RESOLUTION,
+                INPUT_DIRECTORY_OR_FILE,
+                OUTPUT_DIRECTORY,
+                OPERATION,
+                FILE_FILTER_REGEX,
+                IGNORE_DOTTED_FILES,
+                REMOTE_OWNER,
+                REMOTE_GROUP
+            )
+    ).toList();
 
     // non-static global
     protected ProcessorConfiguration processorConfig;
@@ -205,21 +215,12 @@ public class MoveHDFS extends AbstractHadoopProcessor {
     // methods
     @Override
     public Set<Relationship> getRelationships() {
-        return relationships;
+        return RELATIONSHIPS;
     }
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        List<PropertyDescriptor> props = new ArrayList<>(properties);
-        props.add(CONFLICT_RESOLUTION);
-        props.add(INPUT_DIRECTORY_OR_FILE);
-        props.add(OUTPUT_DIRECTORY);
-        props.add(OPERATION);
-        props.add(FILE_FILTER_REGEX);
-        props.add(IGNORE_DOTTED_FILES);
-        props.add(REMOTE_OWNER);
-        props.add(REMOTE_GROUP);
-        return props;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnScheduled

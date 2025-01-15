@@ -218,7 +218,7 @@ public class GetSmbFile extends AbstractProcessor {
 
     public static final Relationship REL_SUCCESS = new Relationship.Builder().name("success").description("All files are routed to success").build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
         HOSTNAME,
         SHARE,
         DIRECTORY,
@@ -262,12 +262,12 @@ public class GetSmbFile extends AbstractProcessor {
 
     @Override
     public Set<Relationship> getRelationships() {
-        return this.RELATIONSHIPS;
+        return RELATIONSHIPS;
     }
 
     @Override
     public final List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnScheduled

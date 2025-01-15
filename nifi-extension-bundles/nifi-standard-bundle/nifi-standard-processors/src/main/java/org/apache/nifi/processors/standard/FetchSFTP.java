@@ -97,7 +97,7 @@ public class FetchSFTP extends FetchFileTransfer {
                     MOVE_CREATE_DIRECTORY.getDisplayName(),
                     SFTPTransfer.DISABLE_DIRECTORY_LISTING.getDescription())).build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             HOSTNAME,
             PORT,
             USERNAME,
@@ -125,7 +125,7 @@ public class FetchSFTP extends FetchFileTransfer {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

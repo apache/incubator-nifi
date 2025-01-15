@@ -299,7 +299,7 @@ public class PublishKafka extends AbstractProcessor implements KafkaPublishCompo
             .description("Any FlowFile that cannot be sent to Kafka will be routed to this Relationship")
             .build();
 
-    private static final List<PropertyDescriptor> DESCRIPTORS = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             CONNECTION_SERVICE,
             TOPIC_NAME,
             FAILURE_STRATEGY,
@@ -323,14 +323,17 @@ public class PublishKafka extends AbstractProcessor implements KafkaPublishCompo
             RECORD_METADATA_STRATEGY
     );
 
-    private static final Set<Relationship> RELATIONSHIPS = Set.of(REL_SUCCESS, REL_FAILURE);
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+            REL_SUCCESS,
+            REL_FAILURE
+    );
 
     private final Queue<KafkaProducerService> producerServices = new LinkedBlockingQueue<>();
 
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return DESCRIPTORS;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

@@ -32,8 +32,6 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -58,20 +56,19 @@ public abstract class PutFileTransfer<T extends FileTransfer> extends AbstractPr
             .description("FlowFiles that were rejected by the destination system")
             .build();
 
-    private final Set<Relationship> relationships;
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+            REL_SUCCESS,
+            REL_FAILURE,
+            REL_REJECT
+    );
 
     public PutFileTransfer() {
         super();
-        final Set<Relationship> relationships = new HashSet<>();
-        relationships.add(REL_SUCCESS);
-        relationships.add(REL_FAILURE);
-        relationships.add(REL_REJECT);
-        this.relationships = Collections.unmodifiableSet(relationships);
     }
 
     @Override
     public Set<Relationship> getRelationships() {
-        return relationships;
+        return RELATIONSHIPS;
     }
 
     protected abstract T getFileTransfer(final ProcessContext context);

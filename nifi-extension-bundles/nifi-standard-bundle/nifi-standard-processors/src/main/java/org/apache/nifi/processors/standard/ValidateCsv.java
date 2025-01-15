@@ -195,7 +195,7 @@ public class ValidateCsv extends AbstractProcessor {
             .defaultValue("false")
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             SCHEMA,
             CSV_SOURCE_ATTRIBUTE,
             HEADER,
@@ -228,7 +228,7 @@ public class ValidateCsv extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

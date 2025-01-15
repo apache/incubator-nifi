@@ -36,12 +36,10 @@ import org.apache.nifi.processor.exception.ProcessException;
 import org.apache.nifi.processors.hadoop.util.SequenceFileWriter;
 import org.apache.nifi.util.StopWatch;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 /**
  * <p>
@@ -83,14 +81,7 @@ public class CreateHadoopSequenceFile extends AbstractHadoopProcessor {
             .name("failure")
             .description("Incoming files that failed to generate a Sequence File are sent to this relationship")
             .build();
-    private static final Set<Relationship> relationships;
 
-    static {
-        Set<Relationship> rels = new HashSet<>();
-        rels.add(RELATIONSHIP_SUCCESS);
-        rels.add(RELATIONSHIP_FAILURE);
-        relationships = Collections.unmodifiableSet(rels);
-    }
     // Optional Properties.
     static final PropertyDescriptor COMPRESSION_TYPE = new PropertyDescriptor.Builder()
             .displayName("Compression type")
@@ -102,17 +93,27 @@ public class CreateHadoopSequenceFile extends AbstractHadoopProcessor {
     // Default Values.
     public static final String DEFAULT_COMPRESSION_TYPE = "NONE";
 
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+            RELATIONSHIP_SUCCESS,
+            RELATIONSHIP_FAILURE
+    );
+
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = Stream.concat(
+            getCommonPropertyDescriptors().stream(),
+            Stream.of(
+                COMPRESSION_TYPE,
+                COMPRESSION_CODEC
+            )
+    ).toList();
+
     @Override
     public Set<Relationship> getRelationships() {
-        return relationships;
+        return RELATIONSHIPS;
     }
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        List<PropertyDescriptor> someProps = new ArrayList<>(properties);
-        someProps.add(COMPRESSION_TYPE);
-        someProps.add(COMPRESSION_CODEC);
-        return  someProps;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

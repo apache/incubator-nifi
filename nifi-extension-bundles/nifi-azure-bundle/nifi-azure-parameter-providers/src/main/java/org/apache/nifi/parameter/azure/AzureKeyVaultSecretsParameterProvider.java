@@ -75,7 +75,7 @@ public class AzureKeyVaultSecretsParameterProvider extends AbstractParameterProv
 
     static final String GROUP_NAME_TAG = "group-name";
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             AZURE_CREDENTIALS_SERVICE,
             KEY_VAULT_URI,
             GROUP_NAME_PATTERN
@@ -83,7 +83,7 @@ public class AzureKeyVaultSecretsParameterProvider extends AbstractParameterProv
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

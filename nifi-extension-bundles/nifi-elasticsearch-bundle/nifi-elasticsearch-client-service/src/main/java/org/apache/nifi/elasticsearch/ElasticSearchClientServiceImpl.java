@@ -102,10 +102,30 @@ public class ElasticSearchClientServiceImpl extends AbstractControllerService im
 
     private ObjectMapper mapper;
 
-    private static final List<PropertyDescriptor> properties = List.of(HTTP_HOSTS, PATH_PREFIX, AUTHORIZATION_SCHEME, USERNAME, PASSWORD, API_KEY_ID, API_KEY,
-            PROP_SSL_CONTEXT_SERVICE, PROXY_CONFIGURATION_SERVICE, CONNECT_TIMEOUT, SOCKET_TIMEOUT, CHARSET,
-            SUPPRESS_NULLS, COMPRESSION, SEND_META_HEADER, STRICT_DEPRECATION, NODE_SELECTOR, SNIFF_CLUSTER_NODES,
-            SNIFFER_INTERVAL, SNIFFER_REQUEST_TIMEOUT, SNIFF_ON_FAILURE, SNIFFER_FAILURE_DELAY);
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+            HTTP_HOSTS,
+            PATH_PREFIX,
+            AUTHORIZATION_SCHEME,
+            USERNAME,
+            PASSWORD,
+            API_KEY_ID,
+            API_KEY,
+            PROP_SSL_CONTEXT_SERVICE,
+            PROXY_CONFIGURATION_SERVICE,
+            CONNECT_TIMEOUT,
+            SOCKET_TIMEOUT,
+            CHARSET,
+            SUPPRESS_NULLS,
+            COMPRESSION,
+            SEND_META_HEADER,
+            STRICT_DEPRECATION,
+            NODE_SELECTOR,
+            SNIFF_CLUSTER_NODES,
+            SNIFFER_INTERVAL,
+            SNIFFER_REQUEST_TIMEOUT,
+            SNIFF_ON_FAILURE,
+            SNIFFER_FAILURE_DELAY
+    );
 
     private RestClient client;
 
@@ -117,7 +137,7 @@ public class ElasticSearchClientServiceImpl extends AbstractControllerService im
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return properties;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

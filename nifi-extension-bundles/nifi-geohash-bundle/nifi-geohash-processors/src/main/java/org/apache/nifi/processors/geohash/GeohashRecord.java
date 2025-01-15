@@ -31,7 +31,6 @@ import org.apache.nifi.flowfile.attributes.CoreAttributes;
 import org.apache.nifi.processor.AbstractProcessor;
 import org.apache.nifi.processor.ProcessContext;
 import org.apache.nifi.processor.ProcessSession;
-import org.apache.nifi.processor.ProcessorInitializationContext;
 import org.apache.nifi.processor.Relationship;
 import org.apache.nifi.processor.util.StandardValidators;
 import org.apache.nifi.record.path.FieldValue;
@@ -56,10 +55,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Optional;
@@ -226,28 +223,23 @@ public class GeohashRecord extends AbstractProcessor {
             REL_FAILURE
     );
 
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+            MODE,
+            RECORD_READER,
+            RECORD_WRITER,
+            ROUTING_STRATEGY,
+            LATITUDE_RECORD_PATH,
+            LONGITUDE_RECORD_PATH,
+            GEOHASH_RECORD_PATH,
+            GEOHASH_FORMAT,
+            GEOHASH_LEVEL
+    );
+
     private RoutingStrategyExecutor routingStrategyExecutor;
     private static boolean isSplit;
     private static Integer enrichedCount, unenrichedCount;
 
     private final RecordPathCache cache = new RecordPathCache(100);
-
-    private List<PropertyDescriptor> descriptors;
-
-    @Override
-    protected void init(final ProcessorInitializationContext context) {
-        descriptors = new ArrayList<>();
-        descriptors.add(MODE);
-        descriptors.add(RECORD_READER);
-        descriptors.add(RECORD_WRITER);
-        descriptors.add(ROUTING_STRATEGY);
-        descriptors.add(LATITUDE_RECORD_PATH);
-        descriptors.add(LONGITUDE_RECORD_PATH);
-        descriptors.add(GEOHASH_RECORD_PATH);
-        descriptors.add(GEOHASH_FORMAT);
-        descriptors.add(GEOHASH_LEVEL);
-        descriptors = Collections.unmodifiableList(descriptors);
-    }
 
     @Override
     public void onPropertyModified(final PropertyDescriptor descriptor, final String oldValue, final String newValue) {
@@ -263,7 +255,7 @@ public class GeohashRecord extends AbstractProcessor {
 
     @Override
     public final List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return descriptors;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnScheduled

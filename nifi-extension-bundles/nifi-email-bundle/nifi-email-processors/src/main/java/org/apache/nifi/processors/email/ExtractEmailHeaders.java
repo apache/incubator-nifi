@@ -127,12 +127,12 @@ public class ExtractEmailHeaders extends AbstractProcessor {
 
     private static final String ATTACHMENT_DISPOSITION = "attachment";
 
-    private static final Set<Relationship> relationships = Set.of(
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
             REL_SUCCESS,
             REL_FAILURE
     );
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             CAPTURED_HEADERS,
             STRICT_PARSING
     );
@@ -221,12 +221,12 @@ public class ExtractEmailHeaders extends AbstractProcessor {
 
     @Override
     public Set<Relationship> getRelationships() {
-        return relationships;
+        return RELATIONSHIPS;
     }
 
     @Override
     public final List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     private static void putAddressListInAttributes(

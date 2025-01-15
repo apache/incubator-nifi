@@ -96,7 +96,7 @@ public class GetAzureQueueStorage_v12 extends AbstractAzureQueueStorage_v12 {
             .build();
 
     private static final ProxySpec[] PROXY_SPECS = {ProxySpec.HTTP, ProxySpec.SOCKS};
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             QUEUE_NAME,
             ENDPOINT_SUFFIX,
             STORAGE_CREDENTIALS_SERVICE,
@@ -115,7 +115,7 @@ public class GetAzureQueueStorage_v12 extends AbstractAzureQueueStorage_v12 {
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

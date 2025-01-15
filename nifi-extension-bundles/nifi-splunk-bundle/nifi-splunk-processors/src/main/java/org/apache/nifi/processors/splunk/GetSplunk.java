@@ -270,7 +270,7 @@ public class GetSplunk extends AbstractProcessor implements ClassloaderIsolation
             REL_SUCCESS
     );
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
         SCHEME,
         HOSTNAME,
         PORT,
@@ -304,7 +304,7 @@ public class GetSplunk extends AbstractProcessor implements ClassloaderIsolation
 
     @Override
     public final List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

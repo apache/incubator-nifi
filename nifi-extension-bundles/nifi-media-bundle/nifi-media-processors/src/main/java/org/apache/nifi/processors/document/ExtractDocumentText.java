@@ -32,10 +32,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -53,7 +50,11 @@ public class ExtractDocumentText extends AbstractProcessor {
     public static final Relationship REL_FAILURE = new Relationship.Builder().name("failure")
             .description("Content extraction failed").build();
 
-    private static final Set<Relationship> RELATIONSHIPS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(REL_ORIGINAL, REL_EXTRACTED, REL_FAILURE)));
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+            REL_ORIGINAL,
+            REL_EXTRACTED,
+            REL_FAILURE
+    );
 
     @Override
     public Set<Relationship> getRelationships() {

@@ -77,7 +77,7 @@ import java.util.Map;
 @SystemResourceConsideration(resource = SystemResource.MEMORY)
 public class PutDynamoDB extends AbstractDynamoDBProcessor {
 
-    public static final List<PropertyDescriptor> PROPERTIES = List.of(
+    public static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
         TABLE,
         REGION,
         AWS_CREDENTIALS_PROVIDER_SERVICE,
@@ -99,7 +99,7 @@ public class PutDynamoDB extends AbstractDynamoDBProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

@@ -237,7 +237,7 @@ public class Wait extends AbstractProcessor {
         .expressionLanguageSupported(ExpressionLanguageScope.NONE)
         .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             RELEASE_SIGNAL_IDENTIFIER,
             TARGET_SIGNAL_COUNT,
             SIGNAL_COUNTER_NAME,
@@ -281,7 +281,7 @@ public class Wait extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

@@ -87,7 +87,7 @@ public class PutKinesisFirehose extends AbstractAwsSyncProcessor<FirehoseClient,
             .sensitive(false)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
         KINESIS_FIREHOSE_DELIVERY_STREAM_NAME,
         BATCH_SIZE,
         REGION,
@@ -101,7 +101,7 @@ public class PutKinesisFirehose extends AbstractAwsSyncProcessor<FirehoseClient,
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

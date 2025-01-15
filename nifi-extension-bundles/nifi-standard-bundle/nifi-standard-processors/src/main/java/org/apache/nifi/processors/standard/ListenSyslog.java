@@ -192,7 +192,7 @@ public class ListenSyslog extends AbstractSyslogProcessor {
             .dependsOn(PROTOCOL, TCP_VALUE)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             PROTOCOL,
             PORT,
             NETWORK_INTF_NAME,
@@ -239,7 +239,7 @@ public class ListenSyslog extends AbstractSyslogProcessor {
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

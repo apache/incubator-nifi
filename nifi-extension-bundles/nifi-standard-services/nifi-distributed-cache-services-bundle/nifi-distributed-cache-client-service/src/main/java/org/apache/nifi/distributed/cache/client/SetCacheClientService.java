@@ -32,7 +32,6 @@ import org.apache.nifi.remote.VersionNegotiatorFactory;
 import org.apache.nifi.ssl.SSLContextProvider;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -71,6 +70,13 @@ public class SetCacheClientService extends AbstractControllerService implements 
             .defaultValue("30 secs")
             .build();
 
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        HOSTNAME,
+        PORT,
+        SSL_CONTEXT_SERVICE,
+        COMMUNICATIONS_TIMEOUT
+    );
+
     private volatile NettySetCacheClient cacheClient = null;
 
     /**
@@ -80,12 +86,7 @@ public class SetCacheClientService extends AbstractControllerService implements 
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        final List<PropertyDescriptor> descriptors = new ArrayList<>();
-        descriptors.add(HOSTNAME);
-        descriptors.add(PORT);
-        descriptors.add(SSL_CONTEXT_SERVICE);
-        descriptors.add(COMMUNICATIONS_TIMEOUT);
-        return descriptors;
+       return PROPERTY_DESCRIPTORS;
     }
 
     @OnEnabled

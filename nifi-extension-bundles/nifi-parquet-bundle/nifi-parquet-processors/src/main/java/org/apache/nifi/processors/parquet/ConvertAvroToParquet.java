@@ -19,7 +19,6 @@
 package org.apache.nifi.processors.parquet;
 
 
-import com.google.common.collect.ImmutableSet;
 import org.apache.avro.Schema;
 import org.apache.avro.file.DataFileStream;
 import org.apache.avro.generic.GenericDatumReader;
@@ -39,7 +38,6 @@ import org.apache.nifi.parquet.utils.ParquetUtils;
 import org.apache.nifi.processor.AbstractProcessor;
 import org.apache.nifi.processor.ProcessContext;
 import org.apache.nifi.processor.ProcessSession;
-import org.apache.nifi.processor.ProcessorInitializationContext;
 import org.apache.nifi.processor.Relationship;
 import org.apache.nifi.processor.exception.ProcessException;
 import org.apache.parquet.avro.AvroParquetWriter;
@@ -49,8 +47,6 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,8 +70,6 @@ public class ConvertAvroToParquet extends AbstractProcessor {
     // Attributes
     public static final String RECORD_COUNT_ATTRIBUTE = "record.count";
 
-    private volatile List<PropertyDescriptor> parquetProps;
-
     // Relationships
     static final Relationship SUCCESS = new Relationship.Builder()
             .name("success")
@@ -87,33 +81,25 @@ public class ConvertAvroToParquet extends AbstractProcessor {
             .description("Avro content that could not be processed")
             .build();
 
-    static final Set<Relationship> RELATIONSHIPS
-            = ImmutableSet.<Relationship>builder()
-            .add(SUCCESS)
-            .add(FAILURE)
-            .build();
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+            SUCCESS,
+            FAILURE
+    );
 
-    @Override
-    protected final void init(final ProcessorInitializationContext context) {
-
-
-        final List<PropertyDescriptor> props = new ArrayList<>();
-
-        props.add(ParquetUtils.COMPRESSION_TYPE);
-        props.add(ParquetUtils.ROW_GROUP_SIZE);
-        props.add(ParquetUtils.PAGE_SIZE);
-        props.add(ParquetUtils.DICTIONARY_PAGE_SIZE);
-        props.add(ParquetUtils.MAX_PADDING_SIZE);
-        props.add(ParquetUtils.ENABLE_DICTIONARY_ENCODING);
-        props.add(ParquetUtils.ENABLE_VALIDATION);
-        props.add(ParquetUtils.WRITER_VERSION);
-
-        this.parquetProps = Collections.unmodifiableList(props);
-    }
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        ParquetUtils.COMPRESSION_TYPE,
+        ParquetUtils.ROW_GROUP_SIZE,
+        ParquetUtils.PAGE_SIZE,
+        ParquetUtils.DICTIONARY_PAGE_SIZE,
+        ParquetUtils.MAX_PADDING_SIZE,
+        ParquetUtils.ENABLE_DICTIONARY_ENCODING,
+        ParquetUtils.ENABLE_VALIDATION,
+        ParquetUtils.WRITER_VERSION
+    );
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return parquetProps;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

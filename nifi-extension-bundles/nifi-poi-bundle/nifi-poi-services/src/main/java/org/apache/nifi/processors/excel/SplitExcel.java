@@ -109,7 +109,7 @@ public class SplitExcel extends AbstractProcessor {
             .description("The individual Excel 'segments' of the original Excel FlowFile will be routed to this relationship.")
             .build();
 
-    private static final List<PropertyDescriptor> DESCRIPTORS = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             PROTECTION_TYPE,
             PASSWORD
     );
@@ -138,7 +138,7 @@ public class SplitExcel extends AbstractProcessor {
 
     @Override
     public final List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return DESCRIPTORS;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

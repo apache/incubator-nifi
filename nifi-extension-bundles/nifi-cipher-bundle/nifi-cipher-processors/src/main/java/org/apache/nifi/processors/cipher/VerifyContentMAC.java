@@ -133,7 +133,7 @@ public class VerifyContentMAC extends AbstractProcessor {
     protected static final String MAC_ALGORITHM_ATTRIBUTE = "mac.algorithm";
     protected static final String MAC_ENCODING_ATTRIBUTE = "mac.encoding";
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
                     MAC_ALGORITHM,
                     MAC_ENCODING,
                     MAC,
@@ -198,7 +198,7 @@ public class VerifyContentMAC extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

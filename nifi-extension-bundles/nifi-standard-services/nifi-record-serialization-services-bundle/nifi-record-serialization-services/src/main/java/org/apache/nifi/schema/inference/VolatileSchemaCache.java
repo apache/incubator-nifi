@@ -38,7 +38,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -60,11 +59,15 @@ public class VolatileSchemaCache extends AbstractControllerService implements Re
 
     private static final Base64.Encoder ENCODER = Base64.getEncoder().withoutPadding();
 
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        MAX_SIZE
+    );
+
     private volatile Cache<String, RecordSchema> cache;
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return Collections.singletonList(MAX_SIZE);
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnEnabled

@@ -222,7 +222,7 @@ public class PublishSlack extends AbstractProcessor {
         .required(false)
         .build();
 
-    private static final List<PropertyDescriptor> properties = List.of(ACCESS_TOKEN,
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(ACCESS_TOKEN,
         CHANNEL,
         PUBLISH_STRATEGY,
         MESSAGE_TEXT,
@@ -230,7 +230,8 @@ public class PublishSlack extends AbstractProcessor {
         SEND_CONTENT_AS_ATTACHMENT,
         MAX_FILE_SIZE,
         THREAD_TS,
-        METHODS_ENDPOINT_URL_PREFIX);
+        METHODS_ENDPOINT_URL_PREFIX
+    );
 
 
     public static final Relationship REL_SUCCESS = new Relationship.Builder()
@@ -248,7 +249,7 @@ public class PublishSlack extends AbstractProcessor {
         .description("FlowFiles are routed to 'failure' if unable to be sent to Slack for any other reason")
         .build();
 
-    private static final Set<Relationship> relationships = Set.of(
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
         REL_SUCCESS,
         REL_RATE_LIMITED,
         REL_FAILURE);
@@ -261,12 +262,12 @@ public class PublishSlack extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return properties;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override
     public Set<Relationship> getRelationships() {
-        return relationships;
+        return RELATIONSHIPS;
     }
 
     @OnScheduled

@@ -79,7 +79,7 @@ public abstract class AbstractAwsMachineLearningJobStatusProcessor<
             .autoTerminateDefault(true)
             .build();
     public static final String FAILURE_REASON_ATTRIBUTE = "failure.reason";
-    protected static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             TASK_ID,
             MANDATORY_AWS_CREDENTIALS_PROVIDER_SERVICE,
             REGION,
@@ -91,6 +91,10 @@ public abstract class AbstractAwsMachineLearningJobStatusProcessor<
             .configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true)
             .findAndAddModules()
             .build();
+
+    protected static List<PropertyDescriptor> getCommonPropertyDescriptors() {
+        return PROPERTY_DESCRIPTORS;
+    }
 
     @Override
     public void migrateProperties(final PropertyConfiguration config) {
@@ -112,7 +116,7 @@ public abstract class AbstractAwsMachineLearningJobStatusProcessor<
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     protected FlowFile writeToFlowFile(final ProcessSession session, final FlowFile flowFile, final AwsResponse response) {

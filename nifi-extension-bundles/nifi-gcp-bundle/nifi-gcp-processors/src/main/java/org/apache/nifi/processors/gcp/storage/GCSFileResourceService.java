@@ -44,7 +44,6 @@ import org.apache.nifi.processors.gcp.util.GoogleUtils;
 
 import java.io.IOException;
 import java.nio.channels.Channels;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -89,7 +88,7 @@ public class GCSFileResourceService extends AbstractControllerService implements
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = Arrays.asList(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             BUCKET,
             KEY,
             GoogleUtils.GCP_CREDENTIALS_PROVIDER_SERVICE
@@ -99,7 +98,7 @@ public class GCSFileResourceService extends AbstractControllerService implements
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnEnabled

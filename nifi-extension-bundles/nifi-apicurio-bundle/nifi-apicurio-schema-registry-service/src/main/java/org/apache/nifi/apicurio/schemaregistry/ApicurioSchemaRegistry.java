@@ -94,7 +94,7 @@ public class ApicurioSchemaRegistry extends AbstractControllerService implements
             .identifiesControllerService(WebClientServiceProvider.class)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             SCHEMA_REGISTRY_URL,
             SCHEMA_GROUP_ID,
             CACHE_SIZE,
@@ -105,7 +105,7 @@ public class ApicurioSchemaRegistry extends AbstractControllerService implements
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     private volatile SchemaRegistryClient client;

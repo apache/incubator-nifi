@@ -50,7 +50,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -139,16 +138,18 @@ public class IPLookupService extends AbstractControllerService implements Record
         .required(true)
         .build();
 
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        GEO_DATABASE_FILE,
+        LOOKUP_CITY,
+        LOOKUP_ISP,
+        LOOKUP_DOMAIN,
+        LOOKUP_CONNECTION_TYPE,
+        LOOKUP_ANONYMOUS_IP_INFO
+    );
+
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        final List<PropertyDescriptor> properties = new ArrayList<>();
-        properties.add(GEO_DATABASE_FILE);
-        properties.add(LOOKUP_CITY);
-        properties.add(LOOKUP_ISP);
-        properties.add(LOOKUP_DOMAIN);
-        properties.add(LOOKUP_CONNECTION_TYPE);
-        properties.add(LOOKUP_ANONYMOUS_IP_INFO);
-        return properties;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnEnabled

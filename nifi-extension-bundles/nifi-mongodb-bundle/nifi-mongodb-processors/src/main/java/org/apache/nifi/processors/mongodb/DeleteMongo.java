@@ -92,8 +92,8 @@ public class DeleteMongo extends AbstractMongoProcessor {
             REL_FAILURE
     );
 
-    private final static List<PropertyDescriptor> PROPERTIES = Stream.concat(
-            AbstractMongoProcessor.DESCRIPTORS.stream(),
+    private final static List<PropertyDescriptor> PROPERTY_DESCRIPTORS = Stream.concat(
+            getCommonPropertyDescriptors().stream(),
             Stream.of(
                     DELETE_MODE,
                     FAIL_ON_NO_DELETE
@@ -107,7 +107,7 @@ public class DeleteMongo extends AbstractMongoProcessor {
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     private static final List<String> ALLOWED_DELETE_VALUES;

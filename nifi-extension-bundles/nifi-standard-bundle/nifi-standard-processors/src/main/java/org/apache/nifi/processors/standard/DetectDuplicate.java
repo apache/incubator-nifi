@@ -108,7 +108,7 @@ public class DetectDuplicate extends AbstractProcessor {
             .defaultValue("true")
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             CACHE_ENTRY_IDENTIFIER,
             FLOWFILE_DESCRIPTION,
             AGE_OFF_DURATION,
@@ -141,7 +141,7 @@ public class DetectDuplicate extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

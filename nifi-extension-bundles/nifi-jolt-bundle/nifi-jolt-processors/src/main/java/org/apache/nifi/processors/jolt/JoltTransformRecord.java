@@ -106,8 +106,8 @@ public class JoltTransformRecord extends AbstractJoltTransform {
             .description("The original FlowFile that was transformed. If the FlowFile fails processing, nothing will be sent to this relationship")
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = Stream.concat(
-            AbstractJoltTransform.PROPERTIES.stream(),
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = Stream.concat(
+            getCommonPropertyDescriptors().stream(),
             Stream.of(
                     RECORD_READER,
                     RECORD_WRITER
@@ -127,7 +127,7 @@ public class JoltTransformRecord extends AbstractJoltTransform {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

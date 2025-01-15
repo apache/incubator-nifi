@@ -174,7 +174,7 @@ public class SampleRecord extends AbstractProcessor {
             .dependsOn(SAMPLING_STRATEGY, PROBABILISTIC_SAMPLING, RESERVOIR_SAMPLING)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             RECORD_READER_FACTORY,
             RECORD_WRITER_FACTORY,
             SAMPLING_STRATEGY,
@@ -214,7 +214,7 @@ public class SampleRecord extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

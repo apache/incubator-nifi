@@ -290,7 +290,7 @@ public class ListS3 extends AbstractS3Processor implements VerifiableProcessor {
         .build();
 
 
-    public static final List<PropertyDescriptor> PROPERTIES = List.of(
+    public static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
         BUCKET_WITHOUT_DEFAULT_VALUE,
         REGION,
         AWS_CREDENTIALS_PROVIDER_SERVICE,
@@ -321,7 +321,7 @@ public class ListS3 extends AbstractS3Processor implements VerifiableProcessor {
             REL_SUCCESS
     );
 
-    private static final Set<PropertyDescriptor> TRACKING_RESET_PROPERTIES = Set.of(
+    private static final Set<PropertyDescriptor> TRACKING_RESET_PROPERTY_DESCRIPTORS = Set.of(
             BUCKET_WITHOUT_DEFAULT_VALUE,
             REGION,
             PREFIX,
@@ -350,7 +350,7 @@ public class ListS3 extends AbstractS3Processor implements VerifiableProcessor {
 
     @Override
     public void onPropertyModified(final PropertyDescriptor descriptor, final String oldValue, final String newValue) {
-        if (isConfigurationRestored() && TRACKING_RESET_PROPERTIES.contains(descriptor)) {
+        if (isConfigurationRestored() && TRACKING_RESET_PROPERTY_DESCRIPTORS.contains(descriptor)) {
             resetTracking = true;
         }
     }
@@ -421,7 +421,7 @@ public class ListS3 extends AbstractS3Processor implements VerifiableProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

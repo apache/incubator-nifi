@@ -87,8 +87,8 @@ public class JoltTransformJSON extends AbstractJoltTransform {
             .description("If a FlowFile fails processing for any reason (for example, the FlowFile is not valid JSON), it will be routed to this relationship")
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = Stream.concat(
-            AbstractJoltTransform.PROPERTIES.stream(),
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = Stream.concat(
+            getCommonPropertyDescriptors().stream(),
             Stream.of(
                     PRETTY_PRINT,
                     MAX_STRING_LENGTH
@@ -110,7 +110,7 @@ public class JoltTransformJSON extends AbstractJoltTransform {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

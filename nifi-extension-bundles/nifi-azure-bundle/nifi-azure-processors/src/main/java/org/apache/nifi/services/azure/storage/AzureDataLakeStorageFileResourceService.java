@@ -76,7 +76,7 @@ public class AzureDataLakeStorageFileResourceService extends AbstractControllerS
             .defaultValue(String.format("${%s}", ATTR_NAME_DIRECTORY))
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             ADLS_CREDENTIALS_SERVICE,
             FILESYSTEM,
             DIRECTORY,
@@ -88,7 +88,7 @@ public class AzureDataLakeStorageFileResourceService extends AbstractControllerS
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnEnabled

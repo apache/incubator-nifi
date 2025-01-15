@@ -186,7 +186,7 @@ public class CompressContent extends AbstractProcessor {
         .defaultValue("false")
         .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             MODE,
             COMPRESSION_FORMAT,
             COMPRESSION_LEVEL,
@@ -230,7 +230,7 @@ public class CompressContent extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

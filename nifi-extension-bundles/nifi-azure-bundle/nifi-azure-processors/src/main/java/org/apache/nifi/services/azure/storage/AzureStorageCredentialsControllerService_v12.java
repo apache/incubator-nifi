@@ -57,7 +57,7 @@ public class AzureStorageCredentialsControllerService_v12 extends AbstractContro
             .dependsOn(CREDENTIALS_TYPE, AzureStorageCredentialsType.SERVICE_PRINCIPAL, AzureStorageCredentialsType.MANAGED_IDENTITY)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             ACCOUNT_NAME,
             ENDPOINT_SUFFIX,
             CREDENTIALS_TYPE,
@@ -74,7 +74,7 @@ public class AzureStorageCredentialsControllerService_v12 extends AbstractContro
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnEnabled

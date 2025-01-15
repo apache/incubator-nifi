@@ -69,6 +69,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 @Tags({"WebSocket", "Jetty", "server"})
 @CapabilityDescription("Implementation of WebSocketServerService." +
@@ -165,28 +166,26 @@ public class JettyWebSocketServer extends AbstractJettyWebSocketService implemen
             .identifiesExternalResource(ResourceCardinality.SINGLE, ResourceType.FILE)
             .build();
 
-    private static final List<PropertyDescriptor> properties;
-
-    static {
-        final List<PropertyDescriptor> props = new ArrayList<>(getAbstractPropertyDescriptors());
-        props.add(LISTEN_PORT);
-        props.add(SSL_CONTEXT);
-        props.add(CLIENT_AUTH);
-        props.add(BASIC_AUTH);
-        props.add(AUTH_PATH_SPEC);
-        props.add(AUTH_ROLES);
-        props.add(LOGIN_SERVICE);
-        props.add(USERS_PROPERTIES_FILE);
-
-        properties = Collections.unmodifiableList(props);
-    }
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = Stream.concat(
+            getAbstractPropertyDescriptors().stream(),
+            Stream.of(
+                LISTEN_PORT,
+                SSL_CONTEXT,
+                CLIENT_AUTH,
+                BASIC_AUTH,
+                AUTH_PATH_SPEC,
+                AUTH_ROLES,
+                LOGIN_SERVICE,
+                USERS_PROPERTIES_FILE
+            )
+    ).toList();
 
     private Server server;
     private Integer listenPort;
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return properties;
+        return PROPERTY_DESCRIPTORS;
     }
 
 

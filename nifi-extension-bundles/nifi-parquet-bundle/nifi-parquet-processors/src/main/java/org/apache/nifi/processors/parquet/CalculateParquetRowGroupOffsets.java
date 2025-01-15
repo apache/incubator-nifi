@@ -17,12 +17,9 @@
 
 package org.apache.nifi.processors.parquet;
 
-import static java.util.Collections.singletonList;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -83,9 +80,13 @@ public class CalculateParquetRowGroupOffsets extends AbstractProcessor {
             .description("FlowFiles, with special attributes that represent a chunk of the input file.")
             .build();
 
-    static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = singletonList(PROP_ZERO_CONTENT_OUTPUT);
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+            PROP_ZERO_CONTENT_OUTPUT
+    );
 
-    static final Set<Relationship> RELATIONSHIPS = new HashSet<>(singletonList(REL_SUCCESS));
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+            REL_SUCCESS
+    );
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {

@@ -35,7 +35,6 @@ import org.apache.nifi.serialization.record.RecordSchema;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +60,17 @@ public class FreeFormTextRecordSetWriter extends AbstractControllerService imple
         .required(true)
         .build();
 
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        TEXT,
+        CHARACTER_SET
+    );
+
     private volatile PropertyValue textValue;
     private volatile Charset characterSet;
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        final List<PropertyDescriptor> properties = new ArrayList<>();
-        properties.add(TEXT);
-        properties.add(CHARACTER_SET);
-        return properties;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnEnabled

@@ -128,7 +128,7 @@ public class ListBoxFile extends AbstractListProcessor<BoxFileInfo> {
         .dependsOn(LISTING_STRATEGY, BY_ENTITIES)
         .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
         BoxClientService.BOX_CLIENT_SERVICE,
         FOLDER_ID,
         RECURSIVE_SEARCH,
@@ -144,7 +144,7 @@ public class ListBoxFile extends AbstractListProcessor<BoxFileInfo> {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

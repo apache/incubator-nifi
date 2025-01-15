@@ -32,10 +32,8 @@ import org.apache.nifi.controller.ConfigurationContext;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collections;
 import java.util.List;
 
-import static java.util.Arrays.asList;
 import static org.apache.nifi.processor.util.StandardValidators.NON_BLANK_VALIDATOR;
 import static org.apache.nifi.processor.util.StandardValidators.NON_EMPTY_VALIDATOR;
 import static org.apache.nifi.processor.util.StandardValidators.PORT_VALIDATOR;
@@ -103,19 +101,18 @@ public class SmbjClientProviderService extends AbstractControllerService impleme
             .addValidator(NON_BLANK_VALIDATOR)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = Collections
-            .unmodifiableList(asList(
-                    HOSTNAME,
-                    PORT,
-                    SHARE,
-                    USERNAME,
-                    PASSWORD,
-                    DOMAIN,
-                    SMB_DIALECT,
-                    USE_ENCRYPTION,
-                    ENABLE_DFS,
-                    TIMEOUT
-            ));
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+            HOSTNAME,
+            PORT,
+            SHARE,
+            USERNAME,
+            PASSWORD,
+            DOMAIN,
+            SMB_DIALECT,
+            USE_ENCRYPTION,
+            ENABLE_DFS,
+            TIMEOUT
+    );
 
     private SMBClient smbClient;
     private AuthenticationContext authenticationContext;
@@ -125,7 +122,7 @@ public class SmbjClientProviderService extends AbstractControllerService impleme
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnEnabled

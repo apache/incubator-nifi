@@ -229,7 +229,7 @@ public class ExtractText extends AbstractProcessor {
         .defaultValue("false")
         .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             CHARACTER_SET,
             MAX_BUFFER_SIZE,
             MAX_CAPTURE_GROUP_LENGTH,
@@ -273,7 +273,7 @@ public class ExtractText extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

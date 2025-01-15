@@ -34,7 +34,6 @@ import org.apache.nifi.json.schema.SchemaVersion;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -59,7 +58,9 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
         expressionLanguageScope = ExpressionLanguageScope.NONE)
 public class StandardJsonSchemaRegistry extends AbstractControllerService implements JsonSchemaRegistry, JsonSchemaRegistryComponent {
 
-    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = Collections.singletonList(SCHEMA_VERSION);
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+            SCHEMA_VERSION
+    );
 
     private final ConcurrentMap<String, JsonSchema> jsonSchemas;
     private final ConcurrentMap<SchemaVersion, JsonSchemaFactory> schemaFactories;

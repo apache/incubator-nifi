@@ -22,17 +22,16 @@ import org.apache.nifi.dbcp.DBCPService;
 import org.apache.nifi.expression.ExpressionLanguageScope;
 import org.apache.nifi.processor.util.StandardValidators;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class AbstractDatabaseLookupService extends AbstractControllerService {
 
     static final String KEY = "key";
 
-    static final Set<String> REQUIRED_KEYS = Collections.unmodifiableSet(Stream.of(KEY).collect(Collectors.toSet()));
+    static final Set<String> REQUIRED_KEYS = Set.of(
+        KEY
+    );
 
     static final PropertyDescriptor DBCP_SERVICE = new PropertyDescriptor.Builder()
             .name("dbrecord-lookup-dbcp-service")

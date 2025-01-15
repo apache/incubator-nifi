@@ -125,7 +125,7 @@ public class FetchAzureDataLakeStorage extends AbstractAzureDataLakeStorageProce
             .defaultValue("0")
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             ADLS_CREDENTIALS_SERVICE,
             FILESYSTEM,
             DIRECTORY,
@@ -138,7 +138,7 @@ public class FetchAzureDataLakeStorage extends AbstractAzureDataLakeStorageProce
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

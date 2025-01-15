@@ -167,7 +167,7 @@ public class AttributesToJSON extends AbstractProcessor {
             .dependsOn(DESTINATION, DESTINATION_CONTENT)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             ATTRIBUTES_LIST,
             ATTRIBUTES_REGEX,
             DESTINATION,
@@ -198,7 +198,7 @@ public class AttributesToJSON extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

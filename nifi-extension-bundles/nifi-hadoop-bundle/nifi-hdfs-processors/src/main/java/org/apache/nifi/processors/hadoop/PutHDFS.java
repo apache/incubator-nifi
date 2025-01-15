@@ -75,13 +75,13 @@ import java.security.PrivilegedAction;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.io.InputStream;
+import java.util.stream.Stream;
+
 import org.apache.nifi.processors.transfer.ResourceTransferSource;
 import static org.apache.nifi.processors.transfer.ResourceTransferProperties.FILE_RESOURCE_SERVICE;
 import static org.apache.nifi.processors.transfer.ResourceTransferProperties.RESOURCE_TRANSFER_SOURCE;
@@ -234,41 +234,42 @@ public class PutHDFS extends AbstractHadoopProcessor {
             .addValidator(StandardValidators.BOOLEAN_VALIDATOR)
             .build();
 
-    private static final Set<Relationship> relationships;
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+            REL_SUCCESS,
+            REL_FAILURE
+    );
 
-    static {
-        final Set<Relationship> rels = new HashSet<>();
-        rels.add(REL_SUCCESS);
-        rels.add(REL_FAILURE);
-        relationships = Collections.unmodifiableSet(rels);
-    }
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = Stream.concat(
+            getCommonPropertyDescriptors().stream(),
+            Stream.of(
+                    new PropertyDescriptor.Builder()
+                            .fromPropertyDescriptor(DIRECTORY)
+                            .description("The parent HDFS directory to which files should be written. The directory will be created if it doesn't exist.")
+                            .build(),
+                    CONFLICT_RESOLUTION,
+                    APPEND_MODE,
+                    WRITING_STRATEGY,
+                    BLOCK_SIZE,
+                    BUFFER_SIZE,
+                    REPLICATION_FACTOR,
+                    UMASK,
+                    REMOTE_OWNER,
+                    REMOTE_GROUP,
+                    COMPRESSION_CODEC,
+                    IGNORE_LOCALITY,
+                    RESOURCE_TRANSFER_SOURCE,
+                    FILE_RESOURCE_SERVICE
+            )
+    ).toList();
 
     @Override
     public Set<Relationship> getRelationships() {
-        return relationships;
+        return RELATIONSHIPS;
     }
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        List<PropertyDescriptor> props = new ArrayList<>(properties);
-        props.add(new PropertyDescriptor.Builder()
-                .fromPropertyDescriptor(DIRECTORY)
-                .description("The parent HDFS directory to which files should be written. The directory will be created if it doesn't exist.")
-                .build());
-        props.add(CONFLICT_RESOLUTION);
-        props.add(APPEND_MODE);
-        props.add(WRITING_STRATEGY);
-        props.add(BLOCK_SIZE);
-        props.add(BUFFER_SIZE);
-        props.add(REPLICATION_FACTOR);
-        props.add(UMASK);
-        props.add(REMOTE_OWNER);
-        props.add(REMOTE_GROUP);
-        props.add(COMPRESSION_CODEC);
-        props.add(IGNORE_LOCALITY);
-        props.add(RESOURCE_TRANSFER_SOURCE);
-        props.add(FILE_RESOURCE_SERVICE);
-        return props;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

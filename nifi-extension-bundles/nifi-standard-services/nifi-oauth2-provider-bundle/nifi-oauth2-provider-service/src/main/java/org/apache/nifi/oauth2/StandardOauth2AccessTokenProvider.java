@@ -55,7 +55,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -210,7 +209,7 @@ public class StandardOauth2AccessTokenProvider extends AbstractControllerService
 
     private static final ProxySpec[] PROXY_SPECS = {ProxySpec.HTTP_AUTH};
 
-    private static final List<PropertyDescriptor> PROPERTIES = Collections.unmodifiableList(Arrays.asList(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
         AUTHORIZATION_SERVER_URL,
         CLIENT_AUTHENTICATION_STRATEGY,
         GRANT_TYPE,
@@ -226,7 +225,7 @@ public class StandardOauth2AccessTokenProvider extends AbstractControllerService
         SSL_CONTEXT,
         HTTP_PROTOCOL_STRATEGY,
         ProxyConfiguration.createProxyConfigPropertyDescriptor(PROXY_SPECS)
-    ));
+    );
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
 
@@ -252,7 +251,7 @@ public class StandardOauth2AccessTokenProvider extends AbstractControllerService
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnEnabled

@@ -205,7 +205,7 @@ public class RouteText extends AbstractProcessor {
         .defaultValue("UTF-8")
         .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             ROUTE_STRATEGY,
             MATCH_STRATEGY,
             CHARACTER_SET,
@@ -264,7 +264,7 @@ public class RouteText extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

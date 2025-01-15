@@ -18,8 +18,6 @@ package org.apache.nifi.reporting.sink;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
@@ -52,31 +50,31 @@ import org.apache.nifi.serialization.record.RecordSet;
 @CapabilityDescription("Provides a service to write records using a configured RecordSetWriter over a Site-to-Site connection.")
 public class SiteToSiteReportingRecordSink extends AbstractControllerService implements RecordSinkService {
 
-    private List<PropertyDescriptor> properties;
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+            RECORD_WRITER_FACTORY,
+            SiteToSiteUtils.DESTINATION_URL,
+            SiteToSiteUtils.PORT_NAME,
+            SiteToSiteUtils.SSL_CONTEXT,
+            SiteToSiteUtils.INSTANCE_URL,
+            SiteToSiteUtils.COMPRESS,
+            SiteToSiteUtils.TIMEOUT,
+            SiteToSiteUtils.BATCH_SIZE,
+            SiteToSiteUtils.TRANSPORT_PROTOCOL,
+            SiteToSiteUtils.PROXY_CONFIGURATION_SERVICE
+    );
+
     private volatile SiteToSiteClient siteToSiteClient;
     private volatile RecordSetWriterFactory writerFactory;
     private volatile StateManager stateManager;
 
     @Override
     protected void init(final ControllerServiceInitializationContext context) {
-        final List<PropertyDescriptor> properties = new ArrayList<>();
-        properties.add(RECORD_WRITER_FACTORY);
-        properties.add(SiteToSiteUtils.DESTINATION_URL);
-        properties.add(SiteToSiteUtils.PORT_NAME);
-        properties.add(SiteToSiteUtils.SSL_CONTEXT);
-        properties.add(SiteToSiteUtils.INSTANCE_URL);
-        properties.add(SiteToSiteUtils.COMPRESS);
-        properties.add(SiteToSiteUtils.TIMEOUT);
-        properties.add(SiteToSiteUtils.BATCH_SIZE);
-        properties.add(SiteToSiteUtils.TRANSPORT_PROTOCOL);
-        properties.add(SiteToSiteUtils.PROXY_CONFIGURATION_SERVICE);
-        this.properties = Collections.unmodifiableList(properties);
         this.stateManager = context.getStateManager();
     }
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return properties;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

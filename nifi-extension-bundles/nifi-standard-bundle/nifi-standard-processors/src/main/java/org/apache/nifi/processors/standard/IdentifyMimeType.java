@@ -131,11 +131,11 @@ public class IdentifyMimeType extends AbstractProcessor {
             .dependsOn(CONFIG_STRATEGY, REPLACE, MERGE)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
-            USE_FILENAME_IN_DETECTION,
-            CONFIG_STRATEGY,
-            MIME_CONFIG_BODY,
-            MIME_CONFIG_FILE
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        USE_FILENAME_IN_DETECTION,
+        CONFIG_STRATEGY,
+        MIME_CONFIG_BODY,
+        MIME_CONFIG_FILE
     );
 
     public static final Relationship REL_SUCCESS = new Relationship.Builder()
@@ -143,7 +143,9 @@ public class IdentifyMimeType extends AbstractProcessor {
             .description("All FlowFiles are routed to success")
             .build();
 
-    private static final Set<Relationship> RELATIONSHIPS = Set.of(REL_SUCCESS);
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+        REL_SUCCESS
+    );
 
     private final TikaConfig config;
     private Detector detector;
@@ -205,7 +207,7 @@ public class IdentifyMimeType extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

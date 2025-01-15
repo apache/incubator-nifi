@@ -191,7 +191,7 @@ public class QueryDatabaseTableRecord extends AbstractQueryDatabaseTable {
             .required(true)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             DBCP_SERVICE,
             DB_TYPE,
             TABLE_NAME,
@@ -213,11 +213,13 @@ public class QueryDatabaseTableRecord extends AbstractQueryDatabaseTable {
             VARIABLE_REGISTRY_ONLY_DEFAULT_SCALE
     );
 
-    private static final Set<Relationship> RELATIONSHIPS = Set.of(REL_SUCCESS);
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+            REL_SUCCESS
+    );
 
     public QueryDatabaseTableRecord() {
         relationships = RELATIONSHIPS;
-        propDescriptors = PROPERTIES;
+        propDescriptors = PROPERTY_DESCRIPTORS;
     }
 
     @Override

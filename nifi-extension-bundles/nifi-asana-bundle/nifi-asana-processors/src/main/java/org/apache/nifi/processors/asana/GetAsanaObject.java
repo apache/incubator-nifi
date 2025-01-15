@@ -190,7 +190,7 @@ public class GetAsanaObject extends AbstractProcessor {
             .addValidator(StandardValidators.POSITIVE_INTEGER_VALIDATOR)
             .build();
 
-    protected static final List<PropertyDescriptor> DESCRIPTORS = List.of(
+    protected static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             PROP_ASANA_CLIENT_SERVICE,
             PROP_DISTRIBUTED_CACHE_SERVICE,
             PROP_ASANA_OBJECT_TYPE,
@@ -236,7 +236,7 @@ public class GetAsanaObject extends AbstractProcessor {
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return DESCRIPTORS;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnScheduled

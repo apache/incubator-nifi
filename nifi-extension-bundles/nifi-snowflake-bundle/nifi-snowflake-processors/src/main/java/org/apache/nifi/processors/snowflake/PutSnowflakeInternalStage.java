@@ -113,7 +113,7 @@ public class PutSnowflakeInternalStage extends AbstractProcessor {
             .description("For FlowFiles of failed PUT operation")
             .build();
 
-    static final List<PropertyDescriptor> PROPERTIES = List.of(
+    static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             SNOWFLAKE_CONNECTION_PROVIDER,
             INTERNAL_STAGE_TYPE,
             DATABASE,
@@ -122,11 +122,14 @@ public class PutSnowflakeInternalStage extends AbstractProcessor {
             INTERNAL_STAGE
     );
 
-    private static final Set<Relationship> RELATIONSHIPS = Set.of(REL_SUCCESS, REL_FAILURE);
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+            REL_SUCCESS,
+            REL_FAILURE
+    );
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

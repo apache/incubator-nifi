@@ -113,7 +113,7 @@ public class PutKinesisStream extends AbstractAwsSyncProcessor<KinesisClient, Ki
             .expressionLanguageSupported(ExpressionLanguageScope.FLOWFILE_ATTRIBUTES)
             .build();
 
-    public static final List<PropertyDescriptor> PROPERTIES = List.of(
+    public static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
         KINESIS_STREAM_NAME,
         REGION,
         AWS_CREDENTIALS_PROVIDER_SERVICE,
@@ -129,7 +129,7 @@ public class PutKinesisStream extends AbstractAwsSyncProcessor<KinesisClient, Ki
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

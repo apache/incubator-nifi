@@ -111,7 +111,7 @@ public class ParseSyslog5424 extends AbstractProcessor {
         .defaultValue("true")
         .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             CHARSET,
             NIL_POLICY,
             INCLUDE_BODY_IN_ATTRIBUTES
@@ -137,7 +137,7 @@ public class ParseSyslog5424 extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

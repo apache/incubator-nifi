@@ -56,7 +56,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -233,6 +232,10 @@ public abstract class AbstractListProcessor<T extends ListableEntity> extends Ab
             .identifiesControllerService(RecordSetWriterFactory.class)
             .build();
 
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+        REL_SUCCESS
+    );
+
     /**
      * Represents the timestamp of an entity which was the latest one within those listed at the previous cycle.
      * It does not necessary mean it has been processed as well.
@@ -286,9 +289,7 @@ public abstract class AbstractListProcessor<T extends ListableEntity> extends Ab
 
     @Override
     public Set<Relationship> getRelationships() {
-        final Set<Relationship> relationships = new HashSet<>();
-        relationships.add(REL_SUCCESS);
-        return relationships;
+       return RELATIONSHIPS;
     }
 
     /**

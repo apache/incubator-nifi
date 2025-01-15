@@ -319,7 +319,7 @@ public class HandleHttpRequest extends AbstractProcessor {
             .defaultValue("512 KB")
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             PORT,
             HOSTNAME,
             SSL_CONTEXT,
@@ -348,7 +348,9 @@ public class HandleHttpRequest extends AbstractProcessor {
             .description("All content that is received is routed to the 'success' relationship")
             .build();
 
-    private static final Set<Relationship> RELATIONSHIPS = Set.of(REL_SUCCESS);
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+            REL_SUCCESS
+    );
 
     private volatile Server server;
     private volatile boolean ready;
@@ -360,7 +362,7 @@ public class HandleHttpRequest extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

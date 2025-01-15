@@ -197,15 +197,15 @@ public class GetShopify extends AbstractProcessor {
                     propertyMap.put(resourceType, resourceDescriptor);
                     return resourceDescriptor;
                 })
-                .collect(Collectors.toList());
-        final List<PropertyDescriptor> propertyDescriptors = new ArrayList<>(Arrays.asList(
+                .toList();
+        final List<PropertyDescriptor> propertyDescriptors = new ArrayList<>(List.of(
                 STORE_DOMAIN,
                 ACCESS_TOKEN,
                 API_VERSION,
                 OBJECT_CATEGORY
         ));
         propertyDescriptors.addAll(resourceDescriptors);
-        propertyDescriptors.addAll(Arrays.asList(
+        propertyDescriptors.addAll(List.of(
                 RESULT_LIMIT,
                 IS_INCREMENTAL,
                 INCREMENTAL_DELAY,

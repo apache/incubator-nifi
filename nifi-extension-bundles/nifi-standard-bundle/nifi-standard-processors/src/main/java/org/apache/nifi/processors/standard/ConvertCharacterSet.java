@@ -90,14 +90,16 @@ public class ConvertCharacterSet extends AbstractProcessor {
             .required(true)
             .build();
 
-    private final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             INPUT_CHARSET,
             OUTPUT_CHARSET
     );
 
     public static final Relationship REL_SUCCESS = new Relationship.Builder().name("success").description("").build();
 
-    private final Set<Relationship> RELATIONSHIPS = Set.of(REL_SUCCESS);
+    private final Set<Relationship> RELATIONSHIPS = Set.of(
+            REL_SUCCESS
+    );
 
     public static final int MAX_BUFFER_SIZE = 512 * 1024;
 
@@ -108,7 +110,7 @@ public class ConvertCharacterSet extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

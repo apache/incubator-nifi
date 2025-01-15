@@ -33,9 +33,6 @@ import org.apache.nifi.processor.util.StandardValidators;
 import org.apache.nifi.util.StringUtils;
 import org.bson.types.ObjectId;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -96,23 +93,25 @@ public abstract class AbstractGridFSProcessor extends AbstractProcessor {
         .description("When the operation succeeds, the flowfile is sent to this relationship.")
         .build();
 
-    static final List<PropertyDescriptor> PARENT_PROPERTIES;
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        CLIENT_SERVICE,
+        DATABASE_NAME,
+        BUCKET_NAME
+    );
 
-    static final Set<Relationship> PARENT_RELATIONSHIPS;
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+        REL_SUCCESS,
+        REL_FAILURE
+    );
 
     protected volatile MongoDBClientService clientService;
 
-    static {
-        List<PropertyDescriptor> _temp = new ArrayList<>();
-        _temp.add(CLIENT_SERVICE);
-        _temp.add(DATABASE_NAME);
-        _temp.add(BUCKET_NAME);
-        PARENT_PROPERTIES = Collections.unmodifiableList(_temp);
+    protected static List<PropertyDescriptor> getCommonPropertyDescriptors() {
+        return PROPERTY_DESCRIPTORS;
+    }
 
-        Set<Relationship> _rels = new HashSet<>();
-        _rels.add(REL_SUCCESS);
-        _rels.add(REL_FAILURE);
-        PARENT_RELATIONSHIPS = Collections.unmodifiableSet(_rels);
+    protected static Set<Relationship> getCommonRelationships() {
+        return RELATIONSHIPS;
     }
 
     protected MongoDatabase getDatabase(FlowFile input, ProcessContext context) {

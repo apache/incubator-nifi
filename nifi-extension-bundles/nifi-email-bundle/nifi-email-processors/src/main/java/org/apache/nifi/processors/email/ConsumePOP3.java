@@ -46,6 +46,6 @@ public class ConsumePOP3 extends AbstractEmailProcessor<Pop3MailReceiver> {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return SHARED_DESCRIPTORS;
+        return getCommonPropertyDescriptors();
     }
 }

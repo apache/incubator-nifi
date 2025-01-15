@@ -131,7 +131,7 @@ public class DecryptContentPGP extends AbstractProcessor {
             FAILURE
     );
 
-    private static final List<PropertyDescriptor> DESCRIPTORS = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             DECRYPTION_STRATEGY,
             PASSPHRASE,
             PRIVATE_KEY_SERVICE
@@ -158,7 +158,7 @@ public class DecryptContentPGP extends AbstractProcessor {
      */
     @Override
     public final List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return DESCRIPTORS;
+        return PROPERTY_DESCRIPTORS;
     }
 
     /**

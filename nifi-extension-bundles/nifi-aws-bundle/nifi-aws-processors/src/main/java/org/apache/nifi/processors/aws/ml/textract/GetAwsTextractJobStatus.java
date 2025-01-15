@@ -68,14 +68,14 @@ public class GetAwsTextractJobStatus extends AbstractAwsMachineLearningJobStatus
             .defaultValue(String.format("${%s}", TEXTRACT_TYPE_ATTRIBUTE))
             .addValidator(TEXTRACT_TYPE_VALIDATOR)
             .build();
-    private static final List<PropertyDescriptor> TEXTRACT_PROPERTIES = Stream.concat(
-            PROPERTIES.stream(),
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = Stream.concat(
+            getCommonPropertyDescriptors().stream(),
             Stream.of(TEXTRACT_TYPE)
     ).toList();
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return TEXTRACT_PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

@@ -150,7 +150,7 @@ public class ExecuteSQLRecord extends AbstractExecuteSQL {
             .required(true)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             DBCP_SERVICE,
             SQL_PRE_QUERY,
             SQL_SELECT_QUERY,
@@ -174,7 +174,7 @@ public class ExecuteSQLRecord extends AbstractExecuteSQL {
 
     public ExecuteSQLRecord() {
         relationships = RELATIONSHIPS;
-        propDescriptors = PROPERTIES;
+        propDescriptors = PROPERTY_DESCRIPTORS;
     }
 
     @Override

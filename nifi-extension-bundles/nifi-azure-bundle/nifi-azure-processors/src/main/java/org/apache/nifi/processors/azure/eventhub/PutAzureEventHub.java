@@ -119,7 +119,7 @@ public class PutAzureEventHub extends AbstractProcessor implements AzureEventHub
             .description("Any FlowFile that could not be sent to the event hub will be transferred to this Relationship.")
             .build();
 
-    private final static List<PropertyDescriptor> PROPERTIES = List.of(
+    private final static List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             NAMESPACE,
             EVENT_HUB_NAME,
             SERVICE_BUS_ENDPOINT,
@@ -146,7 +146,7 @@ public class PutAzureEventHub extends AbstractProcessor implements AzureEventHub
 
     @Override
     public final List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnScheduled

@@ -26,7 +26,6 @@ import org.apache.nifi.controller.VerifiableControllerService;
 import org.apache.nifi.logging.ComponentLog;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -72,7 +71,12 @@ public class EnsureControllerServiceConfigurationCorrect extends AbstractControl
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return Arrays.asList(SUCCESSFUL_VERIFICATION, VERIFICATION_STEPS, EXCEPTION_ON_VERIFICATION, FAILURE_NODE_NUMBER);
+        return List.of(
+            SUCCESSFUL_VERIFICATION,
+            VERIFICATION_STEPS,
+            EXCEPTION_ON_VERIFICATION,
+            FAILURE_NODE_NUMBER
+        );
     }
 
     @Override

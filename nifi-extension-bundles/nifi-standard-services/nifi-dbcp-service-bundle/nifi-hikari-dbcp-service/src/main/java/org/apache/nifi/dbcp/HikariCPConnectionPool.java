@@ -50,7 +50,6 @@ import javax.security.auth.login.LoginException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -206,31 +205,26 @@ public class HikariCPConnectionPool extends AbstractControllerService implements
             .required(false)
             .build();
 
-    private static final List<PropertyDescriptor> properties;
-
-    static {
-        final List<PropertyDescriptor> props = new ArrayList<>();
-        props.add(DATABASE_URL);
-        props.add(DB_DRIVERNAME);
-        props.add(DB_DRIVER_LOCATION);
-        props.add(KERBEROS_USER_SERVICE);
-        props.add(DB_USER);
-        props.add(DB_PASSWORD);
-        props.add(MAX_WAIT_TIME);
-        props.add(MAX_TOTAL_CONNECTIONS);
-        props.add(VALIDATION_QUERY);
-        props.add(MIN_IDLE);
-        props.add(MAX_CONN_LIFETIME);
-
-        properties = Collections.unmodifiableList(props);
-    }
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        DATABASE_URL,
+        DB_DRIVERNAME,
+        DB_DRIVER_LOCATION,
+        KERBEROS_USER_SERVICE,
+        DB_USER,
+        DB_PASSWORD,
+        MAX_WAIT_TIME,
+        MAX_TOTAL_CONNECTIONS,
+        VALIDATION_QUERY,
+        MIN_IDLE,
+        MAX_CONN_LIFETIME
+    );
 
     private volatile HikariDataSource dataSource;
     private volatile KerberosUser kerberosUser;
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return properties;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

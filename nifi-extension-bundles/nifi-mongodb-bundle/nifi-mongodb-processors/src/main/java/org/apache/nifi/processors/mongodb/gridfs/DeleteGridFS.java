@@ -43,10 +43,9 @@ import org.bson.Document;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 @CapabilityDescription("Deletes a file from GridFS using a file name or a query.")
 @Tags({"gridfs", "delete", "mongodb"})
@@ -71,25 +70,23 @@ public class DeleteGridFS extends AbstractGridFSProcessor {
         .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
         .build();
 
-    static final List<PropertyDescriptor> DESCRIPTORS;
-
-    static {
-        List<PropertyDescriptor> _temp = new ArrayList<>();
-        _temp.addAll(PARENT_PROPERTIES);
-        _temp.add(FILE_NAME);
-        _temp.add(QUERY);
-        _temp.add(QUERY_ATTRIBUTE);
-        DESCRIPTORS = Collections.unmodifiableList(_temp);
-    }
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = Stream.concat(
+            getCommonPropertyDescriptors().stream(),
+            Stream.of(
+                FILE_NAME,
+                QUERY,
+                QUERY_ATTRIBUTE
+            )
+    ).toList();
 
     @Override
     public Set<Relationship> getRelationships() {
-        return new HashSet<>(PARENT_RELATIONSHIPS);
+        return getCommonRelationships();
     }
 
     @Override
     public final List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return DESCRIPTORS;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

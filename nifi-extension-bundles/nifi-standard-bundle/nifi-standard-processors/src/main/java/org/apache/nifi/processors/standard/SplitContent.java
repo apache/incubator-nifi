@@ -115,7 +115,7 @@ public class SplitContent extends AbstractProcessor {
             .defaultValue(TRAILING_POSITION.getValue())
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             FORMAT,
             BYTE_SEQUENCE,
             KEEP_SEQUENCE,
@@ -145,7 +145,7 @@ public class SplitContent extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

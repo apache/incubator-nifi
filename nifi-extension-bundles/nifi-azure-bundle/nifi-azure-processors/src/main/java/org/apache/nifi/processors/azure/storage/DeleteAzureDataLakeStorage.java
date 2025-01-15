@@ -69,7 +69,7 @@ public class DeleteAzureDataLakeStorage extends AbstractAzureDataLakeStorageProc
             .dependsOn(FILESYSTEM_OBJECT_TYPE, FS_TYPE_FILE)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             ADLS_CREDENTIALS_SERVICE,
             FILESYSTEM,
             FILESYSTEM_OBJECT_TYPE,
@@ -114,6 +114,6 @@ public class DeleteAzureDataLakeStorage extends AbstractAzureDataLakeStorageProc
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 }

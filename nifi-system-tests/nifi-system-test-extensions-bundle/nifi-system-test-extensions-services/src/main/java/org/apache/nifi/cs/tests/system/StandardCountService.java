@@ -23,7 +23,6 @@ import org.apache.nifi.controller.AbstractControllerService;
 import org.apache.nifi.controller.ConfigurationContext;
 import org.apache.nifi.processor.util.StandardValidators;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -48,7 +47,10 @@ public class StandardCountService extends AbstractControllerService implements C
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return Arrays.asList(COUNT_SERVICE, START_VALUE);
+        return List.of(
+                COUNT_SERVICE,
+                START_VALUE
+        );
     }
 
     @OnEnabled

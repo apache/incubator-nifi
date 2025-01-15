@@ -180,7 +180,7 @@ public class PutSQL extends AbstractSessionFactoryProcessor {
             .defaultValue("false")
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             CONNECTION_POOL,
             SQL_STATEMENT,
             SUPPORT_TRANSACTIONS,
@@ -221,7 +221,7 @@ public class PutSQL extends AbstractSessionFactoryProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

@@ -94,7 +94,7 @@ public class CalculateRecordStats extends AbstractProcessor {
         .expressionLanguageSupported(ExpressionLanguageScope.FLOWFILE_ATTRIBUTES)
         .build();
 
-    static final List<PropertyDescriptor> PROPERTIES = List.of(
+    static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             RECORD_READER,
             LIMIT
     );
@@ -125,8 +125,9 @@ public class CalculateRecordStats extends AbstractProcessor {
             .build();
     }
 
+    @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnScheduled

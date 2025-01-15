@@ -127,7 +127,7 @@ public class ListenTCP extends AbstractProcessor {
             .addValidator(StandardValidators.TIME_PERIOD_VALIDATOR)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             ListenerProperties.NETWORK_INTF_NAME,
             ListenerProperties.PORT,
             ListenerProperties.RECV_BUFFER_SIZE,
@@ -148,7 +148,9 @@ public class ListenTCP extends AbstractProcessor {
             .description("Messages received successfully will be sent out this relationship.")
             .build();
 
-    private static final Set<Relationship> RELATIONSHIPS = Set.of(REL_SUCCESS);
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+            REL_SUCCESS
+    );
 
     private static final long TRACKING_LOG_INTERVAL = 60000;
     private final AtomicLong nextTrackingLog = new AtomicLong();
@@ -269,12 +271,12 @@ public class ListenTCP extends AbstractProcessor {
 
     @Override
     public final Set<Relationship> getRelationships() {
-        return this.RELATIONSHIPS;
+        return RELATIONSHIPS;
     }
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     private String getMessageDemarcator(final ProcessContext context) {

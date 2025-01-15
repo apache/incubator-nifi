@@ -45,7 +45,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -109,6 +108,12 @@ public class StandardS3EncryptionService extends AbstractControllerService imple
             .allowableValues(RegionUtilV1.getAvailableRegions())
             .defaultValue(RegionUtilV1.createAllowableValue(Regions.DEFAULT_REGION).getValue())
             .build();
+
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+       ENCRYPTION_STRATEGY,
+       ENCRYPTION_VALUE,
+       KMS_REGION
+    );
 
     private String keyValue = "";
     private String kmsRegion = "";
@@ -189,11 +194,7 @@ public class StandardS3EncryptionService extends AbstractControllerService imple
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        final List<PropertyDescriptor> properties = new ArrayList<>();
-        properties.add(ENCRYPTION_STRATEGY);
-        properties.add(ENCRYPTION_VALUE);
-        properties.add(KMS_REGION);
-        return Collections.unmodifiableList(properties);
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

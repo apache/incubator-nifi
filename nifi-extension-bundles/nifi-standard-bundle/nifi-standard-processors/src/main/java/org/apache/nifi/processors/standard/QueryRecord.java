@@ -218,7 +218,7 @@ public class QueryRecord extends AbstractProcessor {
         .required(true)
         .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             RECORD_READER_FACTORY,
             RECORD_WRITER_FACTORY,
             INCLUDE_ZERO_RECORD_FLOWFILES,
@@ -262,7 +262,7 @@ public class QueryRecord extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

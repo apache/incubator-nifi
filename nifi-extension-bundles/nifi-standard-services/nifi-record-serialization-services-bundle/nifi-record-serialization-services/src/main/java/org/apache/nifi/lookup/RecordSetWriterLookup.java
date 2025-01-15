@@ -67,6 +67,9 @@ public class RecordSetWriterLookup extends AbstractControllerService implements 
         .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
         .build();
 
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+            SERVICE_TO_USE
+    );
 
     private volatile Map<String, RecordSetWriterFactory> recordSetWriterFactoryMap;
     private volatile PropertyValue serviceToUseValue;
@@ -82,7 +85,7 @@ public class RecordSetWriterLookup extends AbstractControllerService implements 
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return Collections.singletonList(SERVICE_TO_USE);
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

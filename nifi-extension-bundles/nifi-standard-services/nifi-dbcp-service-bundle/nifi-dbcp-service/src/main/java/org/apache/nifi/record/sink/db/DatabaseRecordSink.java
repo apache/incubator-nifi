@@ -25,7 +25,6 @@ import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.context.PropertyContext;
 import org.apache.nifi.controller.AbstractControllerService;
 import org.apache.nifi.controller.ConfigurationContext;
-import org.apache.nifi.controller.ControllerServiceInitializationContext;
 import org.apache.nifi.dbcp.DBCPService;
 import org.apache.nifi.expression.ExpressionLanguageScope;
 import org.apache.nifi.processor.util.StandardValidators;
@@ -48,7 +47,6 @@ import java.sql.SQLDataException;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -162,31 +160,25 @@ public class DatabaseRecordSink extends AbstractControllerService implements Rec
             .expressionLanguageSupported(ExpressionLanguageScope.ENVIRONMENT)
             .build();
 
-    private List<PropertyDescriptor> properties;
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        DBCP_SERVICE,
+        CATALOG_NAME,
+        SCHEMA_NAME,
+        TABLE_NAME,
+        TRANSLATE_FIELD_NAMES,
+        UNMATCHED_FIELD_BEHAVIOR,
+        UNMATCHED_COLUMN_BEHAVIOR,
+        QUOTED_IDENTIFIERS,
+        QUOTED_TABLE_IDENTIFIER,
+        QUERY_TIMEOUT
+    );
+
     private volatile ConfigurationContext context;
     private volatile DBCPService dbcpService;
 
     @Override
-    protected void init(final ControllerServiceInitializationContext context) {
-        final List<PropertyDescriptor> properties = new ArrayList<>();
-        properties.add(DBCP_SERVICE);
-        properties.add(CATALOG_NAME);
-        properties.add(SCHEMA_NAME);
-        properties.add(TABLE_NAME);
-        properties.add(TRANSLATE_FIELD_NAMES);
-        properties.add(UNMATCHED_FIELD_BEHAVIOR);
-        properties.add(UNMATCHED_COLUMN_BEHAVIOR);
-        properties.add(QUOTED_IDENTIFIERS);
-        properties.add(QUOTED_TABLE_IDENTIFIER);
-
-        properties.add(QUERY_TIMEOUT);
-
-        this.properties = Collections.unmodifiableList(properties);
-    }
-
-    @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return properties;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnEnabled

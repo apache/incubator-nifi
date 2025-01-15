@@ -53,14 +53,13 @@ import org.apache.nifi.processors.hadoop.PutHDFS;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 @TriggerSerially
 @TriggerWhenEmpty
@@ -137,7 +136,21 @@ public class GetHDFSEvents extends AbstractHadoopProcessor {
             .description("A flow file with updated information about a specific event will be sent to this relationship.")
             .build();
 
-    private static final Set<Relationship> RELATIONSHIPS = Collections.unmodifiableSet(new HashSet<>(Collections.singletonList(REL_SUCCESS)));
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = Stream.concat(
+            getCommonPropertyDescriptors().stream(),
+            Stream.of(
+                    POLL_DURATION,
+                    HDFS_PATH_TO_WATCH,
+                    IGNORE_HIDDEN_FILES,
+                    EVENT_TYPES,
+                    NUMBER_OF_RETRIES_FOR_POLL
+            )
+    ).toList();
+
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+            REL_SUCCESS
+    );
+
     private static final String LAST_TX_ID = "last.tx.id";
     private volatile long lastTxId = -1L;
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -145,13 +158,7 @@ public class GetHDFSEvents extends AbstractHadoopProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        List<PropertyDescriptor> props = new ArrayList<>(properties);
-        props.add(POLL_DURATION);
-        props.add(HDFS_PATH_TO_WATCH);
-        props.add(IGNORE_HIDDEN_FILES);
-        props.add(EVENT_TYPES);
-        props.add(NUMBER_OF_RETRIES_FOR_POLL);
-        return Collections.unmodifiableList(props);
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

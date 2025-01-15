@@ -63,14 +63,14 @@ public class StartAwsTextractJob extends AbstractAwsMachineLearningJobStarter<
             .allowableValues(TextractType.TEXTRACT_TYPES)
             .defaultValue(DOCUMENT_ANALYSIS.getType())
             .build();
-    private static final List<PropertyDescriptor> TEXTRACT_PROPERTIES = Stream.concat(
-            PROPERTIES.stream(),
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = Stream.concat(
+            getCommonPropertyDescriptors().stream(),
             Stream.of(TEXTRACT_TYPE)
     ).toList();
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return TEXTRACT_PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

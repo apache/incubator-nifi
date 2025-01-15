@@ -85,7 +85,7 @@ public class ScanContent extends AbstractProcessor {
             .defaultValue(TEXT_ENCODING)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             DICTIONARY,
             DICTIONARY_ENCODING
     );
@@ -114,7 +114,7 @@ public class ScanContent extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

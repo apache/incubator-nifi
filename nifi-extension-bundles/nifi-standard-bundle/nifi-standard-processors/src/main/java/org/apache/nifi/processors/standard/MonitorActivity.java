@@ -162,7 +162,7 @@ public class MonitorActivity extends AbstractProcessor {
             .defaultValue(REPORT_NODE_ALL.getValue())
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             THRESHOLD,
             CONTINUALLY_SEND_MESSAGES,
             INACTIVITY_MESSAGE,
@@ -209,7 +209,7 @@ public class MonitorActivity extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnScheduled

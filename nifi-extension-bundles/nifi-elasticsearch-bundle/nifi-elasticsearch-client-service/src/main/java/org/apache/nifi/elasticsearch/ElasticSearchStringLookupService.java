@@ -30,7 +30,6 @@ import org.apache.nifi.lookup.StringLookupService;
 import org.apache.nifi.processor.util.StandardValidators;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +63,13 @@ public class ElasticSearchStringLookupService extends AbstractControllerService 
             .expressionLanguageSupported(ExpressionLanguageScope.ENVIRONMENT)
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .build();
-    private static final List<PropertyDescriptor> DESCRIPTORS = Arrays.asList(CLIENT_SERVICE, INDEX, TYPE);
+
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+            CLIENT_SERVICE,
+            INDEX,
+            TYPE
+    );
+
     private static final ObjectMapper mapper = new ObjectMapper();
     public static final String ID = "es_document_id";
     private ElasticSearchClientService esClient;
@@ -73,7 +78,7 @@ public class ElasticSearchStringLookupService extends AbstractControllerService 
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return DESCRIPTORS;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnEnabled

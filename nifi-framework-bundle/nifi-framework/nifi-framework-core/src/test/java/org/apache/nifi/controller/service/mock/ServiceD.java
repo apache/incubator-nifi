@@ -19,7 +19,6 @@ package org.apache.nifi.controller.service.mock;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.controller.AbstractControllerService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ServiceD extends AbstractControllerService {
@@ -36,10 +35,10 @@ public class ServiceD extends AbstractControllerService {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        final List<PropertyDescriptor> descriptors = new ArrayList<>();
-        descriptors.add(PROP_FOO1);
-        descriptors.add(PROP_FOO2);
-        return descriptors;
+        return List.of(
+                PROP_FOO1,
+                PROP_FOO2
+        );
     }
 
 }

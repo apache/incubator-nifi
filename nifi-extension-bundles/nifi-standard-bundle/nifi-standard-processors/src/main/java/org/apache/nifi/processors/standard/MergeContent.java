@@ -395,7 +395,7 @@ public class MergeContent extends BinFiles {
         .dependsOn(MERGE_FORMAT, MERGE_FORMAT_TAR)
         .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             MERGE_STRATEGY,
             MERGE_FORMAT,
             AttributeStrategyUtil.ATTRIBUTE_STRATEGY,
@@ -438,7 +438,7 @@ public class MergeContent extends BinFiles {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

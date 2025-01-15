@@ -43,7 +43,6 @@ import javax.net.ssl.X509KeyManager;
 import javax.net.ssl.X509TrustManager;
 import java.net.Proxy;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -99,7 +98,7 @@ public class StandardWebClientServiceProvider extends AbstractControllerService 
             .identifiesControllerService(SSLContextProvider.class)
             .build();
 
-    static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = Arrays.asList(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             CONNECT_TIMEOUT,
             READ_TIMEOUT,
             WRITE_TIMEOUT,

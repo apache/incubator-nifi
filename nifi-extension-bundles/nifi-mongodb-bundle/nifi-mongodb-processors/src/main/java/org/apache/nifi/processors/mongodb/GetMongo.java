@@ -91,8 +91,8 @@ public class GetMongo extends AbstractMongoQueryProcessor {
             REL_ORIGINAL
     );
 
-    private final static List<PropertyDescriptor> PROPERTIES = Stream.concat(
-            AbstractMongoProcessor.DESCRIPTORS.stream(),
+    private final static List<PropertyDescriptor> PROPERTY_DESCRIPTORS = Stream.concat(
+            getCommonPropertyDescriptors().stream(),
             Stream.of(
                     JSON_TYPE,
                     USE_PRETTY_PRINTING,
@@ -124,7 +124,7 @@ public class GetMongo extends AbstractMongoQueryProcessor {
 
     @Override
     public final List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     //Turn a list of Mongo result documents into a String representation of a JSON array

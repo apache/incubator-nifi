@@ -142,7 +142,7 @@ public class ListenSlack extends AbstractProcessor {
         .description("All FlowFiles that are created will be sent to this Relationship.")
         .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             APP_TOKEN,
             BOT_TOKEN,
             EVENT_TYPE,
@@ -160,7 +160,7 @@ public class ListenSlack extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

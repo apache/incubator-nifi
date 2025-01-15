@@ -91,7 +91,7 @@ public class RouteOnContent extends AbstractProcessor {
             .defaultValue("UTF-8")
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             MATCH_REQUIREMENT,
             CHARACTER_SET,
             BUFFER_SIZE
@@ -106,7 +106,7 @@ public class RouteOnContent extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

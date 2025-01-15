@@ -160,7 +160,7 @@ public class PutBoxFile extends AbstractProcessor {
             .required(false)
             .build();
 
-    public static final List<PropertyDescriptor> PROPERTIES = List.of(
+    public static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             BoxClientService.BOX_CLIENT_SERVICE,
             FOLDER_ID,
             SUBFOLDER_NAME,
@@ -199,7 +199,7 @@ public class PutBoxFile extends AbstractProcessor {
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnScheduled

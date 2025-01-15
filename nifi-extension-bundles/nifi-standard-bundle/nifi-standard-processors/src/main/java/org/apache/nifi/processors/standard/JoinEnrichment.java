@@ -186,7 +186,7 @@ public class JoinEnrichment extends BinFiles {
         .defaultValue("10000")
         .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             ORIGINAL_RECORD_READER,
             ENRICHMENT_RECORD_READER,
             RECORD_WRITER,
@@ -231,7 +231,7 @@ public class JoinEnrichment extends BinFiles {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

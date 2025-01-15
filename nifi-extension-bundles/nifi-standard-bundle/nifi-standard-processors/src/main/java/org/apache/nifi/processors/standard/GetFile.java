@@ -188,7 +188,7 @@ public class GetFile extends AbstractProcessor {
             .defaultValue("10")
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             DIRECTORY,
             FILE_FILTER,
             PATH_FILTER,
@@ -226,7 +226,7 @@ public class GetFile extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

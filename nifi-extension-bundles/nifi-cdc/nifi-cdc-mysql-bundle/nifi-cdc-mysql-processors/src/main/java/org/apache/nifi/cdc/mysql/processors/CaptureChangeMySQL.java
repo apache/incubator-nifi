@@ -451,7 +451,7 @@ public class CaptureChangeMySQL extends AbstractSessionFactoryProcessor {
                     SSL_MODE_VERIFY_IDENTITY)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             HOSTS,
             DRIVER_NAME,
             DRIVER_LOCATION,
@@ -515,7 +515,7 @@ public class CaptureChangeMySQL extends AbstractSessionFactoryProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

@@ -94,7 +94,9 @@ public class SplitXml extends AbstractProcessor {
             .defaultValue("1")
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(SPLIT_DEPTH);
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+            SPLIT_DEPTH
+    );
 
     public static final Relationship REL_ORIGINAL = new Relationship.Builder()
             .name("original")
@@ -122,7 +124,7 @@ public class SplitXml extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

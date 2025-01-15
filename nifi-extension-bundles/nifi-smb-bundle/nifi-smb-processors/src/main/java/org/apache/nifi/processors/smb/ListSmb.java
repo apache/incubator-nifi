@@ -189,7 +189,7 @@ public class ListSmb extends AbstractListProcessor<SmbListableEntity> {
             .addValidator(new MustNotContainDirectorySeparatorsValidator())
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             SMB_CLIENT_PROVIDER_SERVICE,
             SMB_LISTING_STRATEGY,
             DIRECTORY,
@@ -207,7 +207,7 @@ public class ListSmb extends AbstractListProcessor<SmbListableEntity> {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

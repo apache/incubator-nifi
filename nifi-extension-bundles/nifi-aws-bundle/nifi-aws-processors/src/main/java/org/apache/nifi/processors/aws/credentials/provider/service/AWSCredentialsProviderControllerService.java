@@ -264,7 +264,7 @@ public class AWSCredentialsProviderControllerService extends AbstractControllerS
         .build();
 
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
         USE_DEFAULT_CREDENTIALS,
         ACCESS_KEY_ID,
         SECRET_KEY,
@@ -304,7 +304,7 @@ public class AWSCredentialsProviderControllerService extends AbstractControllerS
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

@@ -59,14 +59,18 @@ public class DuplicateFlowFile extends AbstractProcessor {
     .addValidator(StandardValidators.NON_NEGATIVE_INTEGER_VALIDATOR)
     .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(NUM_COPIES);
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+        NUM_COPIES
+    );
 
     static final Relationship REL_SUCCESS = new Relationship.Builder()
     .name("success")
     .description("The original FlowFile and all copies will be sent to this relationship")
     .build();
 
-    private static final Set<Relationship> RELATIONSHIPS = Set.of(REL_SUCCESS);
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
+        REL_SUCCESS
+    );
 
     @Override
     public Set<Relationship> getRelationships() {
@@ -75,7 +79,7 @@ public class DuplicateFlowFile extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

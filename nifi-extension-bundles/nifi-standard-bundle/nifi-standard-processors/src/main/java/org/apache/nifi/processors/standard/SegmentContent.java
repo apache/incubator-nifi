@@ -78,7 +78,9 @@ public class SegmentContent extends AbstractProcessor {
             .expressionLanguageSupported(ExpressionLanguageScope.FLOWFILE_ATTRIBUTES)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(SIZE);
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+            SIZE
+    );
 
     public static final Relationship REL_SEGMENTS = new Relationship.Builder()
             .name("segments")
@@ -102,7 +104,7 @@ public class SegmentContent extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

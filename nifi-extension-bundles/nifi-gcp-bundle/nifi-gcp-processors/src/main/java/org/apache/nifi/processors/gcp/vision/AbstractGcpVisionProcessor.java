@@ -42,20 +42,24 @@ public abstract class AbstractGcpVisionProcessor extends AbstractProcessor  {
     public static final Relationship REL_FAILURE = new Relationship.Builder().name("failure")
             .description("FlowFiles are routed to failure relationship").build();
 
-    protected static final Set<Relationship> RELATIONSHIPS = Set.of(
+    private static final Set<Relationship> RELATIONSHIPS = Set.of(
             REL_SUCCESS,
             REL_FAILURE
     );
 
-    protected static final List<PropertyDescriptor> COMMON_PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             GCP_CREDENTIALS_PROVIDER_SERVICE
     );
 
     private ImageAnnotatorClient vision;
 
+    protected static List<PropertyDescriptor> getCommonPropertyDescriptors() {
+        return PROPERTY_DESCRIPTORS;
+    }
+
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return COMMON_PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

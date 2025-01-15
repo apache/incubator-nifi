@@ -89,7 +89,7 @@ public abstract class AbstractAzureLogAnalyticsReportingTask extends AbstractRep
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .expressionLanguageSupported(ExpressionLanguageScope.ENVIRONMENT).build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             LOG_ANALYTICS_WORKSPACE_ID,
             LOG_ANALYTICS_WORKSPACE_KEY,
             APPLICATION_ID,
@@ -114,7 +114,7 @@ public abstract class AbstractAzureLogAnalyticsReportingTask extends AbstractRep
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     /**

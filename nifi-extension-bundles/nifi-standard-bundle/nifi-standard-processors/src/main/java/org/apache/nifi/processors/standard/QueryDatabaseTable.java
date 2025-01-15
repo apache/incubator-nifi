@@ -92,7 +92,7 @@ public class QueryDatabaseTable extends AbstractQueryDatabaseTable {
             .description("The name of the database table to be queried. When a custom query is used, this property is used to alias the query and appears as an attribute on the FlowFile.")
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             DBCP_SERVICE,
             DB_TYPE,
             TABLE_NAME,
@@ -118,7 +118,7 @@ public class QueryDatabaseTable extends AbstractQueryDatabaseTable {
 
     public QueryDatabaseTable() {
         relationships = RELATIONSHIPS;
-        propDescriptors = PROPERTIES;
+        propDescriptors = PROPERTY_DESCRIPTORS;
     }
 
     @Override

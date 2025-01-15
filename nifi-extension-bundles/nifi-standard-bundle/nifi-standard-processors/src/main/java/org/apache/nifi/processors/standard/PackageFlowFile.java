@@ -130,7 +130,9 @@ public class PackageFlowFile extends AbstractProcessor {
             .addValidator(StandardValidators.createLongValidator(1, 10_000, true))
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(BATCH_SIZE);
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+            BATCH_SIZE
+    );
 
     static final Relationship REL_SUCCESS = new Relationship.Builder()
             .name("success")
@@ -153,7 +155,7 @@ public class PackageFlowFile extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

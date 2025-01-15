@@ -35,8 +35,6 @@ import org.springframework.data.redis.core.types.Expiration;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,13 +48,10 @@ import static org.apache.nifi.redis.util.RedisUtils.TTL;
         "This service is intended to be used when a non-atomic DistributedMapCacheClient is required.")
 public class SimpleRedisDistributedMapCacheClientService extends AbstractControllerService implements DistributedMapCacheClient {
 
-    static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS;
-    static {
-        final List<PropertyDescriptor> props = new ArrayList<>();
-        props.add(REDIS_CONNECTION_POOL);
-        props.add(TTL);
-        PROPERTY_DESCRIPTORS = Collections.unmodifiableList(props);
-    }
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+            REDIS_CONNECTION_POOL,
+            TTL
+    );
 
     private volatile RedisConnectionPool redisConnectionPool;
     private Long ttl;

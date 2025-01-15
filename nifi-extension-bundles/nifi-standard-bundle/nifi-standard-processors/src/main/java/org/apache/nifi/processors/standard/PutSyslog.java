@@ -149,7 +149,7 @@ public class PutSyslog extends AbstractSyslogProcessor {
             .dependsOn(PROTOCOL, TCP_VALUE)
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             HOSTNAME,
             PROTOCOL,
             PORT,
@@ -195,7 +195,7 @@ public class PutSyslog extends AbstractSyslogProcessor {
 
     @Override
     public final List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

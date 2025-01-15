@@ -43,7 +43,6 @@ import org.neo4j.driver.summary.SummaryCounters;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -156,21 +155,17 @@ public class Neo4JCypherClientService extends AbstractControllerService implemen
     protected String password;
     protected String connectionUrl;
 
-    private static final List<PropertyDescriptor> DESCRIPTORS;
-    static {
-        List<PropertyDescriptor> _temp = new ArrayList<>();
-        _temp.add(CONNECTION_URL);
-        _temp.add(USERNAME);
-        _temp.add(PASSWORD);
-        _temp.add(CONNECTION_TIMEOUT);
-        _temp.add(MAX_CONNECTION_POOL_SIZE);
-        _temp.add(MAX_CONNECTION_ACQUISITION_TIMEOUT);
-        _temp.add(IDLE_TIME_BEFORE_CONNECTION_TEST);
-        _temp.add(MAX_CONNECTION_LIFETIME);
-        _temp.add(SSL_TRUST_STORE_FILE);
-
-        DESCRIPTORS = Collections.unmodifiableList(_temp);
-    }
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+            CONNECTION_URL,
+            USERNAME,
+            PASSWORD,
+            CONNECTION_TIMEOUT,
+            MAX_CONNECTION_POOL_SIZE,
+            MAX_CONNECTION_ACQUISITION_TIMEOUT,
+            IDLE_TIME_BEFORE_CONNECTION_TEST,
+            MAX_CONNECTION_LIFETIME,
+            SSL_TRUST_STORE_FILE
+    );
 
     @Override
     protected Collection<ValidationResult> customValidate(ValidationContext validationContext) {
@@ -191,7 +186,7 @@ public class Neo4JCypherClientService extends AbstractControllerService implemen
 
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return DESCRIPTORS;
+        return PROPERTY_DESCRIPTORS;
     }
 
     protected Driver getDriver(ConfigurationContext context) {

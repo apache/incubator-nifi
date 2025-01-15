@@ -192,7 +192,9 @@ public class RouteOnAttribute extends AbstractProcessor {
             .defaultValue(ROUTE_PROPERTY_NAME.getValue())
             .build();
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(ROUTE_STRATEGY);
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
+            ROUTE_STRATEGY
+    );
 
     public static final Relationship REL_NO_MATCH = new Relationship.Builder()
             .name("unmatched")
@@ -220,7 +222,7 @@ public class RouteOnAttribute extends AbstractProcessor {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override

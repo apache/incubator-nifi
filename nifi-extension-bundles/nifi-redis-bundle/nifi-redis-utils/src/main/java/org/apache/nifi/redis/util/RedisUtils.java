@@ -48,7 +48,6 @@ import redis.clients.jedis.JedisPoolConfig;
 import javax.net.ssl.SSLContext;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -298,34 +297,31 @@ public class RedisUtils {
             .identifiesControllerService(SSLContextProvider.class)
             .build();
 
-    public static final List<PropertyDescriptor> REDIS_CONNECTION_PROPERTY_DESCRIPTORS;
-    static {
-        final List<PropertyDescriptor> props = new ArrayList<>();
-        props.add(RedisUtils.REDIS_MODE);
-        props.add(RedisUtils.CONNECTION_STRING);
-        props.add(RedisUtils.DATABASE);
-        props.add(RedisUtils.COMMUNICATION_TIMEOUT);
-        props.add(RedisUtils.CLUSTER_MAX_REDIRECTS);
-        props.add(RedisUtils.SENTINEL_MASTER);
-        props.add(RedisUtils.USERNAME);
-        props.add(RedisUtils.PASSWORD);
-        props.add(RedisUtils.SENTINEL_USERNAME);
-        props.add(RedisUtils.SENTINEL_PASSWORD);
-        props.add(RedisUtils.SSL_CONTEXT_SERVICE);
-        props.add(RedisUtils.POOL_MAX_TOTAL);
-        props.add(RedisUtils.POOL_MAX_IDLE);
-        props.add(RedisUtils.POOL_MIN_IDLE);
-        props.add(RedisUtils.POOL_BLOCK_WHEN_EXHAUSTED);
-        props.add(RedisUtils.POOL_MAX_WAIT_TIME);
-        props.add(RedisUtils.POOL_MIN_EVICTABLE_IDLE_TIME);
-        props.add(RedisUtils.POOL_TIME_BETWEEN_EVICTION_RUNS);
-        props.add(RedisUtils.POOL_NUM_TESTS_PER_EVICTION_RUN);
-        props.add(RedisUtils.POOL_TEST_ON_CREATE);
-        props.add(RedisUtils.POOL_TEST_ON_BORROW);
-        props.add(RedisUtils.POOL_TEST_ON_RETURN);
-        props.add(RedisUtils.POOL_TEST_WHILE_IDLE);
-        REDIS_CONNECTION_PROPERTY_DESCRIPTORS = Collections.unmodifiableList(props);
-    }
+    public static final List<PropertyDescriptor> REDIS_CONNECTION_PROPERTY_DESCRIPTORS = List.of(
+        RedisUtils.REDIS_MODE,
+        RedisUtils.CONNECTION_STRING,
+        RedisUtils.DATABASE,
+        RedisUtils.COMMUNICATION_TIMEOUT,
+        RedisUtils.CLUSTER_MAX_REDIRECTS,
+        RedisUtils.SENTINEL_MASTER,
+        RedisUtils.USERNAME,
+        RedisUtils.PASSWORD,
+        RedisUtils.SENTINEL_USERNAME,
+        RedisUtils.SENTINEL_PASSWORD,
+        RedisUtils.SSL_CONTEXT_SERVICE,
+        RedisUtils.POOL_MAX_TOTAL,
+        RedisUtils.POOL_MAX_IDLE,
+        RedisUtils.POOL_MIN_IDLE,
+        RedisUtils.POOL_BLOCK_WHEN_EXHAUSTED,
+        RedisUtils.POOL_MAX_WAIT_TIME,
+        RedisUtils.POOL_MIN_EVICTABLE_IDLE_TIME,
+        RedisUtils.POOL_TIME_BETWEEN_EVICTION_RUNS,
+        RedisUtils.POOL_NUM_TESTS_PER_EVICTION_RUN,
+        RedisUtils.POOL_TEST_ON_CREATE,
+        RedisUtils.POOL_TEST_ON_BORROW,
+        RedisUtils.POOL_TEST_ON_RETURN,
+        RedisUtils.POOL_TEST_WHILE_IDLE
+    );
 
     public static RedisConfig createRedisConfig(final PropertyContext context) {
         final RedisType redisType = RedisType.fromDisplayName(context.getProperty(RedisUtils.REDIS_MODE).getValue());

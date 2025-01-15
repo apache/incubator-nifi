@@ -105,7 +105,7 @@ public class FetchDropbox extends AbstractProcessor implements DropboxTrait {
             REL_FAILURE
     );
 
-    private static final List<PropertyDescriptor> PROPERTIES = List.of(
+    private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
             CREDENTIAL_SERVICE,
             FILE,
             ProxyConfiguration.createProxyConfigPropertyDescriptor(ProxySpec.HTTP_AUTH)
@@ -120,7 +120,7 @@ public class FetchDropbox extends AbstractProcessor implements DropboxTrait {
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @OnScheduled

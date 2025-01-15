@@ -116,7 +116,7 @@ public class GetSQS extends AbstractAwsSyncProcessor<SqsClient, SqsClientBuilder
             .addValidator(StandardValidators.createTimePeriodValidator(0, TimeUnit.SECONDS, 20, TimeUnit.SECONDS))  // 20 seconds is the maximum allowed by SQS
             .build();
 
-    public static final List<PropertyDescriptor> PROPERTIES = List.of(
+    public static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
         QUEUE_URL,
         REGION,
         AWS_CREDENTIALS_PROVIDER_SERVICE,
@@ -128,11 +128,12 @@ public class GetSQS extends AbstractAwsSyncProcessor<SqsClient, SqsClientBuilder
         CHARSET,
         VISIBILITY_TIMEOUT,
         RECEIVE_MSG_WAIT_TIME,
-        PROXY_CONFIGURATION_SERVICE);
+        PROXY_CONFIGURATION_SERVICE
+    );
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-        return PROPERTIES;
+        return PROPERTY_DESCRIPTORS;
     }
 
     @Override
