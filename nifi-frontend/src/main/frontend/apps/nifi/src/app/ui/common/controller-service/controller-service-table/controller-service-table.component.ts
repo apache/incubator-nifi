@@ -62,6 +62,7 @@ export class ControllerServiceTable {
 
     @Input() selectedServiceId!: string;
     @Input() formatScope!: (entity: ControllerServiceEntity) => string;
+    @Input() showMoveOption!: boolean;
     @Input() definedByCurrentGroup!: (entity: ControllerServiceEntity) => boolean;
     @Input() flowConfiguration!: FlowConfiguration;
     @Input() currentUser!: CurrentUser;
@@ -77,6 +78,8 @@ export class ControllerServiceTable {
         new EventEmitter<ControllerServiceEntity>();
     @Output() manageAccessPolicies: EventEmitter<ControllerServiceEntity> = new EventEmitter<ControllerServiceEntity>();
     @Output() openAdvancedUi: EventEmitter<ControllerServiceEntity> = new EventEmitter<ControllerServiceEntity>();
+    @Output() moveControllerService: EventEmitter<ControllerServiceEntity> =
+        new EventEmitter<ControllerServiceEntity>();
     @Output() enableControllerService: EventEmitter<ControllerServiceEntity> =
         new EventEmitter<ControllerServiceEntity>();
     @Output() disableControllerService: EventEmitter<ControllerServiceEntity> =
@@ -226,6 +229,14 @@ export class ControllerServiceTable {
 
     enabledClicked(entity: ControllerServiceEntity): void {
         this.enableControllerService.next(entity);
+    }
+
+    canMove(entity: ControllerServiceEntity): boolean {
+        return this.showMoveOption && this.canRead(entity) && this.canWrite(entity);
+    }
+
+    moveClicked(entity: ControllerServiceEntity): void {
+        this.moveControllerService.next(entity);
     }
 
     canDisable(entity: ControllerServiceEntity): boolean {

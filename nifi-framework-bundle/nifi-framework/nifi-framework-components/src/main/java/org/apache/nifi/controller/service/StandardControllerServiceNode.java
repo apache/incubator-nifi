@@ -115,6 +115,7 @@ public class StandardControllerServiceNode extends AbstractComponentNode impleme
     private volatile LogLevel bulletinLevel = LogLevel.WARN;
 
     private final AtomicBoolean active;
+    private final AtomicBoolean moving;
 
     public StandardControllerServiceNode(final LoggableComponent<ControllerService> implementation, final LoggableComponent<ControllerService> proxiedControllerService,
                                          final ControllerServiceInvocationHandler invocationHandler, final String id, final ValidationContextFactory validationContextFactory,
@@ -134,6 +135,7 @@ public class StandardControllerServiceNode extends AbstractComponentNode impleme
         super(id, validationContextFactory, serviceProvider, componentType, componentCanonicalClass, reloadComponent, extensionManager, validationTrigger, isExtensionMissing);
         this.serviceProvider = serviceProvider;
         this.active = new AtomicBoolean();
+        this.moving = new AtomicBoolean(false);
         setControllerServiceAndProxy(implementation, proxiedControllerService, invocationHandler);
         stateTransition = new ServiceStateTransition(this);
         this.comment = "";
@@ -445,7 +447,14 @@ public class StandardControllerServiceNode extends AbstractComponentNode impleme
     public boolean isActive() {
         return this.active.get();
     }
-
+    @Override
+    public boolean isMoving() {
+        return this.moving.get();
+    }
+    @Override
+    public void setMoving(boolean moving) {
+        this.moving.set(moving);
+    }
     @Override
     public boolean awaitEnabled(final long timePeriod, final TimeUnit timeUnit) throws InterruptedException {
         LOG.debug("Waiting up to {} {} for {} to be enabled", timePeriod, timeUnit, this);

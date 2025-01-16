@@ -206,6 +206,10 @@ public interface ControllerServiceNode extends ComponentNode, VersionedComponent
      */
     boolean isActive();
 
+    boolean isMoving();
+
+    void setMoving(boolean moving);
+
     /**
      * Waits up to the given amount of time for the Controller Service to transition to an ENABLED state.
      * @param timePeriod maximum amount of time to wait

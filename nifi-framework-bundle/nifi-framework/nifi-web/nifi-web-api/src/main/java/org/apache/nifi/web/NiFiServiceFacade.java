@@ -2196,6 +2196,16 @@ public interface NiFiServiceFacade {
     ControllerServiceEntity updateControllerService(Revision revision, ControllerServiceDTO controllerServiceDTO);
 
     /**
+     * Moves the specified controller service.
+     *
+     * @param revision Revision to compare with current base revision
+     * @param controllerServiceDTO The controller service DTO
+     * @param newProcessGroupID The id of the process group the controller service is being moved to
+     * @return The controller service DTO
+     */
+    ControllerServiceEntity moveControllerService(final Revision revision, final ControllerServiceDTO controllerServiceDTO, final String newProcessGroupID);
+
+    /**
      * Performs verification of the given Configuration for the Controller Service with the given ID
      * @param controllerServiceId the id of the controller service
      * @param properties the configured properties to verify
