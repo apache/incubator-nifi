@@ -27,6 +27,7 @@ org.apache.nifi.processors.azure.storage.FetchAzureBlobStorage_v12
 org.apache.nifi.processors.azure.storage.PutAzureBlobStorage_v12
 org.apache.nifi.processors.azure.storage.DeleteAzureBlobStorage_v12
 org.apache.nifi.processors.azure.storage.CopyAzureBlobStorage_v12
+org.apache.nifi.processors.azure.storage.GetAzureBlobStorageMetadata_v12
 org.apache.nifi.processors.azure.storage.MoveAzureDataLakeStorage
 org.apache.nifi.processors.azure.storage.queue.GetAzureQueueStorage_v12
 org.apache.nifi.processors.azure.storage.queue.PutAzureQueueStorage_v12

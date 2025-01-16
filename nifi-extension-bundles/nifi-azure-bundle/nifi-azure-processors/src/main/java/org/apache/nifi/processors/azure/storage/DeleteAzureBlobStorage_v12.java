@@ -43,8 +43,8 @@ import static org.apache.nifi.processors.azure.storage.utils.BlobAttributes.ATTR
 import static org.apache.nifi.processors.azure.storage.utils.BlobAttributes.ATTR_NAME_CONTAINER;
 
 @Tags({"azure", "microsoft", "cloud", "storage", "blob"})
-@SeeAlso({ListAzureBlobStorage_v12.class, FetchAzureBlobStorage_v12.class, PutAzureBlobStorage_v12.class,
-        CopyAzureBlobStorage_v12.class})
+@SeeAlso({ ListAzureBlobStorage_v12.class, FetchAzureBlobStorage_v12.class, PutAzureBlobStorage_v12.class,
+        CopyAzureBlobStorage_v12.class, GetAzureBlobStorageMetadata_v12.class })
 @CapabilityDescription("Deletes the specified blob from Azure Blob Storage. The processor uses Azure Blob Storage client library v12.")
 @InputRequirement(Requirement.INPUT_REQUIRED)
 public class DeleteAzureBlobStorage_v12 extends AbstractAzureBlobProcessor_v12 {

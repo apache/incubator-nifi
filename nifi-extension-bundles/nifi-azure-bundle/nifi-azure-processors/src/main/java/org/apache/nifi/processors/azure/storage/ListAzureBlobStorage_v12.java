@@ -83,8 +83,8 @@ import static org.apache.nifi.processors.azure.storage.utils.BlobAttributes.ATTR
 @PrimaryNodeOnly
 @TriggerSerially
 @Tags({ "azure", "microsoft", "cloud", "storage", "blob" })
-@SeeAlso({ FetchAzureBlobStorage_v12.class, PutAzureBlobStorage_v12.class, DeleteAzureBlobStorage_v12.class,
-        CopyAzureBlobStorage_v12.class })
+@SeeAlso({ FetchAzureBlobStorage_v12.class, PutAzureBlobStorage_v12.class, CopyAzureBlobStorage_v12.class,
+        DeleteAzureBlobStorage_v12.class, GetAzureBlobStorageMetadata_v12.class })
 @CapabilityDescription("Lists blobs in an Azure Blob Storage container. Listing details are attached to an empty FlowFile for use with FetchAzureBlobStorage. " +
         "This Processor is designed to run on Primary Node only in a cluster. If the primary node changes, the new Primary Node will pick up where the " +
         "previous node left off without duplicating all of the data. The processor uses Azure Blob Storage client library v12.")

@@ -27,6 +27,7 @@ import com.azure.storage.blob.models.BlobStorageException;
 import com.azure.storage.blob.models.BlobType;
 import com.azure.storage.blob.models.BlockBlobItem;
 import com.azure.storage.blob.options.BlobParallelUploadOptions;
+import org.apache.nifi.annotation.behavior.DynamicProperty;
 import org.apache.nifi.annotation.behavior.InputRequirement;
 import org.apache.nifi.annotation.behavior.InputRequirement.Requirement;
 import org.apache.nifi.annotation.behavior.WritesAttribute;
@@ -34,14 +35,17 @@ import org.apache.nifi.annotation.behavior.WritesAttributes;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.SeeAlso;
 import org.apache.nifi.annotation.documentation.Tags;
+import org.apache.nifi.components.AllowableValue;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.ValidationContext;
 import org.apache.nifi.components.ValidationResult;
+import org.apache.nifi.expression.ExpressionLanguageScope;
 import org.apache.nifi.fileresource.service.api.FileResource;
 import org.apache.nifi.flowfile.FlowFile;
 import org.apache.nifi.processor.ProcessContext;
 import org.apache.nifi.processor.ProcessSession;
 import org.apache.nifi.processor.exception.ProcessException;
+import org.apache.nifi.processor.util.StandardValidators;
 import org.apache.nifi.processors.azure.AbstractAzureBlobProcessor_v12;
 import org.apache.nifi.processors.azure.ClientSideEncryptionSupport;
 import org.apache.nifi.processors.azure.storage.utils.AzureStorageUtils;
@@ -71,6 +75,7 @@ import static org.apache.nifi.processors.azure.storage.utils.BlobAttributes.ATTR
 import static org.apache.nifi.processors.azure.storage.utils.BlobAttributes.ATTR_DESCRIPTION_MIME_TYPE;
 import static org.apache.nifi.processors.azure.storage.utils.BlobAttributes.ATTR_DESCRIPTION_PRIMARY_URI;
 import static org.apache.nifi.processors.azure.storage.utils.BlobAttributes.ATTR_DESCRIPTION_TIMESTAMP;
+import static org.apache.nifi.processors.azure.storage.utils.BlobAttributes.ATTR_DESCRIPTION_USER_METADATA;
 import static org.apache.nifi.processors.azure.storage.utils.BlobAttributes.ATTR_NAME_BLOBNAME;
 import static org.apache.nifi.processors.azure.storage.utils.BlobAttributes.ATTR_NAME_BLOBTYPE;
 import static org.apache.nifi.processors.azure.storage.utils.BlobAttributes.ATTR_NAME_CONTAINER;
@@ -82,14 +87,19 @@ import static org.apache.nifi.processors.azure.storage.utils.BlobAttributes.ATTR
 import static org.apache.nifi.processors.azure.storage.utils.BlobAttributes.ATTR_NAME_MIME_TYPE;
 import static org.apache.nifi.processors.azure.storage.utils.BlobAttributes.ATTR_NAME_PRIMARY_URI;
 import static org.apache.nifi.processors.azure.storage.utils.BlobAttributes.ATTR_NAME_TIMESTAMP;
+import static org.apache.nifi.processors.azure.storage.utils.BlobAttributes.ATTR_NAME_USER_METADATA;
 import static org.apache.nifi.processors.transfer.ResourceTransferProperties.FILE_RESOURCE_SERVICE;
 import static org.apache.nifi.processors.transfer.ResourceTransferProperties.RESOURCE_TRANSFER_SOURCE;
 import static org.apache.nifi.processors.transfer.ResourceTransferUtils.getFileResource;
 
 @Tags({"azure", "microsoft", "cloud", "storage", "blob"})
-@SeeAlso({ListAzureBlobStorage_v12.class, FetchAzureBlobStorage_v12.class, DeleteAzureBlobStorage_v12.class,
-        CopyAzureBlobStorage_v12.class})
+@SeeAlso({ ListAzureBlobStorage_v12.class, FetchAzureBlobStorage_v12.class, CopyAzureBlobStorage_v12.class,
+        DeleteAzureBlobStorage_v12.class, GetAzureBlobStorageMetadata_v12.class })
 @CapabilityDescription("Puts content into a blob on Azure Blob Storage. The processor uses Azure Blob Storage client library v12.")
+@DynamicProperty(name = "The name of a User-Defined Metadata field to add to the blob",
+        value = "The value of a User-Defined Metadata field to add to the blob",
+        description = "Allows user-defined metadata to be added to the blob as key/value pairs",
+        expressionLanguageScope = ExpressionLanguageScope.FLOWFILE_ATTRIBUTES)
 @InputRequirement(Requirement.INPUT_REQUIRED)
 @WritesAttributes({@WritesAttribute(attribute = ATTR_NAME_CONTAINER, description = ATTR_DESCRIPTION_CONTAINER),
         @WritesAttribute(attribute = ATTR_NAME_BLOBNAME, description = ATTR_DESCRIPTION_BLOBNAME),
@@ -101,8 +111,30 @@ import static org.apache.nifi.processors.transfer.ResourceTransferUtils.getFileR
         @WritesAttribute(attribute = ATTR_NAME_TIMESTAMP, description = ATTR_DESCRIPTION_TIMESTAMP),
         @WritesAttribute(attribute = ATTR_NAME_LENGTH, description = ATTR_DESCRIPTION_LENGTH),
         @WritesAttribute(attribute = ATTR_NAME_ERROR_CODE, description = ATTR_DESCRIPTION_ERROR_CODE),
-        @WritesAttribute(attribute = ATTR_NAME_IGNORED, description = ATTR_DESCRIPTION_IGNORED)})
+        @WritesAttribute(attribute = ATTR_NAME_IGNORED, description = ATTR_DESCRIPTION_IGNORED),
+        @WritesAttribute(attribute = ATTR_NAME_USER_METADATA, description = ATTR_DESCRIPTION_USER_METADATA)})
 public class PutAzureBlobStorage_v12 extends AbstractAzureBlobProcessor_v12 implements ClientSideEncryptionSupport {
+
+    public static final PropertyDescriptor BLOB_TAGS_PREFIX = new PropertyDescriptor.Builder()
+            .name("azure-blob-tags-prefix")
+            .displayName("Blob Tags Prefix")
+            .description("Specifies the prefix which would be scanned against the incoming FlowFile's attributes and the matching attribute's " +
+                    "name and value would be considered as the outgoing Azure blob's Tag name and Tag value respectively. For Ex: If the " +
+                    "incoming FlowFile carries the attributes tagAzurecountry, tagAzurePII, the tag prefix to be specified would be 'tagAzure'")
+            .required(false)
+            .addValidator(StandardValidators.NON_EMPTY_EL_VALIDATOR)
+            .expressionLanguageSupported(ExpressionLanguageScope.FLOWFILE_ATTRIBUTES)
+            .build();
+
+    public static final PropertyDescriptor REMOVE_TAG_PREFIX = new PropertyDescriptor.Builder()
+            .name("azure-blob-remove-tags-prefix")
+            .displayName("Remove Tag Prefix")
+            .description("If set to 'True', the value provided for '" + BLOB_TAGS_PREFIX.getDisplayName() + "' will be removed from " +
+                    "the attribute(s) and then considered as the Tag name. For ex: If the incoming FlowFile carries the attributes tagAzurecountry, " +
+                    "tagAzurePII and the prefix is set to 'tagAzure' then the corresponding tag values would be 'country' and 'PII'")
+            .allowableValues(new AllowableValue("true", "True"), new AllowableValue("false", "False"))
+            .defaultValue("false")
+            .build();
 
     private static final List<PropertyDescriptor> PROPERTIES = List.of(
             BLOB_STORAGE_CREDENTIALS_SERVICE,
@@ -112,6 +144,8 @@ public class PutAzureBlobStorage_v12 extends AbstractAzureBlobProcessor_v12 impl
             BLOB_NAME,
             RESOURCE_TRANSFER_SOURCE,
             FILE_RESOURCE_SERVICE,
+            BLOB_TAGS_PREFIX,
+            REMOVE_TAG_PREFIX,
             AzureStorageUtils.PROXY_CONFIGURATION_SERVICE,
             CSE_KEY_TYPE,
             CSE_KEY_ID,
@@ -128,6 +162,16 @@ public class PutAzureBlobStorage_v12 extends AbstractAzureBlobProcessor_v12 impl
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
         return PROPERTIES;
+    }
+
+    @Override
+    protected PropertyDescriptor getSupportedDynamicPropertyDescriptor(final String propertyDescriptorName) {
+        return new PropertyDescriptor.Builder()
+                .name(propertyDescriptorName)
+                .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
+                .expressionLanguageSupported(ExpressionLanguageScope.FLOWFILE_ATTRIBUTES)
+                .dynamic(true)
+                .build();
     }
 
     public void onTrigger(final ProcessContext context, final ProcessSession session) throws ProcessException {
@@ -176,12 +220,28 @@ public class PutAzureBlobStorage_v12 extends AbstractAzureBlobProcessor_v12 impl
                 ) {
                     final BlobParallelUploadOptions blobParallelUploadOptions = new BlobParallelUploadOptions(toFluxByteBuffer(sourceInputStream, BlobClient.BLOB_DEFAULT_UPLOAD_BLOCK_SIZE));
                     blobParallelUploadOptions.setRequestConditions(blobRequestConditions);
+                    if (context.getProperty(BLOB_TAGS_PREFIX).isSet()) {
+                        blobParallelUploadOptions.setTags(getObjectTags(context, flowFile));
+                    }
+
+                    final Map<String, String> userMetadata = getUserMetadata(context, flowFile);
+                    if (!userMetadata.isEmpty()) {
+                        blobParallelUploadOptions.setMetadata(userMetadata);
+                    }
+
                     Response<BlockBlobItem> response = blobClient.uploadWithResponse(blobParallelUploadOptions, null, Context.NONE);
                     BlockBlobItem blob = response.getValue();
                     applyUploadResultAttributes(attributes, blob, BlobType.BLOCK_BLOB, transferSize);
                     applyBlobMetadata(attributes, blobClient);
                     if (ignore) {
                         attributes.put(ATTR_NAME_IGNORED, "false");
+                    }
+                    if (!userMetadata.isEmpty()) {
+                        StringBuilder userMetaBldr = new StringBuilder();
+                        for (String userKey : userMetadata.keySet()) {
+                            userMetaBldr.append(userKey).append("=").append(userMetadata.get(userKey));
+                        }
+                        attributes.put(ATTR_NAME_USER_METADATA, userMetaBldr.toString());
                     }
                 }
             } catch (BlobStorageException e) {
@@ -216,5 +276,39 @@ public class PutAzureBlobStorage_v12 extends AbstractAzureBlobProcessor_v12 impl
         attributes.put(ATTR_NAME_TIMESTAMP, String.valueOf(blob.getLastModified()));
         attributes.put(ATTR_NAME_LANG, null);
         attributes.put(ATTR_NAME_MIME_TYPE, APPLICATION_OCTET_STREAM);
+    }
+
+    private Map<String, String> getObjectTags(ProcessContext context, FlowFile flowFile) {
+        final String prefix = context.getProperty(BLOB_TAGS_PREFIX).evaluateAttributeExpressions(flowFile).getValue();
+        final Map<String, String> objectTags = new HashMap<>();
+        final Map<String, String> attributesMap = flowFile.getAttributes();
+
+        attributesMap.entrySet().stream()
+                .filter(attribute -> attribute.getKey().startsWith(prefix))
+                .forEach(attribute -> {
+                    String tagKey = attribute.getKey();
+                    String tagValue = attribute.getValue();
+
+                    if (context.getProperty(REMOVE_TAG_PREFIX).asBoolean()) {
+                        tagKey = tagKey.replace(prefix, "");
+                    }
+                    objectTags.put(tagKey, tagValue);
+                });
+
+        return objectTags;
+    }
+
+    private Map<String, String> getUserMetadata(ProcessContext context, FlowFile flowFile) {
+        final Map<String, String> userMetadata = new HashMap<>();
+
+        for (final Map.Entry<PropertyDescriptor, String> entry : context.getProperties().entrySet()) {
+            if (entry.getKey().isDynamic()) {
+                final String value = context.getProperty(
+                        entry.getKey()).evaluateAttributeExpressions(flowFile).getValue();
+                userMetadata.put(entry.getKey().getName(), value);
+            }
+        }
+
+        return userMetadata;
     }
 }

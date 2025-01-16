@@ -51,4 +51,8 @@ public final class BlobAttributes {
     public static final String ATTR_NAME_IGNORED = "azure.ignored";
     public static final String ATTR_DESCRIPTION_IGNORED = "When Conflict Resolution Strategy is 'ignore', " +
             "this property will be true/false depending on whether the blob was ignored.";
+
+    public static final String ATTR_NAME_USER_METADATA = "azure.usermetadata";
+    public static final String ATTR_DESCRIPTION_USER_METADATA = "A human-readable form of the User Metadata of " +
+            "the blob, if any was set";
 }

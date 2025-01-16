@@ -71,7 +71,8 @@ import static org.apache.nifi.processors.azure.storage.utils.BlobAttributes.ATTR
 
 @Tags({"azure", "microsoft", "cloud", "storage", "blob"})
 @CapabilityDescription("Retrieves the specified blob from Azure Blob Storage and writes its content to the content of the FlowFile. The processor uses Azure Blob Storage client library v12.")
-@SeeAlso({ListAzureBlobStorage_v12.class, PutAzureBlobStorage_v12.class, DeleteAzureBlobStorage_v12.class})
+@SeeAlso({ ListAzureBlobStorage_v12.class, PutAzureBlobStorage_v12.class, CopyAzureBlobStorage_v12.class,
+        DeleteAzureBlobStorage_v12.class, GetAzureBlobStorageMetadata_v12.class })
 @InputRequirement(Requirement.INPUT_REQUIRED)
 @WritesAttributes({@WritesAttribute(attribute = ATTR_NAME_CONTAINER, description = ATTR_DESCRIPTION_CONTAINER),
         @WritesAttribute(attribute = ATTR_NAME_BLOBNAME, description = ATTR_DESCRIPTION_BLOBNAME),
