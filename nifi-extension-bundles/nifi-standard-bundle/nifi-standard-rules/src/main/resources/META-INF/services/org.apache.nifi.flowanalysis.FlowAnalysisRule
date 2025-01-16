@@ -14,3 +14,4 @@
 # limitations under the License.
 
 org.apache.nifi.flowanalysis.rules.DisallowComponentType
+org.apache.nifi.flowanalysis.rules.RestrictBackpressureSettings

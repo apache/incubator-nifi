@@ -23,7 +23,20 @@
     <artifactId>nifi-standard-rules</artifactId>
     <packaging>jar</packaging>
 
-    <dependencies>
-
-    </dependencies>
+    <dependencies />
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.rat</groupId>
+                <artifactId>apache-rat-plugin</artifactId>
+                <configuration>
+                    <excludes combine.children="append">
+                        <exclude>src/test/resources/RestrictBackpressureSettings/RestrictBackpressureSettings_noViolation.json</exclude>
+                        <exclude>src/test/resources/RestrictBackpressureSettings/RestrictBackpressureSettings.json</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
