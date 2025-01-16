@@ -36,12 +36,15 @@ import org.apache.nifi.web.api.entity.PasteResponseEntity;
 import org.apache.nifi.web.api.entity.ProcessGroupEntity;
 import org.apache.nifi.web.api.entity.ProcessGroupImportEntity;
 import org.apache.nifi.web.api.entity.ProcessGroupReplaceRequestEntity;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
+import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.UUID;
 
 /**
  * Jersey implementation of ProcessGroupClient.
@@ -376,6 +379,37 @@ public class JerseyProcessGroupClient extends AbstractJerseyClient implements Pr
             return getRequestBuilder(target).put(
                     Entity.entity(pasteRequestEntity, MediaType.APPLICATION_JSON_TYPE),
                     PasteResponseEntity.class);
+        });
+    }
+
+    @Override
+    public ProcessGroupEntity upload(String parentPgId, File file, String pgName, Double posX, Double posY) throws NiFiClientException, IOException {
+        if (StringUtils.isBlank(parentPgId)) {
+            throw new IllegalArgumentException("Parent process group id cannot be null or blank");
+        }
+        if (file == null) {
+            throw new IllegalArgumentException("File cannot be null");
+        }
+        if (!file.exists() || !file.canRead()) {
+            throw new IllegalArgumentException("Specified file is not a local readable file: " + file.getAbsolutePath());
+        }
+
+        FormDataMultiPart form = new FormDataMultiPart();
+
+        form.field("id", parentPgId);
+        form.field("groupName", pgName);
+        form.field("positionX", Double.toString(posX));
+        form.field("positionY", Double.toString(posY));
+        form.field("clientId", UUID.randomUUID().toString());
+        form.bodyPart(new FileDataBodyPart("file", file, MediaType.APPLICATION_JSON_TYPE));
+
+        return executeAction("Error uploading process group", () -> {
+            final WebTarget target = processGroupsTarget
+                    .path("{id}/process-groups/upload")
+                    .resolveTemplate("id", parentPgId);
+            return getRequestBuilder(target).post(
+                    Entity.entity(form, MediaType.MULTIPART_FORM_DATA),
+                    ProcessGroupEntity.class);
         });
     }
 }
