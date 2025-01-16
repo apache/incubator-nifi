@@ -72,6 +72,7 @@ export interface LoadProcessGroupResponse {
     flowStatus: ControllerStatusEntity;
     controllerBulletins: ControllerBulletinsEntity;
     connectedStateChanged: boolean;
+    registryClients: RegistryClientEntity[];
 }
 
 export interface LoadConnectionSuccess {
@@ -556,6 +557,7 @@ export interface CopiedSnippet {
 
 export interface VersionControlTipInput {
     versionControlInformation: VersionControlInformation;
+    registryClients?: RegistryClientEntity[];
 }
 
 /*
@@ -652,6 +654,7 @@ export interface FlowState {
     flowStatus: ControllerStatusEntity;
     refreshRpgDetails: RefreshRemoteProcessGroupPollingDetailsRequest | null;
     controllerBulletins: ControllerBulletinsEntity;
+    registryClients: RegistryClientEntity[];
     dragging: boolean;
     transitionRequired: boolean;
     skipTransform: boolean;

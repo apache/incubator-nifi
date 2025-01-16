@@ -26,7 +26,8 @@ import {
     selectFlowLoadingStatus,
     selectProcessGroups,
     selectAnySelectedComponentIds,
-    selectTransitionRequired
+    selectTransitionRequired,
+    selectRegistryClients
 } from '../../state/flow/flow.selectors';
 import { CanvasUtils } from '../canvas-utils.service';
 import { enterProcessGroup } from '../../state/flow/flow.actions';
@@ -40,6 +41,7 @@ import { ComponentType, NiFiCommon, TextTip } from '@nifi/shared';
 })
 export class ProcessGroupManager implements OnDestroy {
     private destroyed$: Subject<boolean> = new Subject();
+    private registryClients = this.store.selectSignal(selectRegistryClients);
 
     private dimensions: Dimension = {
         width: 384,
@@ -1116,7 +1118,8 @@ export class ProcessGroupManager implements OnDestroy {
                     versionControl.each(function (this: any) {
                         if (self.isUnderVersionControl(processGroupData)) {
                             self.canvasUtils.canvasTooltip(VersionControlTip, d3.select(this), {
-                                versionControlInformation: processGroupData.component.versionControlInformation
+                                versionControlInformation: processGroupData.component.versionControlInformation,
+                                registryClients: self.registryClients()
                             });
                         } else {
                             self.canvasUtils.resetCanvasTooltip(d3.select(this));

@@ -252,6 +252,8 @@ export const selectControllerBulletins = createSelector(
     (state: FlowState) => state.controllerBulletins.bulletins // TODO - include others?
 );
 
+export const selectRegistryClients = createSelector(selectFlowState, (state: FlowState) => state.registryClients);
+
 export const selectNavigationCollapsed = createSelector(
     selectFlowState,
     (state: FlowState) => state.navigationCollapsed

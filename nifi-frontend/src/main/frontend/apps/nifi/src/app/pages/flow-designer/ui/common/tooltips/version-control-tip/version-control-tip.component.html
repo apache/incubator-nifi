@@ -16,10 +16,33 @@
   -->
 
 <div class="tooltip" [style.left.px]="left" [style.top.px]="top">
-    <div>
-        {{ getTrackingMessage() }}
-    </div>
-    <div>
+    @if (data?.versionControlInformation; as vci) {
+        <div class="flex flex-col gap-y-2 mb-3">
+            <div>
+                <div>Flow Name</div>
+                <div class="tertiary-color font-medium">{{ vci.flowName }}</div>
+            </div>
+            <div>
+                <div>Version</div>
+                <div class="tertiary-color font-medium">{{ vci.version }}</div>
+            </div>
+            <div>
+                <div>Registry</div>
+                <div class="tertiary-color font-medium">{{ vci.registryName }}</div>
+            </div>
+            @if (supportsBranching() && vci.branch) {
+                <div>
+                    <div>Branch</div>
+                    <div class="tertiary-color font-medium">{{ vci.branch }}</div>
+                </div>
+            }
+            <div>
+                <div>Bucket</div>
+                <div class="tertiary-color font-medium">{{ vci.bucketName }}</div>
+            </div>
+        </div>
+    }
+    <div class="italic">
         {{ data?.versionControlInformation?.stateExplanation }}
     </div>
 </div>

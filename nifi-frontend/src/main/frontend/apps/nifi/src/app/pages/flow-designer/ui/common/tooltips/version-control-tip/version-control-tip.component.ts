@@ -17,6 +17,7 @@
 
 import { Component, Input } from '@angular/core';
 import { VersionControlInformation, VersionControlTipInput } from '../../../../state/flow';
+import { RegistryClientEntity } from '../../../../../../state/shared';
 
 @Component({
     selector: 'version-control-tip',
@@ -35,5 +36,15 @@ export class VersionControlTip {
         }
 
         return '';
+    }
+
+    supportsBranching(): boolean {
+        if (this.data?.registryClients && this.data?.registryClients.length > 0) {
+            const vci = this.data.versionControlInformation;
+            return this.data.registryClients.some((client: RegistryClientEntity) => {
+                return client.id === vci.registryId && client.component.supportsBranching;
+            });
+        }
+        return false;
     }
 }

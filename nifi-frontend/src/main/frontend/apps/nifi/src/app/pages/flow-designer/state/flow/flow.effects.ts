@@ -169,6 +169,7 @@ import { ErrorContextKey } from '../../../../state/error';
 import {
     disableComponent,
     enableComponent,
+    setRegistryClients,
     startComponent,
     startPollingProcessorUntilStopped,
     stopComponent
@@ -253,9 +254,10 @@ export class FlowEffects {
                 combineLatest([
                     this.flowService.getFlow(request.id),
                     this.flowService.getFlowStatus(),
-                    this.flowService.getControllerBulletins()
+                    this.flowService.getControllerBulletins(),
+                    this.registryService.getRegistryClients()
                 ]).pipe(
-                    map(([flow, flowStatus, controllerBulletins]) => {
+                    map(([flow, flowStatus, controllerBulletins, registryClientsResponse]) => {
                         this.store.dispatch(resetPollingFlowAnalysis());
                         return FlowActions.loadProcessGroupSuccess({
                             response: {
@@ -263,7 +265,8 @@ export class FlowEffects {
                                 flow: flow,
                                 flowStatus: flowStatus,
                                 controllerBulletins: controllerBulletins,
-                                connectedStateChanged
+                                connectedStateChanged,
+                                registryClients: registryClientsResponse.registries
                             }
                         });
                     }),
@@ -358,7 +361,7 @@ export class FlowEffects {
                                     request,
                                     registryClients: response.registries
                                 };
-
+                                this.store.dispatch(setRegistryClients({ request: response.registries }));
                                 return FlowActions.openImportFromRegistryDialog({ request: dialogRequest });
                             }),
                             catchError((errorResponse: HttpErrorResponse) =>
@@ -3699,7 +3702,7 @@ export class FlowEffects {
                             revision: versionInfo.processGroupRevision,
                             registryClients: registryClients.registries
                         };
-
+                        this.store.dispatch(setRegistryClients({ request: registryClients.registries }));
                         return FlowActions.openSaveVersionDialog({ request: dialogRequest });
                     }),
                     catchError((errorResponse: HttpErrorResponse) => of(this.snackBarOrFullScreenError(errorResponse)))
