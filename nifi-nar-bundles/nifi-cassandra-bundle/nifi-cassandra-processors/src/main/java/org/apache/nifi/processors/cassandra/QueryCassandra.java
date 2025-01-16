@@ -70,6 +70,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -262,6 +263,8 @@ public class QueryCassandra extends AbstractCassandraProcessor {
             }
         }
 
+        final Map<String, String> originalAttributes = fileToProcess != null ? fileToProcess.getAttributes() : new HashMap<>();
+
         final ComponentLog logger = getLogger();
         final String selectQuery = context.getProperty(CQL_SELECT_QUERY).evaluateAttributeExpressions(fileToProcess).getValue();
         final long queryTimeout = context.getProperty(QUERY_TIMEOUT).evaluateAttributeExpressions(fileToProcess).asTimePeriod(TimeUnit.MILLISECONDS);
@@ -321,6 +324,8 @@ public class QueryCassandra extends AbstractCassandraProcessor {
                         throw new ProcessException(e);
                     }
                 });
+
+                fileToProcess = session.putAllAttributes(fileToProcess, originalAttributes);
 
                 // set attribute how many rows were selected
                 fileToProcess = session.putAttribute(fileToProcess, RESULT_ROW_COUNT, String.valueOf(nrOfRows.get()));
