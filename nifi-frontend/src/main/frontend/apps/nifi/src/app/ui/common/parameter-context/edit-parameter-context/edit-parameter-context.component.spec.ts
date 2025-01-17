@@ -18,16 +18,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { EditParameterContext } from './edit-parameter-context.component';
-import { EditParameterContextRequest } from '../../../state/parameter-context-listing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { of } from 'rxjs';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { provideMockStore } from '@ngrx/store/testing';
-import { initialState } from '../../../state/parameter-context-listing/parameter-context-listing.reducer';
-import { ClusterConnectionService } from '../../../../../service/cluster-connection.service';
-import { ParameterContextEntity } from '../../../../../state/shared';
+import { initialState } from '../../../../pages/parameter-contexts/state/parameter-context-listing/parameter-context-listing.reducer';
+import { ClusterConnectionService } from '../../../../service/cluster-connection.service';
+import { ParameterContextEntity } from '../../../../state/shared';
 
 import 'codemirror/addon/hint/show-hint';
+import { EditParameterContextRequest } from '../index';
 
 describe('EditParameterContext', () => {
     let component: EditParameterContext;

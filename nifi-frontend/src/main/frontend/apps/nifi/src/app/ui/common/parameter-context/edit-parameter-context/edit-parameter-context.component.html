@@ -89,7 +89,7 @@
                     <div class="dialog-tab-content flex gap-x-4">
                         <div class="w-full">
                             @if (!isNew) {
-                                <div class="flex flex-col mb-5">
+                                <div class="flex w-full flex-col mb-5">
                                     <div>Id</div>
                                     @if (request.parameterContext) {
                                         <div [copy]="request.parameterContext.id" class="tertiary-color font-medium">

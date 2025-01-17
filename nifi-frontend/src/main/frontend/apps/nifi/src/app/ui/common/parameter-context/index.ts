@@ -15,25 +15,28 @@
  * limitations under the License.
  */
 
-import { createSelector } from '@ngrx/store';
-import { CanvasState, selectCanvasState } from '../index';
-import { parameterFeatureKey, ParameterState } from './index';
+import { ParameterContextEntity } from '../../../state/shared';
 
-export const selectParameterState = createSelector(
-    selectCanvasState,
-    (state: CanvasState) => state[parameterFeatureKey]
-);
+export interface EditParameterContextRequest {
+    parameterContext?: ParameterContextEntity;
+}
 
-export const selectUpdateRequest = createSelector(
-    selectParameterState,
-    (state: ParameterState) => state.updateRequestEntity
-);
+export interface CreateParameterContextRequest {
+    payload: any;
+}
 
-export const selectParameterSaving = createSelector(selectParameterState, (state: ParameterState) => state.saving);
+export interface CreateParameterContextSuccess {
+    parameterContext: ParameterContextEntity;
+}
 
-export const selectSaving = createSelector(selectParameterState, (state: ParameterState) => state.saving);
+export interface OpenCreateParameterContextRequest {
+    parameterContexts: ParameterContextEntity[];
+}
 
-export const selectParameterContextStatus = createSelector(
-    selectParameterState,
-    (state: ParameterState) => state.status
-);
+export interface DeleteParameterContextRequest {
+    parameterContext: ParameterContextEntity;
+}
+
+export interface DeleteParameterContextSuccess {
+    parameterContext: ParameterContextEntity;
+}

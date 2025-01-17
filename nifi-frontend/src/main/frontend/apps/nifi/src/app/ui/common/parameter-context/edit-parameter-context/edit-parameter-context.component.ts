@@ -26,10 +26,10 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { Observable } from 'rxjs';
-import { EditParameterContextRequest } from '../../../state/parameter-context-listing';
-import { NifiSpinnerDirective } from '../../../../../ui/common/spinner/nifi-spinner.directive';
-import { Client } from '../../../../../service/client.service';
-import { ParameterTable } from '../parameter-table/parameter-table.component';
+import { EditParameterContextRequest } from '../../../../pages/parameter-contexts/state/parameter-context-listing';
+import { NifiSpinnerDirective } from '../../spinner/nifi-spinner.directive';
+import { Client } from '../../../../service/client.service';
+import { ParameterTable } from '../../../../pages/parameter-contexts/ui/parameter-context-listing/parameter-table/parameter-table.component';
 import {
     EditParameterResponse,
     ParameterContext,
@@ -37,16 +37,16 @@ import {
     ParameterContextUpdateRequestEntity,
     ParameterEntity,
     ParameterProviderConfiguration
-} from '../../../../../state/shared';
-import { ProcessGroupReferences } from '../process-group-references/process-group-references.component';
+} from '../../../../state/shared';
+import { ProcessGroupReferences } from '../../../../pages/parameter-contexts/ui/parameter-context-listing/process-group-references/process-group-references.component';
 import { ParameterContextInheritance } from '../parameter-context-inheritance/parameter-context-inheritance.component';
-import { ParameterReferences } from '../../../../../ui/common/parameter-references/parameter-references.component';
+import { ParameterReferences } from '../../parameter-references/parameter-references.component';
 import { RouterLink } from '@angular/router';
-import { ClusterConnectionService } from '../../../../../service/cluster-connection.service';
-import { TabbedDialog } from '../../../../../ui/common/tabbed-dialog/tabbed-dialog.component';
+import { ClusterConnectionService } from '../../../../service/cluster-connection.service';
+import { TabbedDialog } from '../../tabbed-dialog/tabbed-dialog.component';
 import { NiFiCommon, TextTip, NifiTooltipDirective, CopyDirective, Parameter } from '@nifi/shared';
-import { ErrorContextKey } from '../../../../../state/error';
-import { ContextErrorBanner } from '../../../../../ui/common/context-error-banner/context-error-banner.component';
+import { ErrorContextKey } from '../../../../state/error';
+import { ContextErrorBanner } from '../../context-error-banner/context-error-banner.component';
 
 @Component({
     selector: 'edit-parameter-context',

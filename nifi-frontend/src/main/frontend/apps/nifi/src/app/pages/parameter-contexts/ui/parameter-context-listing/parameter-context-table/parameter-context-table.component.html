@@ -31,7 +31,8 @@
                 <td mat-cell *matCellDef="let item">
                     <div
                         [ngClass]="{ unset: !canRead(item), 'neutral-color': !canRead(item) }"
-                        class="overflow-hidden overflow-ellipsis whitespace-nowrap">
+                        class="truncate"
+                        [title]="formatName(item)">
                         {{ formatName(item) }}
                     </div>
                 </td>
@@ -40,7 +41,7 @@
             <!-- Provider Column -->
             <ng-container matColumnDef="provider">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Provider</th>
-                <td mat-cell *matCellDef="let item">
+                <td mat-cell *matCellDef="let item" [title]="formatProvider(item)">
                     {{ formatProvider(item) }}
                 </td>
             </ng-container>
@@ -48,7 +49,7 @@
             <!-- Description Column -->
             <ng-container matColumnDef="description">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Description</th>
-                <td mat-cell *matCellDef="let item">
+                <td mat-cell *matCellDef="let item" [title]="formatDescription(item)">
                     {{ formatDescription(item) }}
                 </td>
             </ng-container>

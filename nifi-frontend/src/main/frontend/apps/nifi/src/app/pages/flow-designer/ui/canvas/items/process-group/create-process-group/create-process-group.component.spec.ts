@@ -25,149 +25,132 @@ import { provideMockStore } from '@ngrx/store/testing';
 import { initialState } from '../../../../../state/flow/flow.reducer';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
-describe('CreateProcessGroup', () => {
-    let component: CreateProcessGroup;
-    let fixture: ComponentFixture<CreateProcessGroup>;
-
-    const data: CreateProcessGroupDialogRequest = {
-        request: {
-            revision: {
-                clientId: 'a6482293-7fe8-43b4-8ab4-ee95b3b27721',
-                version: 0
-            },
-            type: ComponentType.ProcessGroup,
-            position: {
-                x: -4,
-                y: -698.5
-            }
+const noPermissionsParameterContextId = '95d509b9-018b-1000-daff-b7957ea7935e';
+const parameterContextId = '95d509b9-018b-1000-daff-b7957ea7934f';
+const parameterContexts = [
+    {
+        revision: {
+            version: 0
         },
-        parameterContexts: [
-            {
+        id: parameterContextId,
+        uri: '',
+        permissions: {
+            canRead: true,
+            canWrite: true
+        },
+        component: {
+            name: 'params 2',
+            description: '',
+            parameters: [],
+            boundProcessGroups: [],
+            inheritedParameterContexts: [],
+            id: parameterContextId
+        }
+    },
+    {
+        revision: {
+            version: 0
+        },
+        id: noPermissionsParameterContextId,
+        uri: '',
+        permissions: {
+            canRead: false,
+            canWrite: false
+        }
+    }
+];
+
+describe('CreateProcessGroup', () => {
+    describe('user has permission to current parameter context', () => {
+        let component: CreateProcessGroup;
+        let fixture: ComponentFixture<CreateProcessGroup>;
+
+        const data: CreateProcessGroupDialogRequest = {
+            request: {
                 revision: {
-                    version: 1
-                },
-                id: '95d4f3d2-018b-1000-b7c7-b830c49a8026',
-                uri: '',
-                permissions: {
-                    canRead: true,
-                    canWrite: true
-                },
-                component: {
-                    name: 'params 1',
-                    description: '',
-                    parameters: [
-                        {
-                            canWrite: true,
-                            parameter: {
-                                name: 'one',
-                                description: 'Description for one.',
-                                sensitive: false,
-                                value: 'value',
-                                provided: false,
-                                referencingComponents: [],
-                                parameterContext: {
-                                    id: '95d4f3d2-018b-1000-b7c7-b830c49a8026',
-                                    permissions: {
-                                        canRead: true,
-                                        canWrite: true
-                                    },
-                                    component: {
-                                        id: '95d4f3d2-018b-1000-b7c7-b830c49a8026',
-                                        name: 'params 1'
-                                    }
-                                },
-                                inherited: false
-                            }
-                        },
-                        {
-                            canWrite: true,
-                            parameter: {
-                                name: 'two',
-                                description: 'Description for two.',
-                                sensitive: false,
-                                value: 'value',
-                                provided: false,
-                                referencingComponents: [],
-                                parameterContext: {
-                                    id: '95d4f3d2-018b-1000-b7c7-b830c49a8026',
-                                    permissions: {
-                                        canRead: true,
-                                        canWrite: true
-                                    },
-                                    component: {
-                                        id: '95d4f3d2-018b-1000-b7c7-b830c49a8026',
-                                        name: 'params 1'
-                                    }
-                                },
-                                inherited: false
-                            }
-                        },
-                        {
-                            canWrite: true,
-                            parameter: {
-                                name: 'Group ID',
-                                description: '',
-                                sensitive: false,
-                                value: 'asdf',
-                                provided: false,
-                                referencingComponents: [],
-                                parameterContext: {
-                                    id: '95d4f3d2-018b-1000-b7c7-b830c49a8026',
-                                    permissions: {
-                                        canRead: true,
-                                        canWrite: true
-                                    },
-                                    component: {
-                                        id: '95d4f3d2-018b-1000-b7c7-b830c49a8026',
-                                        name: 'params 1'
-                                    }
-                                },
-                                inherited: false
-                            }
-                        }
-                    ],
-                    boundProcessGroups: [],
-                    inheritedParameterContexts: [],
-                    id: '95d4f3d2-018b-1000-b7c7-b830c49a8026'
-                }
-            },
-            {
-                revision: {
+                    clientId: 'a6482293-7fe8-43b4-8ab4-ee95b3b27721',
                     version: 0
                 },
-                id: '95d509b9-018b-1000-daff-b7957ea7934f',
-                uri: '',
-                permissions: {
-                    canRead: true,
-                    canWrite: true
-                },
-                component: {
-                    name: 'params 2',
-                    description: '',
-                    parameters: [],
-                    boundProcessGroups: [],
-                    inheritedParameterContexts: [],
-                    id: '95d509b9-018b-1000-daff-b7957ea7934f'
+                type: ComponentType.ProcessGroup,
+                position: {
+                    x: -4,
+                    y: -698.5
                 }
-            }
-        ]
-    };
+            },
+            currentParameterContextId: parameterContextId,
+            parameterContexts
+        };
 
-    beforeEach(() => {
-        TestBed.configureTestingModule({
-            imports: [CreateProcessGroup, NoopAnimationsModule],
-            providers: [
-                { provide: MAT_DIALOG_DATA, useValue: data },
-                provideMockStore({ initialState }),
-                { provide: MatDialogRef, useValue: null }
-            ]
+        beforeEach(() => {
+            TestBed.configureTestingModule({
+                imports: [CreateProcessGroup, NoopAnimationsModule],
+                providers: [
+                    { provide: MAT_DIALOG_DATA, useValue: data },
+                    provideMockStore({ initialState }),
+                    { provide: MatDialogRef, useValue: null }
+                ]
+            });
+            fixture = TestBed.createComponent(CreateProcessGroup);
+            component = fixture.componentInstance;
+            component.parameterContexts = [...parameterContexts];
+            fixture.detectChanges();
         });
-        fixture = TestBed.createComponent(CreateProcessGroup);
-        component = fixture.componentInstance;
-        fixture.detectChanges();
+
+        it('should create', () => {
+            expect(component).toBeTruthy();
+        });
+
+        it('verify current parameter context selected', () => {
+            fixture.detectChanges();
+            expect(component.createProcessGroupForm.get('newProcessGroupParameterContext')?.value).toEqual(
+                parameterContextId
+            );
+        });
+
+        it('verify setting new parameter contexts does not append', () => {
+            component.parameterContexts = parameterContexts;
+            fixture.detectChanges();
+            expect(component.parameterContextsOptions.length).toEqual(2);
+        });
     });
 
-    it('should create', () => {
-        expect(component).toBeTruthy();
+    describe('user does NOT have permission to current parameter context', () => {
+        let component: CreateProcessGroup;
+        let fixture: ComponentFixture<CreateProcessGroup>;
+
+        const data: CreateProcessGroupDialogRequest = {
+            request: {
+                revision: {
+                    clientId: 'a6482293-7fe8-43b4-8ab4-ee95b3b27721',
+                    version: 0
+                },
+                type: ComponentType.ProcessGroup,
+                position: {
+                    x: -4,
+                    y: -698.5
+                }
+            },
+            currentParameterContextId: noPermissionsParameterContextId,
+            parameterContexts
+        };
+
+        beforeEach(() => {
+            TestBed.configureTestingModule({
+                imports: [CreateProcessGroup, NoopAnimationsModule],
+                providers: [
+                    { provide: MAT_DIALOG_DATA, useValue: data },
+                    provideMockStore({ initialState }),
+                    { provide: MatDialogRef, useValue: null }
+                ]
+            });
+            fixture = TestBed.createComponent(CreateProcessGroup);
+            component = fixture.componentInstance;
+            component.parameterContexts = [...parameterContexts];
+            fixture.detectChanges();
+        });
+
+        it('verify no parameter context selected', () => {
+            expect(component.createProcessGroupForm.get('newProcessGroupParameterContext')?.value).toEqual(null);
+        });
     });
 });

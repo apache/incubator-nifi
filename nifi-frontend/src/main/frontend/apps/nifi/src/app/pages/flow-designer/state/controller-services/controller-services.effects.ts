@@ -51,7 +51,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ParameterHelperService } from '../../service/parameter-helper.service';
 import { ExtensionTypesService } from '../../../../service/extension-types.service';
 import { ChangeComponentVersionDialog } from '../../../../ui/common/change-component-version-dialog/change-component-version-dialog';
-import { FlowService } from '../../service/flow.service';
 import {
     resetPropertyVerificationState,
     verifyProperties
@@ -64,6 +63,7 @@ import { VerifyPropertiesRequestContext } from '../../../../state/property-verif
 import { BackNavigation } from '../../../../state/navigation';
 import { ComponentType, LARGE_DIALOG, SMALL_DIALOG, XL_DIALOG, NiFiCommon, Storage } from '@nifi/shared';
 import { ErrorContextKey } from '../../../../state/error';
+import { ParameterContextService } from '../../../parameter-contexts/service/parameter-contexts.service';
 
 @Injectable()
 export class ControllerServicesEffects {
@@ -73,7 +73,7 @@ export class ControllerServicesEffects {
         private storage: Storage,
         private client: Client,
         private controllerServiceService: ControllerServiceService,
-        private flowService: FlowService,
+        private parameterContextService: ParameterContextService,
         private errorHelper: ErrorHelper,
         private dialog: MatDialog,
         private router: Router,
@@ -328,7 +328,9 @@ export class ControllerServicesEffects {
                 ]),
                 switchMap(([request, parameterContextReference, processGroupId]) => {
                     if (parameterContextReference && parameterContextReference.permissions.canRead) {
-                        return from(this.flowService.getParameterContext(parameterContextReference.id)).pipe(
+                        return from(
+                            this.parameterContextService.getParameterContext(parameterContextReference.id, true)
+                        ).pipe(
                             map((parameterContext) => {
                                 return [request, parameterContext, processGroupId];
                             }),

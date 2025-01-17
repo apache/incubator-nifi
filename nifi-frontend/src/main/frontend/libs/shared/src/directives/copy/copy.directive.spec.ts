@@ -67,13 +67,18 @@ describe('CopyDirective', () => {
         expect(copyButton).toBeNull();
     });
 
-    xit('should copy text to clipboard and change button appearance on click', async () => {
-        // Mock the clipboard's writeText method
-        Object.assign(navigator, {
-            clipboard: {
-                writeText: jest.fn().mockResolvedValue(undefined)
-            }
+    it('should copy text to clipboard and change button appearance on click', async () => {
+        // Mock the clipboard object with a writable property
+        const mockClipboard = {
+            writeText: jest.fn().mockResolvedValue(undefined)
+        };
+
+        // Use Object.defineProperty to define a writable property
+        Object.defineProperty(navigator, 'clipboard', {
+            value: mockClipboard,
+            writable: true
         });
+
         directiveDebugEl.triggerEventHandler('mouseenter', null);
         fixture.detectChanges();
         const copyButton = directiveDebugEl.nativeElement.querySelector('.copy-button');

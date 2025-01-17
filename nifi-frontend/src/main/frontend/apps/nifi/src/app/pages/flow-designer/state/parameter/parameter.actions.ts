@@ -17,6 +17,11 @@
 
 import { createAction, props } from '@ngrx/store';
 import { PollParameterContextUpdateSuccess, SubmitParameterContextUpdate } from '../../../../state/shared';
+import {
+    CreateParameterContextRequest,
+    CreateParameterContextSuccess,
+    OpenCreateParameterContextRequest
+} from '../../../../ui/common/parameter-context';
 
 export const parameterApiError = createAction('[Parameter] Parameter Error', props<{ error: string }>());
 
@@ -48,3 +53,28 @@ export const stopPollingParameterContextUpdateRequest = createAction(
 export const deleteParameterContextUpdateRequest = createAction('[Parameter] Delete Parameter Context Update Request');
 
 export const editParameterContextComplete = createAction('[Parameter] Edit Parameter Context Complete');
+
+export const openNewParameterContextDialog = createAction(
+    '[Parameter Context] Open New Parameter Context Dialog',
+    props<{ request: OpenCreateParameterContextRequest }>()
+);
+
+export const createParameterContext = createAction(
+    '[Parameter Context] Create Parameter Context',
+    props<{ request: CreateParameterContextRequest }>()
+);
+
+export const createParameterContextSuccess = createAction(
+    '[Parameter Context] Create Parameter Context Success',
+    props<{ response: CreateParameterContextSuccess }>()
+);
+
+export const parameterContextSnackbarApiError = createAction(
+    '[Parameter Context] Parameter Context Snackbar Api Error',
+    props<{ error: string }>()
+);
+
+export const parameterContextBannerApiError = createAction(
+    '[Parameter Context] Parameter Context Banner Api Error',
+    props<{ error: string }>()
+);

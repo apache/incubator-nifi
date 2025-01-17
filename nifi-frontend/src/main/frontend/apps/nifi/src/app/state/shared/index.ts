@@ -49,6 +49,8 @@ export interface NewPropertyDialogResponse {
 export interface EditParameterRequest {
     existingParameters?: string[];
     parameter?: Parameter;
+    isNewParameterContext: boolean;
+    isConvert?: boolean;
 }
 
 export interface EditParameterResponse {

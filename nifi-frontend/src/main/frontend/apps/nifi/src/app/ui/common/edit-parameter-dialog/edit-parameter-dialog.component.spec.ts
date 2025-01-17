@@ -27,6 +27,7 @@ describe('EditParameterDialog', () => {
     let fixture: ComponentFixture<EditParameterDialog>;
 
     const data: EditParameterRequest = {
+        isNewParameterContext: false,
         parameter: {
             name: 'one',
             description: 'Description for one.',

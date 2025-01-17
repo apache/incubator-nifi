@@ -318,6 +318,13 @@
         min-height: 2.25rem;
     }
 
+    // mat-select mat-option ellipsis
+    .mat-mdc-option .mdc-list-item__primary-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap !important;
+    }
+
     // markdown styles
 
     .mat-typography.text-base markdown {

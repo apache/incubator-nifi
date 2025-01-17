@@ -32,25 +32,45 @@
             </button>
         </mat-form-field>
         @if (!flowDefinition) {
-            <mat-form-field>
-                <mat-label>Parameter Context</mat-label>
-                <mat-select formControlName="newProcessGroupParameterContext">
-                    @for (option of parameterContextsOptions; track option) {
-                        @if (option.description) {
-                            <mat-option
-                                [value]="option.value"
-                                nifiTooltip
-                                [tooltipComponentType]="TextTip"
-                                [tooltipInputData]="option.description"
-                                [delayClose]="false"
-                                >{{ option.text }}</mat-option
-                            >
-                        } @else {
-                            <mat-option [value]="option.value">{{ option.text }}</mat-option>
+            <div class="flex flew-row w-full justify-start items-start">
+                <mat-form-field>
+                    <mat-label>Parameter Context</mat-label>
+                    <mat-select formControlName="newProcessGroupParameterContext">
+                        <mat-option
+                            [value]="null"
+                            nifiTooltip
+                            [tooltipComponentType]="TextTip"
+                            [tooltipInputData]="'No parameter context'"
+                            [delayClose]="false"
+                            >No parameter context
+                        </mat-option>
+                        @for (option of parameterContextsOptions | sortObjectByProperty: 'text'; track option.value) {
+                            @if (option.description) {
+                                <mat-option
+                                    [value]="option.value"
+                                    nifiTooltip
+                                    [disabled]="option.disabled"
+                                    [tooltipComponentType]="TextTip"
+                                    [tooltipInputData]="option.description"
+                                    [delayClose]="false"
+                                    >{{ option.text }}</mat-option
+                                >
+                            } @else {
+                                <mat-option [value]="option.value" [disabled]="option.disabled">{{
+                                    option.text
+                                }}</mat-option>
+                            }
                         }
-                    }
-                </mat-select>
-            </mat-form-field>
+                    </mat-select>
+                </mat-form-field>
+                <button
+                    mat-icon-button
+                    class="primary-icon-button mt-1 ml-1"
+                    (click)="openNewParameterContextDialog()"
+                    title="Create parameter context">
+                    <i class="fa fa-plus"></i>
+                </button>
+            </div>
         }
         @if (flowDefinition) {
             <div>

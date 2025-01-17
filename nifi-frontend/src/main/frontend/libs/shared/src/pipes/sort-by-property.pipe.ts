@@ -15,15 +15,24 @@
  * limitations under the License.
  */
 
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { SortObjectByPropertyPipe } from './sort-by-property.pipe';
-import { JoinPipe } from './join.pipe';
-import { SortPipe } from './sort.pipe';
+import { Pipe, PipeTransform } from '@angular/core';
 
-@NgModule({
-    declarations: [SortPipe, SortObjectByPropertyPipe, JoinPipe],
-    exports: [SortPipe, SortObjectByPropertyPipe, JoinPipe],
-    imports: [CommonModule]
+export interface SortableBy {
+    [key: string]: any; // Allows for flexibility with additional properties
+}
+
+@Pipe({
+    name: 'sortObjectByProperty',
+    pure: true // Set to true to ensure the pipe is only recalculated when inputs change
 })
-export class PipesModule {}
+export class SortObjectByPropertyPipe implements PipeTransform {
+    transform(items: SortableBy[], property: string = 'name'): any[] {
+        return items.sort((a, b) =>
+            this.getPropertyValue(a, property).localeCompare(this.getPropertyValue(b, property))
+        );
+    }
+
+    private getPropertyValue(item: SortableBy, propertyPath: string): any {
+        return propertyPath.split('.').reduce((obj, key) => (obj ? obj[key] : ''), item) ?? '';
+    }
+}

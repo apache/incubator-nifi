@@ -29,11 +29,23 @@
                                 <input matInput formControlName="name" type="text" [readonly]="readonly" />
                             </mat-form-field>
                         </div>
-                        <div>
+                        <div class="flex flew-row w-full justify-start items-start">
                             <mat-form-field>
                                 <mat-label>Parameter Context</mat-label>
                                 <mat-select formControlName="parameterContext">
-                                    @for (option of parameterContextsOptions; track option.value) {
+                                    <mat-option
+                                        [value]="null"
+                                        [disabled]="readonly"
+                                        nifiTooltip
+                                        [tooltipComponentType]="TextTip"
+                                        [tooltipInputData]="'No parameter context'"
+                                        [delayClose]="false"
+                                        >No parameter context
+                                    </mat-option>
+                                    @for (
+                                        option of parameterContextsOptions | sortObjectByProperty: 'text';
+                                        track option.value
+                                    ) {
                                         @if (option.description) {
                                             <mat-option
                                                 [value]="option.value"
@@ -42,18 +54,29 @@
                                                 [tooltipComponentType]="TextTip"
                                                 [tooltipInputData]="option.description"
                                                 [delayClose]="false"
-                                                >{{ option.text }}</mat-option
-                                            >
+                                                >{{ option.text }}
+                                            </mat-option>
                                         } @else {
                                             <mat-option
                                                 [value]="option.value"
                                                 [disabled]="readonly || option.disabled"
-                                                >{{ option.text }}</mat-option
-                                            >
+                                                nifiTooltip
+                                                [tooltipComponentType]="TextTip"
+                                                [tooltipInputData]="option.text"
+                                                [delayClose]="false"
+                                                >{{ option.text }}
+                                            </mat-option>
                                         }
                                     }
                                 </mat-select>
                             </mat-form-field>
+                            <button
+                                mat-icon-button
+                                class="primary-icon-button mt-1 ml-1"
+                                (click)="openNewParameterContextDialog()"
+                                title="Create parameter context">
+                                <i class="fa fa-plus"></i>
+                            </button>
                         </div>
                         <div class="-mt-4 mb-4">
                             <mat-checkbox

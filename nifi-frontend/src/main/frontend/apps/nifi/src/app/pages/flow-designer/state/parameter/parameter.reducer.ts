@@ -18,8 +18,12 @@
 import { createReducer, on } from '@ngrx/store';
 import { ParameterState } from './index';
 import {
+    createParameterContext,
+    createParameterContextSuccess,
     editParameterContextComplete,
     parameterApiError,
+    parameterContextBannerApiError,
+    parameterContextSnackbarApiError,
     pollParameterContextUpdateRequestSuccess,
     submitParameterContextUpdateRequest,
     submitParameterContextUpdateRequestSuccess
@@ -28,11 +32,24 @@ import {
 export const initialState: ParameterState = {
     updateRequestEntity: null,
     saving: false,
-    error: null
+    error: null,
+    status: 'pending'
 };
 
 export const parameterReducer = createReducer(
     initialState,
+    on(parameterContextSnackbarApiError, parameterContextBannerApiError, (state) => ({
+        ...state,
+        saving: false
+    })),
+    on(createParameterContext, (state) => ({
+        ...state,
+        saving: true
+    })),
+    on(createParameterContextSuccess, (state) => ({
+        ...state,
+        saving: false
+    })),
     on(submitParameterContextUpdateRequest, (state) => ({
         ...state,
         saving: true

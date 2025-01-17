@@ -358,6 +358,7 @@ export interface EditComponentDialogRequest {
     uri: string;
     entity: any;
     history?: ComponentHistory;
+    parameterContexts?: ParameterContextEntity[];
 }
 
 export interface EditRemotePortDialogRequest extends EditComponentDialogRequest {

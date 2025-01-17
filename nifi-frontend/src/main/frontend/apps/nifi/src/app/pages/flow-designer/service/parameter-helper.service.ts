@@ -21,7 +21,6 @@ import { catchError, EMPTY, filter, map, Observable, switchMap, takeUntil, tap }
 import { Store } from '@ngrx/store';
 import { HttpErrorResponse } from '@angular/common/http';
 import { NiFiState } from '../../../state';
-import { ParameterService } from './parameter.service';
 import { Client } from '../../../service/client.service';
 import { EditParameterRequest, EditParameterResponse, ParameterContext, ParameterEntity } from '../../../state/shared';
 import { EditParameterDialog } from '../../../ui/common/edit-parameter-dialog/edit-parameter-dialog.component';
@@ -32,6 +31,7 @@ import * as ParameterActions from '../state/parameter/parameter.actions';
 import { MEDIUM_DIALOG } from '@nifi/shared';
 import { ClusterConnectionService } from '../../../service/cluster-connection.service';
 import { ErrorHelper } from '../../../service/error-helper.service';
+import { ParameterContextService } from '../../parameter-contexts/service/parameter-contexts.service';
 
 export interface ConvertToParameterResponse {
     propertyValue: string;
@@ -45,7 +45,7 @@ export class ParameterHelperService {
     constructor(
         private dialog: MatDialog,
         private store: Store<NiFiState>,
-        private parameterService: ParameterService,
+        private parameterContextService: ParameterContextService,
         private clusterConnectionService: ClusterConnectionService,
         private client: Client,
         private errorHelper: ErrorHelper
@@ -60,7 +60,7 @@ export class ParameterHelperService {
         parameterContextId: string
     ): (name: string, sensitive: boolean, value: string | null) => Observable<ConvertToParameterResponse> {
         return (name: string, sensitive: boolean, value: string | null) => {
-            return this.parameterService.getParameterContext(parameterContextId, false).pipe(
+            return this.parameterContextService.getParameterContext(parameterContextId, false).pipe(
                 catchError((errorResponse: HttpErrorResponse) => {
                     this.store.dispatch(
                         ErrorActions.snackBarError({ error: this.errorHelper.getErrorString(errorResponse) })
@@ -80,7 +80,9 @@ export class ParameterHelperService {
                             sensitive,
                             description: ''
                         },
-                        existingParameters
+                        existingParameters,
+                        isNewParameterContext: false,
+                        isConvert: true
                     };
                     const convertToParameterDialogReference = this.dialog.open(EditParameterDialog, {
                         ...MEDIUM_DIALOG,
