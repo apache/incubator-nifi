@@ -207,7 +207,10 @@
                 <div class="unset neutral-color">Empty string set</div>
             </ng-container>
             <ng-template #nonEmptyValue>
-                <div class="tertiary-color font-medium" *ngIf="title == null; else valueWithTitle">
+                <div
+                    class="tertiary-color font-medium truncate"
+                    [title]="value"
+                    *ngIf="title == null; else valueWithTitle">
                     {{ value }}
                 </div>
                 <ng-template #valueWithTitle>
@@ -240,7 +243,7 @@
 
     <ng-template #formatContentValue let-value let-title="title">
         <ng-container *ngIf="value != null; else nullValue">
-            <div class="tertiary-color font-medium" *ngIf="title == null; else valueWithTitle">
+            <div class="tertiary-color font-medium truncate" [title]="value" *ngIf="title == null; else valueWithTitle">
                 {{ value }}
             </div>
             <ng-template #valueWithTitle>

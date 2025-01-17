@@ -426,14 +426,13 @@
             </ng-container>
             <ng-template #nonEmptyValue>
                 <div
-                    class="tertiary-color font-medium overflow-ellipsis overflow-hidden whitespace-nowrap"
+                    class="tertiary-color font-medium truncate"
+                    [title]="value"
                     *ngIf="title == null; else valueWithTitle">
                     {{ value }}
                 </div>
                 <ng-template #valueWithTitle>
-                    <div
-                        class="tertiary-color font-medium overflow-ellipsis overflow-hidden whitespace-nowrap"
-                        [title]="title">
+                    <div class="tertiary-color font-medium truncate" [title]="title">
                         {{ value }}
                     </div>
                 </ng-template>
@@ -471,15 +470,11 @@
     </ng-template>
     <ng-template #formatContentValue let-value let-title="title">
         <ng-container *ngIf="value != null; else nullValue">
-            <div
-                class="tertiary-color font-medium overflow-ellipsis overflow-hidden whitespace-nowrap"
-                *ngIf="title == null; else valueWithTitle">
+            <div class="tertiary-color font-medium truncate" [title]="value" *ngIf="title == null; else valueWithTitle">
                 {{ value }}
             </div>
             <ng-template #valueWithTitle>
-                <div
-                    class="tertiary-color font-medium overflow-ellipsis overflow-hidden whitespace-nowrap"
-                    [title]="title">
+                <div class="tertiary-color font-medium truncate" [title]="title">
                     {{ value }}
                 </div>
             </ng-template>
