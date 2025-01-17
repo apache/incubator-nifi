@@ -49,6 +49,7 @@ class ElasticSearchLookupService_IT extends AbstractElasticsearch_IT {
 
     private ElasticSearchLookupService lookupService;
 
+    @Override
     @BeforeEach
     void before() throws Exception {
         super.before();

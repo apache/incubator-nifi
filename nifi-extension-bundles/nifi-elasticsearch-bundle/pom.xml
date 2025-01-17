@@ -119,7 +119,7 @@ language governing permissions and limitations under the License. -->
         <profile>
             <id>elasticsearch7</id>
             <properties>
-                <elasticsearch_docker_image>7.17.23</elasticsearch_docker_image>
+                <elasticsearch_docker_image>7.17.26</elasticsearch_docker_image>
             </properties>
         </profile>
     </profiles>

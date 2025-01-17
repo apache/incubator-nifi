@@ -21,6 +21,7 @@ import org.apache.nifi.elasticsearch.AuthorizationScheme;
 import org.apache.nifi.elasticsearch.ElasticSearchClientService;
 import org.apache.nifi.elasticsearch.ElasticSearchClientServiceImpl;
 import org.apache.nifi.elasticsearch.TestControllerServiceProcessor;
+import org.apache.nifi.oauth2.OAuth2AccessTokenProvider;
 import org.apache.nifi.reporting.InitializationException;
 import org.apache.nifi.ssl.SSLContextProvider;
 import org.apache.nifi.util.TestRunner;
@@ -114,9 +115,25 @@ class ElasticSearchClientServiceImplTest {
         assertPKIAuthorizationValidationErrorMessage();
     }
 
+    @Test
+    void testValidateJwtAuth() throws InitializationException {
+        runner.setProperty(service, ElasticSearchClientService.AUTHORIZATION_SCHEME, AuthorizationScheme.JWT);
+        runner.setProperty(service, ElasticSearchClientService.JWT_SHARED_SECRET, "jwt-shared-secret");
+        assertJWTAuthorizationValidationErrorMessage(ElasticSearchClientService.OAUTH2_ACCESS_TOKEN_PROVIDER);
+
+        final OAuth2AccessTokenProvider oAuth2AccessTokenProvider = mock(OAuth2AccessTokenProvider.class);
+        when(oAuth2AccessTokenProvider.getIdentifier()).thenReturn("oauth2-access-token-provider");
+        runner.addControllerService("oauth2-access-token-provider", oAuth2AccessTokenProvider);
+        runner.setProperty(service, ElasticSearchClientService.OAUTH2_ACCESS_TOKEN_PROVIDER, "oauth2-access-token-provider");
+        runner.assertValid(service);
+
+        runner.removeProperty(service, ElasticSearchClientService.JWT_SHARED_SECRET);
+        assertJWTAuthorizationValidationErrorMessage(ElasticSearchClientService.JWT_SHARED_SECRET);
+    }
+
     private void assertAuthorizationPropertyValidationErrorMessage(final PropertyDescriptor presentProperty, final PropertyDescriptor missingProperty) {
         final AssertionFailedError afe = assertThrows(AssertionFailedError.class, () -> runner.assertValid(service));
-        assertTrue(afe.getMessage().contains(String.format("if '%s' is then '%s' must be set.", presentProperty.getDisplayName(), missingProperty.getDisplayName())));
+        assertTrue(afe.getMessage().contains(String.format("if '%s' is set, then '%s' must be set.", presentProperty.getDisplayName(), missingProperty.getDisplayName())));
     }
 
     private void assertPKIAuthorizationValidationErrorMessage() {
@@ -126,6 +143,16 @@ class ElasticSearchClientServiceImplTest {
                 ElasticSearchClientService.AUTHORIZATION_SCHEME.getDisplayName(),
                 AuthorizationScheme.PKI.getDisplayName(),
                 ElasticSearchClientService.PROP_SSL_CONTEXT_SERVICE.getDisplayName()
+        )));
+    }
+
+    private void assertJWTAuthorizationValidationErrorMessage(final PropertyDescriptor expectedMissingProperty) {
+        final AssertionFailedError afe = assertThrows(AssertionFailedError.class, () -> runner.assertValid(service));
+        assertTrue(afe.getMessage().contains(String.format(
+                "if '%s' is '%s' then '%s' must be set.",
+                ElasticSearchClientService.AUTHORIZATION_SCHEME.getDisplayName(),
+                AuthorizationScheme.JWT.getDisplayName(),
+                expectedMissingProperty.getDisplayName()
         )));
     }
 }

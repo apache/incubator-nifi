@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ElasticSearchStringLookupServiceTest {
+class ElasticSearchStringLookupServiceTest {
     private ElasticSearchClientService mockClientService;
     private ElasticSearchStringLookupService lookupService;
 
@@ -56,8 +56,9 @@ public class ElasticSearchStringLookupServiceTest {
         runner.enableControllerService(lookupService);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
-    public void simpleLookupTest() throws Exception {
+    void simpleLookupTest() throws Exception {
         Map<String, Object> coordinates = new HashMap<>();
         coordinates.put(ElasticSearchStringLookupService.ID, "12345");
 

@@ -22,7 +22,8 @@ public enum AuthorizationScheme implements DescribedValue {
     NONE("None", "No authorization scheme."),
     PKI("PKI", "Mutual TLS with PKI certificate authorization scheme."),
     BASIC("Basic", "Basic authorization scheme."),
-    API_KEY("API Key", "API key authorization scheme.");
+    API_KEY("API Key", "API key authorization scheme."),
+    JWT("JWT", "JWT realm scheme.");
 
     private final String displayName;
     private final String description;

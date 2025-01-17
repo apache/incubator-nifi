@@ -209,12 +209,12 @@ public class ElasticSearchLookupService extends JsonInferenceSchemaRegistryServi
             return null;
         }
 
-        final Map<String, Object> source = (Map<String, Object>) response.getHits().get(0).get("_source");
+        final Map<String, Object> source = (Map<String, Object>) response.getHits().getFirst().get("_source");
 
         final RecordSchema toUse = getSchema(context, source, null);
 
         Record record = new MapRecord(toUse, source);
-        if (recordPathMappings.size() > 0) {
+        if (!recordPathMappings.isEmpty()) {
             record = applyMappings(record, source);
         }
 
@@ -239,7 +239,7 @@ public class ElasticSearchLookupService extends JsonInferenceSchemaRegistryServi
                                     put(e.getKey(), e.getValue());
                                 }});
                             }
-                        }}).collect(Collectors.toList())
+                        }}).toList()
                 );
             }});
         }};
@@ -256,10 +256,10 @@ public class ElasticSearchLookupService extends JsonInferenceSchemaRegistryServi
             if (response.getNumberOfHits() == 0) {
                 return null;
             } else {
-                final Map<String, Object> source = (Map<String, Object>) response.getHits().get(0).get("_source");
+                final Map<String, Object> source = (Map<String, Object>) response.getHits().getFirst().get("_source");
                 final RecordSchema toUse = getSchema(context, source, null);
                 Record record = new MapRecord(toUse, source);
-                if (recordPathMappings.size() > 0) {
+                if (!recordPathMappings.isEmpty()) {
                     record = applyMappings(record, source);
                 }
 

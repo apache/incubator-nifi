@@ -263,7 +263,7 @@ class ElasticSearchClientService_IT extends AbstractElasticsearch_IT {
                         "four", 4, "five", 5)
                 .build();
 
-        buckets.forEach( (aggRes) -> {
+        buckets.forEach(aggRes -> {
             final String key = (String) aggRes.get("key");
             final Integer docCount = (Integer) aggRes.get("doc_count");
             assertEquals(expected.get(key), docCount, String.format("%s did not match.", key));
