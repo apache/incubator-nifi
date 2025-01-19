@@ -17,15 +17,14 @@
 
 package org.apache.nifi.yaml;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.controller.ConfigurationContext;
 import org.apache.nifi.json.JsonTreeReader;
 import org.apache.nifi.json.JsonTreeRowRecordReader;
+import org.apache.nifi.json.TokenParserFactory;
 import org.apache.nifi.logging.ComponentLog;
-import org.apache.nifi.schema.inference.RecordSourceFactory;
 import org.apache.nifi.serialization.MalformedRecordException;
 import org.apache.nifi.serialization.record.RecordSchema;
 
@@ -53,8 +52,8 @@ public class YamlTreeReader extends JsonTreeReader {
     }
 
     @Override
-    protected RecordSourceFactory<JsonNode> createJsonRecordSourceFactory() {
-        return (var, in) -> new YamlRecordSource(in, startingFieldStrategy, startingFieldName, streamReadConstraints);
+    protected TokenParserFactory createTokenParserFactory(final ConfigurationContext context) {
+        return new YamlParserFactory(buildStreamReadConstraints(context), isAllowCommentsEnabled(context));
     }
 
     @Override

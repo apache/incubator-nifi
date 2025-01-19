@@ -30,6 +30,8 @@ import java.util.function.BiPredicate;
 
 public class YamlTreeRowRecordReader extends JsonTreeRowRecordReader {
 
+    private static final YamlParserFactory yamlParserFactory = new YamlParserFactory();
+
     public YamlTreeRowRecordReader(final InputStream in, final ComponentLog logger, final RecordSchema schema,
                                    final String dateFormat, final String timeFormat, final String timestampFormat) throws IOException, MalformedRecordException {
         this(in, logger, schema, dateFormat, timeFormat, timestampFormat, null, null, null, null);
@@ -42,6 +44,6 @@ public class YamlTreeRowRecordReader extends JsonTreeRowRecordReader {
             throws IOException, MalformedRecordException {
 
         super(in, logger, schema, dateFormat, timeFormat, timestampFormat, startingFieldStrategy, startingFieldName, schemaApplicationStrategy,
-                captureFieldPredicate, true, null, new YamlParserFactory());
+                captureFieldPredicate, yamlParserFactory);
     }
 }

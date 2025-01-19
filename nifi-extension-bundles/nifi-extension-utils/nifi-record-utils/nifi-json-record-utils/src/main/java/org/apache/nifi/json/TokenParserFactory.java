@@ -17,20 +17,17 @@
 package org.apache.nifi.json;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.StreamReadConstraints;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 public interface TokenParserFactory {
     /**
-     * Get JSON Parser implementation for provided Input Stream with configured settings
+     * Get JSON Parser implementation for provided Input Stream with preconfigured settings
      *
      * @param in Input Stream to be parsed
-     * @param streamReadConstraints Stream Read Constraints applied
-     * @param allowComments Whether to allow comments when parsing
      * @return JSON Parser
      * @throws IOException Thrown on failures to read the Input Stream
      */
-    JsonParser getJsonParser(InputStream in, StreamReadConstraints streamReadConstraints, boolean allowComments) throws IOException;
+    JsonParser getJsonParser(InputStream in) throws IOException;
 }

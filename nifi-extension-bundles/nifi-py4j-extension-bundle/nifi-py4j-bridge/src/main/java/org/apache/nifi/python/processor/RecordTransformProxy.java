@@ -76,6 +76,7 @@ public class RecordTransformProxy extends PythonProcessorProxy<RecordTransform> 
         .required(true)
         .build();
 
+    private static final JsonParserFactory jsonParserFactory = new JsonParserFactory();
 
     public RecordTransformProxy(final String processorType, final Supplier<PythonProcessorBridge> bridgeFactory, final boolean initialize) {
         super(processorType, bridgeFactory, initialize);
@@ -303,7 +304,7 @@ public class RecordTransformProxy extends PythonProcessorProxy<RecordTransform> 
 
         try (final InputStream in = new ByteArrayInputStream(jsonBytes)) {
             final JsonTreeRowRecordReader reader = new JsonTreeRowRecordReader(in, getLogger(), schema, null, null, null, null,
-                    null, null, null, false, null, new JsonParserFactory());
+                    null, null, null, jsonParserFactory);
             final Record record = reader.nextRecord(false, false);
             return record;
         }

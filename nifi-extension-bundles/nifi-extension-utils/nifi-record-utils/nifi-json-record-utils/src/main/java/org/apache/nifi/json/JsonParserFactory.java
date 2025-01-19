@@ -26,17 +26,37 @@ import java.io.InputStream;
 import java.util.Objects;
 
 public class JsonParserFactory implements TokenParserFactory {
-    @Override
-    public JsonParser getJsonParser(final InputStream in, final StreamReadConstraints streamReadConstraints, final boolean allowComments) throws IOException {
-        Objects.requireNonNull(in, "Input Stream required");
+    private static final ObjectMapper defaultObjectMapper = new ObjectMapper();
+
+    private final JsonFactory jsonFactory;
+
+    /**
+     * JSON Parser Factory constructor using default ObjectMapper and associated configuration options
+     */
+    public JsonParserFactory() {
+        jsonFactory = defaultObjectMapper.getFactory();
+    }
+
+    /**
+     * JSON Parser Factory constructor with configurable constraints
+     *
+     * @param streamReadConstraints Stream Read Constraints
+     * @param allowComments Allow Comments during parsing
+     */
+    public JsonParserFactory(final StreamReadConstraints streamReadConstraints, final boolean allowComments) {
         Objects.requireNonNull(streamReadConstraints, "Stream Read Constraints required");
 
         final ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.getFactory().setStreamReadConstraints(streamReadConstraints);
         if (allowComments) {
             objectMapper.enable(JsonParser.Feature.ALLOW_COMMENTS);
         }
-        final JsonFactory jsonFactory = objectMapper.getFactory();
+        jsonFactory = objectMapper.getFactory();
+        jsonFactory.setStreamReadConstraints(streamReadConstraints);
+    }
+
+    @Override
+    public JsonParser getJsonParser(final InputStream in) throws IOException {
+        Objects.requireNonNull(in, "Input Stream required");
         return jsonFactory.createParser(in);
     }
 }

@@ -17,10 +17,10 @@
 
 package org.apache.nifi.yaml;
 
-import com.fasterxml.jackson.core.StreamReadConstraints;
 import org.apache.avro.Schema;
 import org.apache.commons.io.FileUtils;
 import org.apache.nifi.avro.AvroTypeUtil;
+import org.apache.nifi.json.JsonRecordSource;
 import org.apache.nifi.json.JsonSchemaInference;
 import org.apache.nifi.json.JsonTreeRowRecordReader;
 import org.apache.nifi.json.SchemaApplicationStrategy;
@@ -1091,7 +1091,7 @@ class TestYamlTreeRowRecordReader {
 
     private RecordSchema inferSchema(InputStream jsonStream, StartingFieldStrategy strategy, String startingFieldName) throws IOException {
         RecordSchema schema = new InferSchemaAccessStrategy<>(
-            (__, inputStream) -> new YamlRecordSource(inputStream, strategy, startingFieldName, StreamReadConstraints.defaults()),
+            (__, inputStream) -> new JsonRecordSource(inputStream, strategy, startingFieldName, new YamlParserFactory()),
             new JsonSchemaInference(new TimeValueInference(null, null, null)),
             mock(ComponentLog.class)
         ).getSchema(Collections.emptyMap(), jsonStream, null);

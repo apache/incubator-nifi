@@ -1312,7 +1312,7 @@ class TestJsonTreeRowRecordReader {
 
     private RecordSchema inferSchema(InputStream jsonStream, StartingFieldStrategy strategy, String startingFieldName) throws IOException {
         RecordSchema schema = new InferSchemaAccessStrategy<>(
-            (__, inputStream) -> new JsonRecordSource(inputStream, strategy, startingFieldName, StreamReadConstraints.defaults()),
+            (__, inputStream) -> new JsonRecordSource(inputStream, strategy, startingFieldName, new JsonParserFactory()),
             new JsonSchemaInference(new TimeValueInference(null, null, null)), log
         ).getSchema(Collections.emptyMap(), jsonStream, null);
 
@@ -1329,7 +1329,15 @@ class TestJsonTreeRowRecordReader {
                                                                   StartingFieldStrategy startingFieldStrategy, String startingFieldName, SchemaApplicationStrategy schemaApplicationStrategy,
                                                                   BiPredicate<String, String> captureFieldPredicate, boolean allowComments, StreamReadConstraints streamReadConstraints)
             throws Exception {
+
+        final TokenParserFactory tokenParserFactory;
+        if (streamReadConstraints == null) {
+            tokenParserFactory = new JsonParserFactory();
+        } else {
+            tokenParserFactory = new JsonParserFactory(streamReadConstraints, allowComments);
+        }
+
         return new JsonTreeRowRecordReader(inputStream, log, recordSchema, dateFormat, timeFormat, timestampFormat, startingFieldStrategy, startingFieldName, schemaApplicationStrategy,
-                captureFieldPredicate, allowComments, streamReadConstraints, new JsonParserFactory());
+                captureFieldPredicate, tokenParserFactory);
     }
 }

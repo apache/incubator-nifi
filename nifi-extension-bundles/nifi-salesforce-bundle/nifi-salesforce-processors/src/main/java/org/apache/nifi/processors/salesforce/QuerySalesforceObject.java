@@ -274,6 +274,7 @@ public class QuerySalesforceObject extends AbstractProcessor {
     private static final JsonFactory JSON_FACTORY = OBJECT_MAPPER.getFactory();
     private static final String TOTAL_RECORD_COUNT_ATTRIBUTE = "total.record.count";
     private static final int MAX_RECORD_COUNT = 2000;
+    private static final JsonParserFactory jsonParserFactory = new JsonParserFactory();
 
     private volatile SalesforceToRecordSchemaConverter salesForceToRecordSchemaConverter;
     private volatile SalesforceRestClient salesforceRestService;
@@ -508,9 +509,7 @@ public class QuerySalesforceObject extends AbstractProcessor {
                 STARTING_FIELD_NAME,
                 SchemaApplicationStrategy.SELECTED_PART,
                 CAPTURE_PREDICATE,
-                false,
-                null,
-                new JsonParserFactory()
+                jsonParserFactory
         );
     }
 

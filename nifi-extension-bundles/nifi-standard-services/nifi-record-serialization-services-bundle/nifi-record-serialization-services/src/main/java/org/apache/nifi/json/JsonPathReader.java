@@ -19,6 +19,7 @@ package org.apache.nifi.json;
 
 import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import org.apache.nifi.annotation.behavior.DynamicProperty;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
@@ -75,8 +76,8 @@ public class JsonPathReader extends SchemaRegistryService implements RecordReade
     private volatile String timeFormat;
     private volatile String timestampFormat;
     private volatile LinkedHashMap<String, JsonPath> jsonPaths;
-    private volatile boolean allowComments;
-    private volatile StreamReadConstraints streamReadConstraints;
+    private volatile ObjectMapper objectMapper;
+    private volatile TokenParserFactory tokenParserFactory;
 
     @Override
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
@@ -107,8 +108,13 @@ public class JsonPathReader extends SchemaRegistryService implements RecordReade
         this.timestampFormat = context.getProperty(DateTimeUtils.TIMESTAMP_FORMAT).getValue();
 
         final int maxStringLength = context.getProperty(AbstractJsonRowRecordReader.MAX_STRING_LENGTH).asDataSize(DataUnit.B).intValue();
-        this.streamReadConstraints = StreamReadConstraints.builder().maxStringLength(maxStringLength).build();
-        this.allowComments = context.getProperty(AbstractJsonRowRecordReader.ALLOW_COMMENTS).asBoolean();
+
+        final StreamReadConstraints streamReadConstraints = StreamReadConstraints.builder().maxStringLength(maxStringLength).build();
+        this.objectMapper = new ObjectMapper();
+        objectMapper.getFactory().setStreamReadConstraints(streamReadConstraints);
+
+        final boolean allowComments = context.getProperty(AbstractJsonRowRecordReader.ALLOW_COMMENTS).asBoolean();
+        this.tokenParserFactory = new JsonParserFactory(streamReadConstraints, allowComments);
 
         final LinkedHashMap<String, JsonPath> compiled = new LinkedHashMap<>();
         for (final PropertyDescriptor descriptor : context.getProperties().keySet()) {
@@ -155,7 +161,7 @@ public class JsonPathReader extends SchemaRegistryService implements RecordReade
 
     @Override
     protected SchemaAccessStrategy getSchemaAccessStrategy(final String strategy, final SchemaRegistry schemaRegistry, final PropertyContext context) {
-        final RecordSourceFactory<JsonNode> jsonSourceFactory = (var, in) -> new JsonRecordSource(in, streamReadConstraints);
+        final RecordSourceFactory<JsonNode> jsonSourceFactory = (var, in) -> new JsonRecordSource(in, null, null, tokenParserFactory);
         final Supplier<SchemaInferenceEngine<JsonNode>> inferenceSupplier = () -> new JsonSchemaInference(new TimeValueInference(dateFormat, timeFormat, timestampFormat));
 
         return SchemaInferenceUtil.getSchemaAccessStrategy(strategy, context, getLogger(), jsonSourceFactory, inferenceSupplier,
@@ -171,6 +177,6 @@ public class JsonPathReader extends SchemaRegistryService implements RecordReade
     public RecordReader createRecordReader(final Map<String, String> variables, final InputStream in, final long inputLength, final ComponentLog logger)
             throws IOException, MalformedRecordException, SchemaNotFoundException {
         final RecordSchema schema = getSchema(variables, in, null);
-        return new JsonPathRowRecordReader(jsonPaths, schema, in, logger, dateFormat, timeFormat, timestampFormat, allowComments, streamReadConstraints);
+        return new JsonPathRowRecordReader(jsonPaths, schema, in, logger, dateFormat, timeFormat, timestampFormat, objectMapper, tokenParserFactory);
     }
 }

@@ -453,6 +453,8 @@ public class TestForkRecord {
 
     private class JsonRecordReader extends AbstractControllerService implements RecordReaderFactory {
 
+        private static final JsonParserFactory jsonParserFactory = new JsonParserFactory();
+
         RecordSchema schema;
 
         public JsonRecordReader(RecordSchema schema) {
@@ -460,14 +462,14 @@ public class TestForkRecord {
         }
 
         @Override
-        public RecordReader createRecordReader(FlowFile flowFile, InputStream in, ComponentLog logger) throws MalformedRecordException, IOException, SchemaNotFoundException {
-            return new JsonTreeRowRecordReader(in, logger, schema, dateFormat, timeFormat, timestampFormat, null, null, null, null, false, null, new JsonParserFactory());
+        public RecordReader createRecordReader(FlowFile flowFile, InputStream in, ComponentLog logger) throws MalformedRecordException, IOException {
+            return new JsonTreeRowRecordReader(in, logger, schema, dateFormat, timeFormat, timestampFormat, null, null, null, null, jsonParserFactory);
         }
 
         @Override
         public RecordReader createRecordReader(Map<String, String> variables, InputStream in, long inputLength, ComponentLog logger)
-                throws MalformedRecordException, IOException, SchemaNotFoundException {
-            return new JsonTreeRowRecordReader(in, logger, schema, dateFormat, timeFormat, timestampFormat, null, null, null, null, false, null, new JsonParserFactory());
+                throws MalformedRecordException, IOException {
+            return new JsonTreeRowRecordReader(in, logger, schema, dateFormat, timeFormat, timestampFormat, null, null, null, null, jsonParserFactory);
         }
     }
 

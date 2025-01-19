@@ -106,8 +106,6 @@ public abstract class AbstractJsonRowRecordReader implements RecordReader {
      * @param nestedFieldName        the name of the field to start the processing from
      * @param captureFieldPredicate  predicate that takes a JSON fieldName and fieldValue to capture top-level non-processed fields which can
      *                               be accessed by calling {@link #getCapturedFields()}
-     * @param allowComments          whether to allow comments within the JSON stream
-     * @param streamReadConstraints  configuration for the JsonFactory stream reader {@link StreamReadConstraints}
      * @param tokenParserFactory     factory to provide an instance of com.fasterxml.jackson.core.JsonParser
      * @throws IOException              in case of JSON stream processing failure
      * @throws MalformedRecordException in case of malformed JSON input
@@ -120,8 +118,6 @@ public abstract class AbstractJsonRowRecordReader implements RecordReader {
                                           final StartingFieldStrategy strategy,
                                           final String nestedFieldName,
                                           final BiPredicate<String, String> captureFieldPredicate,
-                                          final boolean allowComments,
-                                          final StreamReadConstraints streamReadConstraints,
                                           final TokenParserFactory tokenParserFactory)
             throws IOException, MalformedRecordException {
 
@@ -137,8 +133,7 @@ public abstract class AbstractJsonRowRecordReader implements RecordReader {
         capturedFields = new LinkedHashMap<>();
 
         try {
-            final StreamReadConstraints configuredStreamReadConstraints = streamReadConstraints == null ? DEFAULT_STREAM_READ_CONSTRAINTS : streamReadConstraints;
-            jsonParser = tokenParserFactory.getJsonParser(in, configuredStreamReadConstraints, allowComments);
+            jsonParser = tokenParserFactory.getJsonParser(in);
             jsonParser.enable(Feature.USE_FAST_DOUBLE_PARSER);
             jsonParser.enable(Feature.USE_FAST_BIG_NUMBER_PARSER);
         } catch (final JsonParseException e) {

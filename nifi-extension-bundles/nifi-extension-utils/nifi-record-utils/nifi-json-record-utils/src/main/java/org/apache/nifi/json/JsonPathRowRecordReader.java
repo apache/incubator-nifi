@@ -17,7 +17,6 @@
 
 package org.apache.nifi.json;
 
-import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.Configuration;
@@ -57,26 +56,24 @@ public class JsonPathRowRecordReader extends AbstractJsonRowRecordReader {
     private final RecordSchema schema;
     private final Configuration providerConfiguration;
 
-    public JsonPathRowRecordReader(final LinkedHashMap<String, JsonPath> jsonPaths, final RecordSchema schema, final InputStream in, final ComponentLog logger,
-                                   final String dateFormat, final String timeFormat, final String timestampFormat)
-            throws MalformedRecordException, IOException {
-        this(jsonPaths, schema, in, logger, dateFormat, timeFormat, timestampFormat, false, DEFAULT_STREAM_READ_CONSTRAINTS);
-    }
-
-    public JsonPathRowRecordReader(final LinkedHashMap<String, JsonPath> jsonPaths, final RecordSchema schema, final InputStream in, final ComponentLog logger,
-                                   final String dateFormat, final String timeFormat, final String timestampFormat,
-                                   final boolean allowComments, final StreamReadConstraints streamReadConstraints)
-                throws MalformedRecordException, IOException {
-
-        super(in, logger, dateFormat, timeFormat, timestampFormat, null, null, null, allowComments, streamReadConstraints, new JsonParserFactory());
+    public JsonPathRowRecordReader(
+            final LinkedHashMap<String, JsonPath> jsonPaths,
+            final RecordSchema schema,
+            final InputStream in,
+            final ComponentLog logger,
+            final String dateFormat,
+            final String timeFormat,
+            final String timestampFormat,
+            final ObjectMapper objectMapper,
+            final TokenParserFactory tokenParserFactory
+    ) throws MalformedRecordException, IOException {
+        super(in, logger, dateFormat, timeFormat, timestampFormat, null, null, null, tokenParserFactory);
 
         this.schema = schema;
         this.jsonPaths = jsonPaths;
         this.in = in;
         this.logger = logger;
 
-        final ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.getFactory().setStreamReadConstraints(streamReadConstraints);
         final JsonProvider jsonProvider = new JacksonJsonProvider(objectMapper);
         providerConfiguration = Configuration.builder().jsonProvider(jsonProvider).build();
     }

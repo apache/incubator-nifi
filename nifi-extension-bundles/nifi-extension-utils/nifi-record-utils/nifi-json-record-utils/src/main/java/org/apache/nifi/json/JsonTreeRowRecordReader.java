@@ -17,7 +17,6 @@
 
 package org.apache.nifi.json;
 
-import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
@@ -53,15 +52,21 @@ public class JsonTreeRowRecordReader extends AbstractJsonRowRecordReader {
 
     private final RecordSchema schema;
 
-    public JsonTreeRowRecordReader(final InputStream in, final ComponentLog logger, final RecordSchema schema,
-                                   final String dateFormat, final String timeFormat, final String timestampFormat,
-                                   final StartingFieldStrategy startingFieldStrategy, final String startingFieldName,
-                                   final SchemaApplicationStrategy schemaApplicationStrategy, final BiPredicate<String, String> captureFieldPredicate,
-                                   final boolean allowComments, final StreamReadConstraints streamReadConstraints, final TokenParserFactory tokenParserFactory)
-            throws IOException, MalformedRecordException {
+    public JsonTreeRowRecordReader(
+            final InputStream in,
+            final ComponentLog logger,
+            final RecordSchema schema,
+            final String dateFormat,
+            final String timeFormat,
+            final String timestampFormat,
+            final StartingFieldStrategy startingFieldStrategy,
+            final String startingFieldName,
+            final SchemaApplicationStrategy schemaApplicationStrategy,
+            final BiPredicate<String, String> captureFieldPredicate,
+            final TokenParserFactory tokenParserFactory
+    ) throws IOException, MalformedRecordException {
 
-        super(in, logger, dateFormat, timeFormat, timestampFormat, startingFieldStrategy, startingFieldName, captureFieldPredicate,
-                allowComments, streamReadConstraints, tokenParserFactory);
+        super(in, logger, dateFormat, timeFormat, timestampFormat, startingFieldStrategy, startingFieldName, captureFieldPredicate, tokenParserFactory);
 
         if (startingFieldStrategy == StartingFieldStrategy.NESTED_FIELD && schemaApplicationStrategy == SchemaApplicationStrategy.WHOLE_JSON) {
             this.schema = getSelectedSchema(schema, startingFieldName);

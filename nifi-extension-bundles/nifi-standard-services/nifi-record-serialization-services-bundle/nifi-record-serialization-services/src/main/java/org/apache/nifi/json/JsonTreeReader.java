@@ -74,8 +74,7 @@ public class JsonTreeReader extends SchemaRegistryService implements RecordReade
     protected volatile String startingFieldName;
     protected volatile StartingFieldStrategy startingFieldStrategy;
     protected volatile SchemaApplicationStrategy schemaApplicationStrategy;
-    protected volatile StreamReadConstraints streamReadConstraints;
-    private volatile boolean allowComments;
+    protected volatile TokenParserFactory tokenParserFactory;
 
     public static final PropertyDescriptor STARTING_FIELD_STRATEGY = new PropertyDescriptor.Builder()
             .name("starting-field-strategy")
@@ -135,8 +134,11 @@ public class JsonTreeReader extends SchemaRegistryService implements RecordReade
         this.startingFieldStrategy = StartingFieldStrategy.valueOf(context.getProperty(STARTING_FIELD_STRATEGY).getValue());
         this.startingFieldName = context.getProperty(STARTING_FIELD_NAME).getValue();
         this.schemaApplicationStrategy = SchemaApplicationStrategy.valueOf(context.getProperty(SCHEMA_APPLICATION_STRATEGY).getValue());
-        this.streamReadConstraints = buildStreamReadConstraints(context);
-        this.allowComments = isAllowCommentsEnabled(context);
+        this.tokenParserFactory = createTokenParserFactory(context);
+    }
+
+    protected TokenParserFactory createTokenParserFactory(final ConfigurationContext context) {
+        return new JsonParserFactory(buildStreamReadConstraints(context), isAllowCommentsEnabled(context));
     }
 
     /**
@@ -179,7 +181,7 @@ public class JsonTreeReader extends SchemaRegistryService implements RecordReade
     }
 
     protected RecordSourceFactory<JsonNode> createJsonRecordSourceFactory() {
-        return (variables, in) -> new JsonRecordSource(in, startingFieldStrategy, startingFieldName, streamReadConstraints);
+        return (variables, in) -> new JsonRecordSource(in, startingFieldStrategy, startingFieldName, tokenParserFactory);
     }
 
     @Override
@@ -195,6 +197,6 @@ public class JsonTreeReader extends SchemaRegistryService implements RecordReade
 
     protected JsonTreeRowRecordReader createJsonTreeRowRecordReader(final InputStream in, final ComponentLog logger, final RecordSchema schema) throws IOException, MalformedRecordException {
         return new JsonTreeRowRecordReader(in, logger, schema, dateFormat, timeFormat, timestampFormat, startingFieldStrategy, startingFieldName,
-                schemaApplicationStrategy, null, allowComments, streamReadConstraints, new JsonParserFactory());
+                schemaApplicationStrategy, null, tokenParserFactory);
     }
 }
