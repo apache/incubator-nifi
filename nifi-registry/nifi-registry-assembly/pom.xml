@@ -215,6 +215,7 @@
         <nifi.registry.security.user.oidc.client.id />
         <nifi.registry.security.user.oidc.client.secret />
         <nifi.registry.security.user.oidc.preferred.jwsalgorithm />
+        <nifi.registry.security.user.oidc.claim.groups>groups</nifi.registry.security.user.oidc.claim.groups>
 
         <!-- nifi.registry.properties: revision management properties -->
         <nifi.registry.revisions.enabled>false</nifi.registry.revisions.enabled>

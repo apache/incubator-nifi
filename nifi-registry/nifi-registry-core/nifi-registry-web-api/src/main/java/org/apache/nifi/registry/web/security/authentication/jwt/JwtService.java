@@ -37,7 +37,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -48,6 +54,7 @@ public class JwtService {
     private static final MacAlgorithm SIGNATURE_ALGORITHM = Jwts.SIG.HS256;
     private static final String KEY_ID_CLAIM = "kid";
     private static final String USERNAME_CLAIM = "preferred_username";
+    private static final String GROUPS_CLAIM = "groups";
 
     private final KeyService keyService;
 
@@ -56,7 +63,7 @@ public class JwtService {
         this.keyService = keyService;
     }
 
-    public String getUserIdentityFromToken(final String base64EncodedToken) throws JwtException {
+    public Jws<Claims> parseAndValidateToken(final String base64EncodedToken) throws JwtException {
         // The library representations of the JWT should be kept internal to this service.
         try {
             final Jws<Claims> jws = parseTokenFromBase64EncodedString(base64EncodedToken);
@@ -74,12 +81,22 @@ public class JwtService {
             if (StringUtils.isEmpty(jws.getPayload().getIssuer())) {
                 throw new JwtException("No issuer available in token");
             }
-            return jws.getPayload().getSubject();
+
+            return jws;
         } catch (JwtException e) {
-            final String errorMessage = "There was an error validating the JWT";
-            logger.error(errorMessage, e);
-            throw e;
+            throw new JwtException("There was an error validating the JWT", e);
         }
+    }
+
+    public String getUserIdentityFromToken(final Jws<Claims> jws) throws JwtException {
+        return jws.getPayload().getSubject();
+    }
+
+    public Set<String> getUserGroupsFromToken(final Jws<Claims> jws) throws JwtException {
+        @SuppressWarnings("unchecked")
+        final List<String> groupsString = jws.getPayload().get(GROUPS_CLAIM, ArrayList.class);
+
+        return new HashSet<>(groupsString != null ? groupsString : Collections.emptyList());
     }
 
     private Jws<Claims> parseTokenFromBase64EncodedString(final String base64EncodedToken) throws JwtException {
@@ -125,11 +142,15 @@ public class JwtService {
                 authenticationResponse.getUsername(),
                 authenticationResponse.getIssuer(),
                 authenticationResponse.getIssuer(),
-                authenticationResponse.getExpiration());
+                authenticationResponse.getExpiration(),
+                null);
     }
 
     public String generateSignedToken(String identity, String preferredUsername, String issuer, String audience, long expirationMillis) throws JwtException {
+        return this.generateSignedToken(identity, preferredUsername, issuer, audience, expirationMillis, null);
+    }
 
+    public String generateSignedToken(String identity, String preferredUsername, String issuer, String audience, long expirationMillis, Collection<String> groups) throws JwtException {
         if (identity == null || StringUtils.isEmpty(identity)) {
             String errorMessage = "Cannot generate a JWT for a token with an empty identity";
             errorMessage = issuer != null ? errorMessage + " issued by " + issuer + "." : ".";
@@ -155,6 +176,7 @@ public class JwtService {
                     .audience().add(audience).and()
                     .claim(USERNAME_CLAIM, preferredUsername)
                     .claim(KEY_ID_CLAIM, key.getId())
+                    .claim(GROUPS_CLAIM, groups)
                     .issuedAt(now.getTime())
                     .expiration(expiration.getTime())
                     .signWith(Keys.hmacShaKeyFor(keyBytes), SIGNATURE_ALGORITHM).compact();

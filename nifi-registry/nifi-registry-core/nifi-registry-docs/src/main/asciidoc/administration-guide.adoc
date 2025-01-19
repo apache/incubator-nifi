@@ -282,6 +282,9 @@ If this value is `none`, NiFi will attempt to validate unsecured/plain tokens. O
 JSON Web Key (JWK) provided through the jwks_uri in the metadata found at the discovery URL
 |`nifi.registry.security.user.oidc.additional.scopes`                | Comma separated scopes that are sent to OpenID Connect Provider in addition to `openid` and `email`.
 |`nifi.registry.security.user.oidc.claim.identifying.user`           | Claim that identifies the authenticated user. The default value is `email`. Claim names may need to be requested using the `nifi.registry.security.user.oidc.additional.scopes` property
+|`nifi.registry.security.user.oidc.claim.groups`                     | Name of the ID token claim that contains an array of group names of which the
+user is a member. Application groups must be supplied from a User Group Provider with matching names in order for the
+authorization process to use ID token claim groups. The default value is `groups`.
 |==================================================================================================================================================
 
 [[authorization]]

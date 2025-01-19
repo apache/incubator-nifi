@@ -401,6 +401,10 @@ public class StandardOidcIdentityProvider implements OidcIdentityProvider {
         String identityClaim = properties.getOidcClaimIdentifyingUser();
         String identity = claimsSet.getStringClaim(identityClaim);
 
+        // Attempt to extract groups from the configured claim; default is 'groups'
+        final String groupsClaim = properties.getOidcClaimGroups();
+        final List<String> groups = claimsSet.getStringListClaim(groupsClaim);
+
         // If default identity not available, attempt secondary identity extraction
         if (StringUtils.isBlank(identity)) {
             // Provide clear message to admin that desired claim is missing and present available claims
@@ -425,7 +429,7 @@ public class StandardOidcIdentityProvider implements OidcIdentityProvider {
         final String issuer = claimsSet.getIssuer().getValue();
 
         // convert into a nifi jwt for retrieval later
-        return jwtService.generateSignedToken(identity, identity, issuer, issuer, expiresIn);
+        return jwtService.generateSignedToken(identity, identity, issuer, issuer, expiresIn, groups);
     }
 
     private String retrieveIdentityFromUserInfoEndpoint(OIDCTokens oidcTokens) throws IOException {

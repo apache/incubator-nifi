@@ -36,6 +36,7 @@ import org.springframework.security.core.AuthenticationException;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class IdentityAuthenticationProvider implements AuthenticationProvider {
 
@@ -94,7 +95,7 @@ public class IdentityAuthenticationProvider implements AuthenticationProvider {
         return new AuthenticationSuccessToken(new NiFiUserDetails(
                 new StandardNiFiUser.Builder()
                         .identity(mappedIdentity)
-                        .groups(getUserGroups(mappedIdentity))
+                        .groups(getUserGroups(mappedIdentity, response))
                         .clientAddress(requestToken.getClientAddress())
                         .build()));
     }
@@ -110,6 +111,12 @@ public class IdentityAuthenticationProvider implements AuthenticationProvider {
 
     protected Set<String> getUserGroups(final String identity) {
         return getUserGroups(authorizer, identity);
+    }
+
+    protected Set<String> getUserGroups(final String identity, AuthenticationResponse response) {
+        return Stream
+                .concat(getUserGroups(authorizer, identity).stream(), response.getGroups().stream())
+                .collect(Collectors.toSet());
     }
 
     private static Set<String> getUserGroups(final Authorizer authorizer, final String userIdentity) {

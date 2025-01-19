@@ -16,6 +16,8 @@
  */
 package org.apache.nifi.registry.web.security.authentication.jwt;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import org.apache.nifi.registry.properties.NiFiRegistryProperties;
 import org.apache.nifi.registry.security.authentication.AuthenticationRequest;
@@ -34,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -61,16 +64,19 @@ public class JwtIdentityProvider extends BearerAuthIdentityProvider implements I
         }
 
         final Object credentials = authenticationRequest.getCredentials();
-        String jwtAuthToken = credentials != null && credentials instanceof String ? (String) credentials : null;
-
         if (credentials == null) {
             logger.info("JWT not found in authenticationRequest credentials, returning null.");
             return null;
         }
 
         try {
-            final String jwtPrincipal = jwtService.getUserIdentityFromToken(jwtAuthToken);
-            return new AuthenticationResponse(jwtPrincipal, jwtPrincipal, expiration, issuer);
+            String jwtAuthToken = credentials.toString();
+            final Jws<Claims> jws = jwtService.parseAndValidateToken(jwtAuthToken);
+
+            final String jwtPrincipal = jwtService.getUserIdentityFromToken(jws);
+            final Set<String> groups = jwtService.getUserGroupsFromToken(jws);
+
+            return new AuthenticationResponse(jwtPrincipal, jwtPrincipal, expiration, issuer, groups);
         } catch (JwtException e) {
             throw new InvalidAuthenticationException(e.getMessage(), e);
         }
