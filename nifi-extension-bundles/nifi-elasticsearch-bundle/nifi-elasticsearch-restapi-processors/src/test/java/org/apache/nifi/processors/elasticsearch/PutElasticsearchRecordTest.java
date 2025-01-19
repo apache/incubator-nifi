@@ -264,7 +264,8 @@ public class PutElasticsearchRecordTest extends AbstractPutElasticsearchTest {
         runner.setProperty("another", "${blank}");
         runner.setEnvironmentVariableValue("slices", "auto");
         runner.setEnvironmentVariableValue("version", "/version");
-        testWithRequestParametersAndBulkHeaders(null);
+        runner.setEnvironmentVariableValue("accept", "application/json");
+        testWithRequestParametersAndBulkHeadersAndRequestHeaders(null);
     }
 
     @Test
@@ -274,7 +275,8 @@ public class PutElasticsearchRecordTest extends AbstractPutElasticsearchTest {
         attributes.put("version", "/version");
         attributes.put("slices", "auto");
         attributes.put("blank", " ");
-        testWithRequestParametersAndBulkHeaders(attributes);
+        attributes.put("accept", "application/json");
+        testWithRequestParametersAndBulkHeadersAndRequestHeaders(attributes);
     }
 
     @Test
@@ -889,12 +891,13 @@ public class PutElasticsearchRecordTest extends AbstractPutElasticsearchTest {
         runner.assertTransferCount(AbstractPutElasticsearch.REL_ERROR_RESPONSES, 0);
     }
 
-    private void testWithRequestParametersAndBulkHeaders(final Map<String, String> attributes) {
+    private void testWithRequestParametersAndBulkHeadersAndRequestHeaders(final Map<String, String> attributes) {
         runner.setProperty("refresh", "true");
         runner.setProperty("slices", "${slices}");
         runner.setProperty(AbstractPutElasticsearch.BULK_HEADER_PREFIX + "routing", "/routing");
         runner.setProperty(AbstractPutElasticsearch.BULK_HEADER_PREFIX + "version", "${version}");
         runner.setProperty(AbstractPutElasticsearch.BULK_HEADER_PREFIX + "empty", "${empty}");
+        runner.setProperty(ElasticsearchRestProcessor.DYNAMIC_PROPERTY_PREFIX_REQUEST_HEADER + "Accept", "${accept}");
         runner.setEnvironmentVariableValue("blank", " ");
         runner.assertValid();
 
@@ -902,6 +905,11 @@ public class PutElasticsearchRecordTest extends AbstractPutElasticsearchTest {
             assertEquals(2, params.size());
             assertEquals("true", params.get("refresh"));
             assertEquals("auto", params.get("slices"));
+        });
+
+        clientService.setEvalHeadersConsumer((final Map<String, String> headers) -> {
+            assertEquals(1, headers.size());
+            assertEquals("application/json", headers.get("Accept"));
         });
 
         final Consumer<List<IndexOperationRequest>> consumer = (final List<IndexOperationRequest> items) -> {

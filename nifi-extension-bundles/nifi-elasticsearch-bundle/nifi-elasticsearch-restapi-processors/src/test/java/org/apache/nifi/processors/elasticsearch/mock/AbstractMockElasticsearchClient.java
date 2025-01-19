@@ -38,81 +38,82 @@ public class AbstractMockElasticsearchClient extends AbstractControllerService i
     }
 
     @Override
-    public IndexOperationResponse add(final IndexOperationRequest operation, final Map<String, String> requestParameters) {
+    public IndexOperationResponse add(final IndexOperationRequest operation, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
         return null;
     }
 
     @Override
-    public IndexOperationResponse bulk(final List<IndexOperationRequest> operations, final Map<String, String> requestParameters) {
+    public IndexOperationResponse bulk(final List<IndexOperationRequest> operations, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
         return null;
     }
 
     @Override
-    public Long count(final String query, final String index, final String type, final Map<String, String> requestParameters) {
+    public Long count(final String query, final String index, final String type, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
         return null;
     }
 
     @Override
-    public DeleteOperationResponse deleteById(final String index, final String type, final String id, final Map<String, String> requestParameters) {
+    public DeleteOperationResponse deleteById(final String index, final String type, final String id, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
         return null;
     }
 
     @Override
-    public DeleteOperationResponse deleteById(final String index, final String type, final List<String> ids, final Map<String, String> requestParameters) {
+    public DeleteOperationResponse deleteById(final String index, final String type, final List<String> ids, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
         return null;
     }
 
     @Override
-    public DeleteOperationResponse deleteByQuery(final String query, final String index, final String type, final Map<String, String> requestParameters) {
+    public DeleteOperationResponse deleteByQuery(final String query, final String index, final String type, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
         return null;
     }
 
     @Override
-    public UpdateOperationResponse updateByQuery(final String query, final String index, final String type, final Map<String, String> requestParameters) {
+    public UpdateOperationResponse updateByQuery(final String query, final String index, final String type, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
         return null;
     }
 
     @Override
-    public void refresh(final String index, final Map<String, String> requestParameters) {
+    public void refresh(final String index, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
+        // intentionally blank
     }
 
     @Override
-    public boolean exists(final String index, final Map<String, String> requestParameters) {
+    public boolean exists(final String index, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
         return true;
     }
 
     @Override
-    public boolean documentExists(final String index, final String type, final String id, final Map<String, String> requestParameters) {
+    public boolean documentExists(final String index, final String type, final String id, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
         return true;
     }
 
     @Override
-    public Map<String, Object> get(final String index, final String type, final String id, final Map<String, String> requestParameters) {
+    public Map<String, Object> get(final String index, final String type, final String id, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
         return null;
     }
 
     @Override
-    public SearchResponse search(final String query, final String index, final String type, final Map<String, String> requestParameters) {
+    public SearchResponse search(final String query, final String index, final String type, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
         return null;
     }
 
     @Override
-    public SearchResponse scroll(final String scroll) {
+    public SearchResponse scroll(final String scroll, final Map<String, String> requestHeaders) {
         return null;
     }
 
     @Override
-    public String initialisePointInTime(final String index, final String keepAlive) {
+    public String initialisePointInTime(final String index, final String keepAlive, final Map<String, String> requestHeaders) {
         return null;
     }
 
     @Override
-    public DeleteOperationResponse deletePointInTime(final String pitId) {
+    public DeleteOperationResponse deletePointInTime(final String pitId, final Map<String, String> requestHeaders) {
         return null;
     }
 
     @Override
-    public DeleteOperationResponse deleteScroll(final String scrollId) {
+    public DeleteOperationResponse deleteScroll(final String scrollId, final Map<String, String> requestHeaders) {
         return null;
     }
 

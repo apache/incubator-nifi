@@ -56,6 +56,7 @@ import org.apache.nifi.util.StringUtils;
 import org.elasticsearch.client.Node;
 import org.elasticsearch.client.NodeSelector;
 import org.elasticsearch.client.Request;
+import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.ResponseException;
 import org.elasticsearch.client.RestClient;
@@ -187,7 +188,7 @@ public class ElasticSearchClientServiceImpl extends AbstractControllerService im
         try {
             this.client = setupClient(context);
             this.sniffer = setupSniffer(context, this.client);
-            responseCharset = Charset.forName(context.getProperty(CHARSET).getValue());
+            this.responseCharset = Charset.forName(context.getProperty(CHARSET).getValue());
 
             // re-create the ObjectMapper in case the SUPPRESS_NULLS property has changed - the JsonInclude settings aren't dynamic
             createObjectMapper(context);
@@ -537,7 +538,7 @@ public class ElasticSearchClientServiceImpl extends AbstractControllerService im
         }
     }
 
-    private Response runQuery(final String endpoint, final String query, final String index, final String type, final Map<String, String> requestParameters) {
+    private Response runQuery(final String endpoint, final String query, final String index, final String type, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
         final StringBuilder sb = new StringBuilder();
         appendIndex(sb, index);
         if (StringUtils.isNotBlank(type)) {
@@ -547,7 +548,7 @@ public class ElasticSearchClientServiceImpl extends AbstractControllerService im
 
         try {
             final HttpEntity queryEntity = new NStringEntity(query, ContentType.APPLICATION_JSON);
-            return performRequest("POST", sb.toString(), requestParameters, queryEntity);
+            return performRequest("POST", sb.toString(), requestParameters, requestHeaders, queryEntity);
         } catch (final Exception e) {
             throw new ElasticsearchException(e);
         }
@@ -585,8 +586,8 @@ public class ElasticSearchClientServiceImpl extends AbstractControllerService im
     }
 
     @Override
-    public IndexOperationResponse add(final IndexOperationRequest operation, final Map<String, String> requestParameters) {
-        return bulk(Collections.singletonList(operation), requestParameters);
+    public IndexOperationResponse add(final IndexOperationRequest operation, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
+        return bulk(Collections.singletonList(operation), requestParameters, requestHeaders);
     }
 
     private String flatten(final String str) {
@@ -656,7 +657,7 @@ public class ElasticSearchClientServiceImpl extends AbstractControllerService im
     }
 
     @Override
-    public IndexOperationResponse bulk(final List<IndexOperationRequest> operations, final Map<String, String> requestParameters) {
+    public IndexOperationResponse bulk(final List<IndexOperationRequest> operations, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
         try {
             final StringBuilder payload = new StringBuilder();
             for (final IndexOperationRequest or : operations) {
@@ -669,7 +670,7 @@ public class ElasticSearchClientServiceImpl extends AbstractControllerService im
             final HttpEntity entity = new NStringEntity(payload.toString(), ContentType.APPLICATION_JSON);
             final StopWatch watch = new StopWatch();
             watch.start();
-            final Response response = performRequest("POST", "/_bulk", requestParameters, entity);
+            final Response response = performRequest("POST", "/_bulk", requestParameters, requestHeaders, entity);
             watch.stop();
 
             final String rawResponse = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
@@ -686,20 +687,20 @@ public class ElasticSearchClientServiceImpl extends AbstractControllerService im
     }
 
     @Override
-    public Long count(final String query, final String index, final String type, final Map<String, String> requestParameters) {
-        final Response response = runQuery("_count", query, index, type, requestParameters);
+    public Long count(final String query, final String index, final String type, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
+        final Response response = runQuery("_count", query, index, type, requestParameters, requestHeaders);
         final Map<String, Object> parsed = parseResponse(response);
 
         return ((Integer) parsed.get("count")).longValue();
     }
 
     @Override
-    public DeleteOperationResponse deleteById(final String index, final String type, final String id, final Map<String, String> requestParameters) {
-        return deleteById(index, type, Collections.singletonList(id), requestParameters);
+    public DeleteOperationResponse deleteById(final String index, final String type, final String id, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
+        return deleteById(index, type, Collections.singletonList(id), requestParameters, requestHeaders);
     }
 
     @Override
-    public DeleteOperationResponse deleteById(final String index, final String type, final List<String> ids, final Map<String, String> requestParameters) {
+    public DeleteOperationResponse deleteById(final String index, final String type, final List<String> ids, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
         try {
             final StringBuilder sb = new StringBuilder();
             for (final String id : ids) {
@@ -709,7 +710,7 @@ public class ElasticSearchClientServiceImpl extends AbstractControllerService im
             final HttpEntity entity = new NStringEntity(sb.toString(), ContentType.APPLICATION_JSON);
             final StopWatch watch = new StopWatch();
             watch.start();
-            final Response response = performRequest("POST", "/_bulk", requestParameters, entity);
+            final Response response = performRequest("POST", "/_bulk", requestParameters, requestHeaders, entity);
             watch.stop();
 
             if (getLogger().isDebugEnabled()) {
@@ -724,10 +725,10 @@ public class ElasticSearchClientServiceImpl extends AbstractControllerService im
     }
 
     @Override
-    public DeleteOperationResponse deleteByQuery(final String query, final String index, final String type, final Map<String, String> requestParameters) {
+    public DeleteOperationResponse deleteByQuery(final String query, final String index, final String type, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
         final StopWatch watch = new StopWatch();
         watch.start();
-        final Response response = runQuery("_delete_by_query", query, index, type, requestParameters);
+        final Response response = runQuery("_delete_by_query", query, index, type, requestParameters, requestHeaders);
         watch.stop();
 
         // check for errors in response
@@ -738,9 +739,9 @@ public class ElasticSearchClientServiceImpl extends AbstractControllerService im
     }
 
     @Override
-    public UpdateOperationResponse updateByQuery(final String query, final String index, final String type, final Map<String, String> requestParameters) {
+    public UpdateOperationResponse updateByQuery(final String query, final String index, final String type, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
         final long start = System.currentTimeMillis();
-        final Response response = runQuery("_update_by_query", query, index, type, requestParameters);
+        final Response response = runQuery("_update_by_query", query, index, type, requestParameters, requestHeaders);
         final long end = System.currentTimeMillis();
 
         // check for errors in response
@@ -750,12 +751,12 @@ public class ElasticSearchClientServiceImpl extends AbstractControllerService im
     }
 
     @Override
-    public void refresh(final String index, final Map<String, String> requestParameters) {
+    public void refresh(final String index, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
         try {
             final StringBuilder endpoint = new StringBuilder();
             appendIndex(endpoint, index);
             endpoint.append("/_refresh");
-            final Response response = performRequest("POST", endpoint.toString(), requestParameters, null);
+            final Response response = performRequest("POST", endpoint.toString(), requestParameters, requestHeaders, null);
             parseResponseWarningHeaders(response);
         } catch (final Exception ex) {
             throw new ElasticsearchException(ex);
@@ -763,11 +764,11 @@ public class ElasticSearchClientServiceImpl extends AbstractControllerService im
     }
 
     @Override
-    public boolean exists(final String index, final Map<String, String> requestParameters) {
+    public boolean exists(final String index, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
         try {
             final StringBuilder endpoint = new StringBuilder();
             appendIndex(endpoint, index);
-            final Response response = performRequest("HEAD", endpoint.toString(), requestParameters, null);
+            final Response response = performRequest("HEAD", endpoint.toString(), requestParameters, requestHeaders, null);
             parseResponseWarningHeaders(response);
 
             if (response.getStatusLine().getStatusCode() == 200) {
@@ -785,12 +786,12 @@ public class ElasticSearchClientServiceImpl extends AbstractControllerService im
     }
 
     @Override
-    public boolean documentExists(final String index, final String type, final String id, final Map<String, String> requestParameters) {
+    public boolean documentExists(final String index, final String type, final String id, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
         boolean exists = true;
         try {
             final Map<String, String> existsParameters = requestParameters != null ? new HashMap<>(requestParameters) : new HashMap<>();
             existsParameters.putIfAbsent("_source", "false");
-            get(index, type, id, existsParameters);
+            get(index, type, id, existsParameters, requestHeaders);
         } catch (final ElasticsearchException ee) {
             if (ee.isNotFound()) {
                 exists = false;
@@ -803,7 +804,7 @@ public class ElasticSearchClientServiceImpl extends AbstractControllerService im
 
     @SuppressWarnings("unchecked")
     @Override
-    public Map<String, Object> get(final String index, final String type, final String id, final Map<String, String> requestParameters) {
+    public Map<String, Object> get(final String index, final String type, final String id, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
         try {
             final StringBuilder endpoint = new StringBuilder();
             appendIndex(endpoint, index);
@@ -814,7 +815,7 @@ public class ElasticSearchClientServiceImpl extends AbstractControllerService im
             }
             endpoint.append("/").append(id);
 
-            final Response response = performRequest("GET", endpoint.toString(), requestParameters, null);
+            final Response response = performRequest("GET", endpoint.toString(), requestParameters, requestHeaders, null);
             final String body = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
             parseResponseWarningHeaders(response);
 
@@ -839,20 +840,22 @@ public class ElasticSearchClientServiceImpl extends AbstractControllerService im
     }
 
     @Override
-    public SearchResponse search(final String query, final String index, final String type, final Map<String, String> requestParameters) {
+    public SearchResponse search(final String query, final String index, final String type, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
         try {
-            final Response response = runQuery("_search", query, index, type, requestParameters);
+            final Response response = runQuery("_search", query, index, type, requestParameters, requestHeaders);
             return buildSearchResponse(response);
+        } catch (final ElasticsearchException ee) {
+            throw ee;
         } catch (final Exception ex) {
             throw new ElasticsearchException(ex);
         }
     }
 
     @Override
-    public SearchResponse scroll(final String scroll) {
+    public SearchResponse scroll(final String scroll, final Map<String, String> requestHeaders) {
         try {
             final HttpEntity scrollEntity = new NStringEntity(scroll, ContentType.APPLICATION_JSON);
-            final Response response = performRequest("POST", "/_search/scroll", Collections.emptyMap(), scrollEntity);
+            final Response response = performRequest("POST", "/_search/scroll", Collections.emptyMap(), requestHeaders, scrollEntity);
             return buildSearchResponse(response);
         } catch (final Exception ex) {
             throw new ElasticsearchException(ex);
@@ -860,7 +863,7 @@ public class ElasticSearchClientServiceImpl extends AbstractControllerService im
     }
 
     @Override
-    public String initialisePointInTime(final String index, final String keepAlive) {
+    public String initialisePointInTime(final String index, final String keepAlive, final Map<String, String> requestHeaders) {
         try {
             final Map<String, String> params = new HashMap<>() {{
                 if (StringUtils.isNotBlank(keepAlive)) {
@@ -870,7 +873,7 @@ public class ElasticSearchClientServiceImpl extends AbstractControllerService im
             final StringBuilder endpoint = new StringBuilder();
             appendIndex(endpoint, index);
             endpoint.append("/_pit");
-            final Response response = performRequest("POST", endpoint.toString(), params, null);
+            final Response response = performRequest("POST", endpoint.toString(), params, requestHeaders, null);
             final String body = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
             parseResponseWarningHeaders(response);
 
@@ -885,12 +888,12 @@ public class ElasticSearchClientServiceImpl extends AbstractControllerService im
     }
 
     @Override
-    public DeleteOperationResponse deletePointInTime(final String pitId) {
+    public DeleteOperationResponse deletePointInTime(final String pitId, final Map<String, String> requestHeaders) {
         try {
             final HttpEntity pitEntity = new NStringEntity(String.format("{\"id\": \"%s\"}", pitId), ContentType.APPLICATION_JSON);
 
             final StopWatch watch = new StopWatch(true);
-            final Response response = performRequest("DELETE", "/_pit", Collections.emptyMap(), pitEntity);
+            final Response response = performRequest("DELETE", "/_pit", Collections.emptyMap(), requestHeaders, pitEntity);
             watch.stop();
 
             if (getLogger().isDebugEnabled()) {
@@ -911,12 +914,12 @@ public class ElasticSearchClientServiceImpl extends AbstractControllerService im
     }
 
     @Override
-    public DeleteOperationResponse deleteScroll(final String scrollId) {
+    public DeleteOperationResponse deleteScroll(final String scrollId, final Map<String, String> requestHeaders) {
         try {
             final HttpEntity scrollBody = new NStringEntity(String.format("{\"scroll_id\": \"%s\"}", scrollId), ContentType.APPLICATION_JSON);
 
             final StopWatch watch = new StopWatch(true);
-            final Response response = performRequest("DELETE", "/_search/scroll", Collections.emptyMap(), scrollBody);
+            final Response response = performRequest("DELETE", "/_search/scroll", Collections.emptyMap(), requestHeaders, scrollBody);
             watch.stop();
 
             if (getLogger().isDebugEnabled()) {
@@ -995,8 +998,18 @@ public class ElasticSearchClientServiceImpl extends AbstractControllerService im
         return transitUrl.toString();
     }
 
-    private Response performRequest(final String method, final String endpoint, final Map<String, String> parameters, final HttpEntity entity) throws IOException {
-        final Request request = new Request(method, endpoint);
+    private Request addRequestHeaders(final Request request, final Map<String, String> headers) {
+        if (headers != null && !headers.isEmpty()) {
+            final RequestOptions.Builder requestOptionsBuilder = RequestOptions.DEFAULT.toBuilder();
+            headers.forEach(requestOptionsBuilder::addHeader);
+            request.setOptions(requestOptionsBuilder.build());
+        }
+        return request;
+    }
+
+    private Response performRequest(final String method, final String endpoint, final Map<String, String> parameters, final Map<String, String> headers, final HttpEntity entity) throws IOException {
+        final Request baseRequest = new Request(method, endpoint);
+        final Request request = addRequestHeaders(baseRequest, headers);
         if (parameters != null && !parameters.isEmpty()) {
             request.addParameters(parameters);
         }
@@ -1015,6 +1028,9 @@ public class ElasticSearchClientServiceImpl extends AbstractControllerService im
                     .append("\n")
                     .append("Parameters: ")
                     .append(prettyPrintWriter.writeValueAsString(parameters))
+                    .append("\n")
+                    .append("Request Headers: ")
+                    .append(prettyPrintWriter.writeValueAsString(headers))
                     .append("\n");
 
             if (entity != null) {

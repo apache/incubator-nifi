@@ -19,6 +19,7 @@ package org.apache.nifi.processors.elasticsearch;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.nifi.annotation.behavior.DynamicProperties;
 import org.apache.nifi.annotation.behavior.DynamicProperty;
 import org.apache.nifi.annotation.behavior.InputRequirement;
 import org.apache.nifi.annotation.behavior.PrimaryNodeOnly;
@@ -70,14 +71,23 @@ import java.util.stream.Stream;
         "The processor will retrieve multiple pages of results until either no more results are available or the Pagination Keep Alive expiration is reached, " +
         "after which the Range query will automatically update the field constraint based on the last retrieved Document value.")
 @SeeAlso({SearchElasticsearch.class, PaginatedJsonQueryElasticsearch.class})
-@DynamicProperty(
-        name = "The name of a URL query parameter to add",
-        value = "The value of the URL query parameter",
-        expressionLanguageScope = ExpressionLanguageScope.ENVIRONMENT,
-        description = "Adds the specified property name/value as a query parameter in the Elasticsearch URL used for processing. " +
-                "These parameters will override any matching parameters in the query request body. " +
-                "For SCROLL type queries, these parameters are only used in the initial (first page) query as the " +
-                "Elasticsearch Scroll API does not support the same query parameters for subsequent pages of data.")
+@DynamicProperties({
+        @DynamicProperty(
+                name = "The name of the HTTP request header",
+                value = "A Record Path expression to retrieve the HTTP request header value",
+                expressionLanguageScope = ExpressionLanguageScope.ENVIRONMENT,
+                description = "Prefix: " + ElasticsearchRestProcessor.DYNAMIC_PROPERTY_PREFIX_REQUEST_HEADER +
+                        " - adds the specified property name/value as a HTTP request header in the Elasticsearch request. " +
+                        "If the Record Path expression results in a null or blank value, the HTTP request header will be omitted."),
+        @DynamicProperty(
+                name = "The name of a URL query parameter to add",
+                value = "The value of the URL query parameter",
+                expressionLanguageScope = ExpressionLanguageScope.ENVIRONMENT,
+                description = "Adds the specified property name/value as a query parameter in the Elasticsearch URL used for processing. " +
+                        "These parameters will override any matching parameters in the query request body. " +
+                        "For SCROLL type queries, these parameters are only used in the initial (first page) query as the " +
+                        "Elasticsearch Scroll API does not support the same query parameters for subsequent pages of data.")
+})
 @Stateful(scopes = Scope.CLUSTER, description = "The pagination state (scrollId, searchAfter, pitId, hitCount, pageCount, pageExpirationTimestamp, trackingRangeValue) " +
         "is retained in between invocations of this processor until the Scroll/PiT has expired " +
         "(when the current time is later than the last query execution plus the Pagination Keep Alive interval).")

@@ -16,6 +16,7 @@
  */
 package org.apache.nifi.processors.elasticsearch;
 
+import org.apache.nifi.annotation.behavior.DynamicProperties;
 import org.apache.nifi.annotation.behavior.DynamicProperty;
 import org.apache.nifi.annotation.behavior.InputRequirement;
 import org.apache.nifi.annotation.behavior.SystemResource;
@@ -49,14 +50,23 @@ import java.util.List;
         "It will use the flowfile's content for the query unless the QUERY attribute is populated. " +
         "Search After/Point in Time queries must include a valid \"sort\" field.")
 @SeeAlso({JsonQueryElasticsearch.class, ConsumeElasticsearch.class, SearchElasticsearch.class})
-@DynamicProperty(
-        name = "The name of a URL query parameter to add",
-        value = "The value of the URL query parameter",
-        expressionLanguageScope = ExpressionLanguageScope.FLOWFILE_ATTRIBUTES,
-        description = "Adds the specified property name/value as a query parameter in the Elasticsearch URL used for processing. " +
-                "These parameters will override any matching parameters in the query request body. " +
-                "For SCROLL type queries, these parameters are only used in the initial (first page) query as the " +
-                "Elasticsearch Scroll API does not support the same query parameters for subsequent pages of data.")
+@DynamicProperties({
+        @DynamicProperty(
+                name = "The name of the HTTP request header",
+                value = "A Record Path expression to retrieve the HTTP request header value",
+                expressionLanguageScope = ExpressionLanguageScope.FLOWFILE_ATTRIBUTES,
+                description = "Prefix: " + ElasticsearchRestProcessor.DYNAMIC_PROPERTY_PREFIX_REQUEST_HEADER +
+                        " - adds the specified property name/value as a HTTP request header in the Elasticsearch request. " +
+                        "If the Record Path expression results in a null or blank value, the HTTP request header will be omitted."),
+        @DynamicProperty(
+                name = "The name of a URL query parameter to add",
+                value = "The value of the URL query parameter",
+                expressionLanguageScope = ExpressionLanguageScope.FLOWFILE_ATTRIBUTES,
+                description = "Adds the specified property name/value as a query parameter in the Elasticsearch URL used for processing. " +
+                        "These parameters will override any matching parameters in the query request body. " +
+                        "For SCROLL type queries, these parameters are only used in the initial (first page) query as the " +
+                        "Elasticsearch Scroll API does not support the same query parameters for subsequent pages of data.")
+})
 @SystemResourceConsideration(resource = SystemResource.MEMORY, description = "Care should be taken on the size of each page because each response " +
         "from Elasticsearch will be loaded into memory all at once and converted into the resulting flowfiles.")
 public class PaginatedJsonQueryElasticsearch extends AbstractPaginatedJsonQueryElasticsearch {

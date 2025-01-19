@@ -76,6 +76,7 @@ public class PutElasticsearchJsonTest extends AbstractPutElasticsearchTest {
         expectedDynamicTemplate.put("your_field", yourField);
     }
 
+    @Override
     @BeforeEach
     public void setup() throws Exception {
         super.setup();
@@ -181,11 +182,12 @@ public class PutElasticsearchJsonTest extends AbstractPutElasticsearchTest {
     }
 
     @Test
-    void simpleTestWithDocIdAndRequestParametersAndBulkHeaders() {
+    void simpleTestWithDocIdAndRequestParametersAndBulkHeadersAndRequestHeaders() {
         runner.setProperty("refresh", "true");
         runner.setProperty(AbstractPutElasticsearch.BULK_HEADER_PREFIX + "routing", "1");
         runner.setProperty(AbstractPutElasticsearch.BULK_HEADER_PREFIX + "version", "${version}");
         runner.setProperty(AbstractPutElasticsearch.BULK_HEADER_PREFIX + "empty", "${empty}");
+        runner.setProperty(ElasticsearchRestProcessor.DYNAMIC_PROPERTY_PREFIX_REQUEST_HEADER + "Accept", "application/json");
         runner.setProperty("slices", "${slices}");
         runner.setProperty("another", "${blank}");
         runner.setEnvironmentVariableValue("slices", "auto");
@@ -197,6 +199,11 @@ public class PutElasticsearchJsonTest extends AbstractPutElasticsearchTest {
             assertEquals(2, params.size());
             assertEquals("true", params.get("refresh"));
             assertEquals("auto", params.get("slices"));
+        });
+
+        clientService.setEvalHeadersConsumer((final Map<String, String> headers) -> {
+            assertEquals(1, headers.size());
+            assertEquals("application/json", headers.get("Accept"));
         });
 
         clientService.setEvalConsumer((final List<IndexOperationRequest> items) -> {
@@ -228,12 +235,18 @@ public class PutElasticsearchJsonTest extends AbstractPutElasticsearchTest {
         runner.setProperty(AbstractPutElasticsearch.BULK_HEADER_PREFIX + "routing", "1");
         runner.setProperty(AbstractPutElasticsearch.BULK_HEADER_PREFIX + "version", "${version}");
         runner.setProperty(AbstractPutElasticsearch.BULK_HEADER_PREFIX + "empty", "${empty}");
+        runner.setProperty(ElasticsearchRestProcessor.DYNAMIC_PROPERTY_PREFIX_REQUEST_HEADER + "Accept", "${accept}");
         runner.assertValid();
 
         clientService.setEvalParametersConsumer((final Map<String, String> params) -> {
             assertEquals(2, params.size());
             assertEquals("true", params.get("refresh"));
             assertEquals("auto", params.get("slices"));
+        });
+
+        clientService.setEvalHeadersConsumer((final Map<String, String> headers) -> {
+            assertEquals(1, headers.size());
+            assertEquals("application/json", headers.get("Accept"));
         });
 
         clientService.setEvalConsumer((final List<IndexOperationRequest> items) -> {
@@ -251,6 +264,7 @@ public class PutElasticsearchJsonTest extends AbstractPutElasticsearchTest {
         final Map<String, String> attributes = new LinkedHashMap<>();
         attributes.put("slices", "auto");
         attributes.put("version", "external");
+        attributes.put("accept", "application/json");
         attributes.put("blank", " ");
         attributes.put("doc_id", "");
         basicTest(0, 0, 1, attributes);

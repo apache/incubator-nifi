@@ -62,7 +62,7 @@ abstract class AbstractElasticsearch_IT<P extends ElasticsearchRestProcessor> ex
         runner.setProperty(ElasticsearchRestProcessor.INDEX, INDEX);
         runner.setProperty(ElasticsearchRestProcessor.TYPE, type);
 
-        service.refresh(null, null);
+        service.refresh(null, null, null);
     }
 
     @AfterEach

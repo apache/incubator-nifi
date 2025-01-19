@@ -32,6 +32,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -172,18 +173,20 @@ public abstract class AbstractByQueryElasticsearchTest {
         postTest(runner, query);
 
         assertTrue(client.getRequestParameters().isEmpty());
+        assertTrue(client.getRequestHeaders().isEmpty());
     }
 
     @Test
-    public void testWithFlowfileInputAndRequestParameters() {
+    public void testWithFlowfileInputAndRequestParametersAndRequestHeaders() {
         final String query = matchAllQuery;
         runner.setProperty(AbstractByQueryElasticsearch.INDEX, INDEX);
         runner.setProperty(AbstractByQueryElasticsearch.TYPE, TYPE);
         runner.setProperty(AbstractByQueryElasticsearch.QUERY_ATTRIBUTE, queryAttr());
         runner.setProperty("refresh", "true");
         runner.setProperty("slices", "${slices}");
+        runner.setProperty(ElasticsearchRestProcessor.DYNAMIC_PROPERTY_PREFIX_REQUEST_HEADER + "Accept", "${accept}");
         runner.assertValid();
-        runner.enqueue(query, Collections.singletonMap("slices", "auto"));
+        runner.enqueue(query, Map.of("slices", "auto", "accept", "application/json"));
         runner.run();
 
         postTest(runner, query);
@@ -191,6 +194,9 @@ public abstract class AbstractByQueryElasticsearchTest {
         assertEquals(2, client.getRequestParameters().size());
         assertEquals("true", client.getRequestParameters().get("refresh"));
         assertEquals("auto", client.getRequestParameters().get("slices"));
+
+        assertEquals(1, client.getRequestHeaders().size());
+        assertEquals("application/json", client.getRequestHeaders().get("Accept"));
     }
 
     @Test
@@ -264,6 +270,7 @@ public abstract class AbstractByQueryElasticsearchTest {
         postTest(runner, query);
 
         assertTrue(client.getRequestParameters().isEmpty());
+        assertTrue(client.getRequestHeaders().isEmpty());
     }
 
     @Test
@@ -275,7 +282,9 @@ public abstract class AbstractByQueryElasticsearchTest {
         runner.setProperty(AbstractByQueryElasticsearch.QUERY_ATTRIBUTE, queryAttr());
         runner.setProperty("refresh", "true");
         runner.setProperty("slices", "${slices}");
+        runner.setProperty(ElasticsearchRestProcessor.DYNAMIC_PROPERTY_PREFIX_REQUEST_HEADER + "Accept", "${accept}");
         runner.setEnvironmentVariableValue("slices", "auto");
+        runner.setEnvironmentVariableValue("accept", "application/json");
         runner.setIncomingConnection(false);
         runner.assertValid();
         runner.run();
@@ -285,6 +294,9 @@ public abstract class AbstractByQueryElasticsearchTest {
         assertEquals(2, client.getRequestParameters().size());
         assertEquals("true", client.getRequestParameters().get("refresh"));
         assertEquals("auto", client.getRequestParameters().get("slices"));
+
+        assertEquals(1, client.getRequestHeaders().size());
+        assertEquals("application/json", client.getRequestHeaders().get("Accept"));
     }
 
     @ParameterizedTest

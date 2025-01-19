@@ -16,6 +16,7 @@
  */
 package org.apache.nifi.processors.elasticsearch;
 
+import org.apache.nifi.annotation.behavior.DynamicProperties;
 import org.apache.nifi.annotation.behavior.DynamicProperty;
 import org.apache.nifi.annotation.behavior.InputRequirement;
 import org.apache.nifi.annotation.behavior.WritesAttribute;
@@ -49,12 +50,21 @@ import java.util.concurrent.TimeUnit;
         "processor, it will use the flowfile's content for the query. Care should be taken on the size of the query because the entire response " +
         "from Elasticsearch will be loaded into memory all at once and converted into the resulting flowfiles.")
 @SeeAlso(PaginatedJsonQueryElasticsearch.class)
-@DynamicProperty(
-        name = "The name of a URL query parameter to add",
-        value = "The value of the URL query parameter",
-        expressionLanguageScope = ExpressionLanguageScope.FLOWFILE_ATTRIBUTES,
-        description = "Adds the specified property name/value as a query parameter in the Elasticsearch URL used for processing. " +
-                "These parameters will override any matching parameters in the query request body")
+@DynamicProperties({
+        @DynamicProperty(
+                name = "The name of the HTTP request header",
+                value = "A Record Path expression to retrieve the HTTP request header value",
+                expressionLanguageScope = ExpressionLanguageScope.FLOWFILE_ATTRIBUTES,
+                description = "Prefix: " + ElasticsearchRestProcessor.DYNAMIC_PROPERTY_PREFIX_REQUEST_HEADER +
+                        " - adds the specified property name/value as a HTTP request header in the Elasticsearch request. " +
+                        "If the Record Path expression results in a null or blank value, the HTTP request header will be omitted."),
+        @DynamicProperty(
+                name = "The name of a URL query parameter to add",
+                value = "The value of the URL query parameter",
+                expressionLanguageScope = ExpressionLanguageScope.FLOWFILE_ATTRIBUTES,
+                description = "Adds the specified property name/value as a query parameter in the Elasticsearch URL used for processing. " +
+                        "These parameters will override any matching parameters in the query request body")
+})
 public class JsonQueryElasticsearch extends AbstractJsonQueryElasticsearch<JsonQueryParameters> {
     @Override
     JsonQueryParameters buildJsonQueryParameters(final FlowFile input, final ProcessContext context, final ProcessSession session)
@@ -72,7 +82,8 @@ public class JsonQueryElasticsearch extends AbstractJsonQueryElasticsearch<JsonQ
                 queryJsonParameters.getQuery(),
                 queryJsonParameters.getIndex(),
                 queryJsonParameters.getType(),
-                getDynamicProperties(context, input)
+                getRequestParametersFromDynamicProperties(context, input),
+                getRequestHeadersFromDynamicProperties(context, input)
         );
         if (input != null) {
             session.getProvenanceReporter().send(

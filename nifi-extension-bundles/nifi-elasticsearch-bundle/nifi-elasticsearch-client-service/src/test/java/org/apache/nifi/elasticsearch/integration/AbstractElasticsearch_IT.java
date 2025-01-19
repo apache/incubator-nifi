@@ -59,7 +59,7 @@ abstract class AbstractElasticsearch_IT extends AbstractElasticsearchITBase {
 
         runner.enableControllerService(service);
 
-        service.refresh(null, null);
+        service.refresh(null, null, null);
     }
 
     @AfterAll
