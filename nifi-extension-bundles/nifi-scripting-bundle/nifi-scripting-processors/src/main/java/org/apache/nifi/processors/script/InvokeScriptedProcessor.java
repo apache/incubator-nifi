@@ -30,6 +30,8 @@ import org.apache.nifi.annotation.lifecycle.OnAdded;
 import org.apache.nifi.annotation.lifecycle.OnConfigurationRestored;
 import org.apache.nifi.annotation.lifecycle.OnScheduled;
 import org.apache.nifi.annotation.lifecycle.OnStopped;
+import org.apache.nifi.annotation.notification.OnPrimaryNodeStateChange;
+import org.apache.nifi.annotation.notification.PrimaryNodeState;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.RequiredPermission;
 import org.apache.nifi.components.ValidationContext;
@@ -212,7 +214,6 @@ public class InvokeScriptedProcessor extends AbstractSessionFactoryProcessor {
     public void setup(final ProcessContext context) {
         scriptingComponentHelper.setupVariables(context);
         setup();
-
         invokeScriptedProcessorMethod("onScheduled", context);
     }
 
@@ -230,6 +231,12 @@ public class InvokeScriptedProcessor extends AbstractSessionFactoryProcessor {
                 scriptNeedsReload.set(!reloadScriptBody(scriptingComponentHelper.getScriptBody()));
             }
         }
+    }
+
+    @OnPrimaryNodeStateChange
+    public void onPrimaryNodeStateChange(final PrimaryNodeState newState) {
+
+        invokeScriptedProcessorMethod("onPrimaryNodeStateChange", newState);
     }
 
     /**
