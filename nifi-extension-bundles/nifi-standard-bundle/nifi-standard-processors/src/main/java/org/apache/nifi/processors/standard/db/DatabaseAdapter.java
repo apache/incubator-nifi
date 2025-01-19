@@ -81,16 +81,6 @@ public interface DatabaseAdapter {
     }
 
     /**
-     * Tells How many times the column values need to be inserted into the prepared statement. Some DBs (such as MySQL) need the values specified twice in the statement,
-     * some need only to specify them once.
-     *
-     * @return An integer corresponding to the number of times to insert column values into the prepared statement for UPSERT, or -1 if upsert is not supported.
-     */
-    default int getTimesToAddColumnObjectsForUpsert() {
-        return supportsUpsert() ? 1 : -1;
-    }
-
-    /**
      * Returns an SQL UPSERT statement - i.e. UPDATE record or INSERT if id doesn't exist.
      * <br /><br />
      * There is no standard way of doing this so not all adapters support it - use together with {@link #supportsUpsert()}!
@@ -120,24 +110,15 @@ public interface DatabaseAdapter {
         throw new UnsupportedOperationException("UPSERT is not supported for " + getName());
     }
 
-    /**
-     * <p>Returns a bare identifier string by removing wrapping escape characters
-     * from identifier strings such as table and column names.</p>
-     * <p>The default implementation of this method removes double quotes.
-     * If the target database engine supports different escape characters, then its DatabaseAdapter implementation should override
-     * this method so that such escape characters can be removed properly.</p>
-     *
-     * @param identifier An identifier which may be wrapped with escape characters
-     * @return An unwrapped identifier string, or null if the input identifier is null
-     */
-    default String unwrapIdentifier(String identifier) {
-        return identifier == null ? null : identifier.replaceAll("\"", "");
-    }
-
     default String getTableAliasClause(String tableName) {
         return "AS " + tableName;
     }
 
+    /**
+     * Table Quote String usage limited to statement generation methods within DatabaseAdapter
+     *
+     * @return Table Quote String
+     */
     default String getTableQuoteString() {
         // ANSI standard is a double quote
         return "\"";

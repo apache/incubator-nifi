@@ -95,6 +95,7 @@ public class QueryDatabaseTable extends AbstractQueryDatabaseTable {
     private static final List<PropertyDescriptor> PROPERTIES = List.of(
             DBCP_SERVICE,
             DB_TYPE,
+            DATABASE_DIALECT_SERVICE,
             TABLE_NAME,
             COLUMN_NAMES,
             WHERE_CLAUSE,

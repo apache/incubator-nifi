@@ -12,6 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+org.apache.nifi.processors.standard.db.impl.DatabaseDialectServiceDatabaseAdapter
 org.apache.nifi.processors.standard.db.impl.GenericDatabaseAdapter
 org.apache.nifi.processors.standard.db.impl.OracleDatabaseAdapter
 org.apache.nifi.processors.standard.db.impl.Oracle12DatabaseAdapter

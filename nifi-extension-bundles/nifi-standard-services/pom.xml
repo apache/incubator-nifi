@@ -24,6 +24,8 @@
     <artifactId>nifi-standard-services</artifactId>
     <packaging>pom</packaging>
     <modules>
+        <module>nifi-database-dialect-service-bundle</module>
+        <module>nifi-database-dialect-service-api</module>
         <module>nifi-oauth2-provider-api</module>
         <module>nifi-oauth2-provider-bundle</module>
         <module>nifi-distributed-cache-client-service-api</module>

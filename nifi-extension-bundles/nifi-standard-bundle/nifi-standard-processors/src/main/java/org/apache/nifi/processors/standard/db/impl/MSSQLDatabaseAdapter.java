@@ -104,12 +104,6 @@ public class MSSQLDatabaseAdapter implements DatabaseAdapter {
     }
 
     @Override
-    public String unwrapIdentifier(String identifier) {
-        // Remove double quotes and square brackets.
-        return identifier == null ? null : identifier.replaceAll("[\"\\[\\]]", "");
-    }
-
-    @Override
     public List<String> getAlterTableStatements(final String tableName, final List<ColumnDescription> columnsToAdd, final boolean quoteTableName, final boolean quoteColumnNames) {
         List<String> columnsAndDatatypes = new ArrayList<>(columnsToAdd.size());
         for (ColumnDescription column : columnsToAdd) {

@@ -22,7 +22,6 @@ import org.apache.nifi.components.state.StateManager;
 import org.apache.nifi.controller.AbstractControllerService;
 import org.apache.nifi.dbcp.DBCPService;
 import org.apache.nifi.processor.exception.ProcessException;
-import org.apache.nifi.processors.standard.db.impl.DerbyDatabaseAdapter;
 import org.apache.nifi.util.MockFlowFile;
 import org.apache.nifi.util.MockProcessSession;
 import org.apache.nifi.util.MockSessionFactory;
@@ -119,7 +118,7 @@ public class TestGenerateTableFetch {
         runner.addControllerService("dbcp", dbcp, dbcpProperties);
         runner.enableControllerService(dbcp);
         runner.setProperty(GenerateTableFetch.DBCP_SERVICE, "dbcp");
-        runner.setProperty(DB_TYPE, new DerbyDatabaseAdapter().getName());
+        runner.setProperty(DB_TYPE, "Derby");
     }
 
     @Test

@@ -19,7 +19,6 @@ package org.apache.nifi.processors.standard.db.impl;
 import org.apache.nifi.processors.standard.db.ColumnDescription;
 import org.apache.nifi.processors.standard.db.NameNormalizer;
 import org.apache.nifi.processors.standard.db.NameNormalizerFactory;
-import org.apache.nifi.processors.standard.db.DatabaseAdapter;
 import org.apache.nifi.processors.standard.db.TableSchema;
 import org.apache.nifi.processors.standard.db.TranslationStrategy;
 import org.junit.jupiter.api.Test;
@@ -35,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestOracleDatabaseAdapter {
 
-    private final DatabaseAdapter db = new OracleDatabaseAdapter();
+    private final OracleDatabaseAdapter db = new OracleDatabaseAdapter();
 
     @Test
     public void testGeneration() {

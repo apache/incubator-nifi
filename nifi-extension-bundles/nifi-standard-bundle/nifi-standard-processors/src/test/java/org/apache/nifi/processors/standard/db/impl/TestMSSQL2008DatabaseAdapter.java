@@ -16,14 +16,13 @@
  */
 package org.apache.nifi.processors.standard.db.impl;
 
-import org.apache.nifi.processors.standard.db.DatabaseAdapter;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestMSSQL2008DatabaseAdapter {
-    private final DatabaseAdapter db = new MSSQL2008DatabaseAdapter();
+    private final MSSQL2008DatabaseAdapter db = new MSSQL2008DatabaseAdapter();
 
     @Test
     public void testGeneration() {

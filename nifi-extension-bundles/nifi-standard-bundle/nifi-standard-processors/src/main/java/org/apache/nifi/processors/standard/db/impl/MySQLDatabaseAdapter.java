@@ -52,12 +52,6 @@ public class MySQLDatabaseAdapter extends GenericDatabaseAdapter {
     }
 
     @Override
-    public String unwrapIdentifier(String identifier) {
-        // Removes double quotes and back-ticks.
-        return identifier == null ? null : identifier.replaceAll("[\"`]", "");
-    }
-
-    @Override
     public boolean supportsUpsert() {
         return true;
     }
@@ -65,17 +59,6 @@ public class MySQLDatabaseAdapter extends GenericDatabaseAdapter {
     @Override
     public boolean supportsInsertIgnore() {
         return true;
-    }
-
-    /**
-     * Tells How many times the column values need to be inserted into the prepared statement. Some DBs (such as MySQL) need the values specified twice in the statement,
-     * some need only to specify them once.
-     *
-     * @return An integer corresponding to the number of times to insert column values into the prepared statement for UPSERT, or -1 if upsert is not supported.
-     */
-    @Override
-    public int getTimesToAddColumnObjectsForUpsert() {
-        return 2;
     }
 
     @Override

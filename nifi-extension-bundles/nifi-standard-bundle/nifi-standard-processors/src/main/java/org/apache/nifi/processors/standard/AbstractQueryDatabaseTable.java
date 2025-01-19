@@ -25,6 +25,14 @@ import org.apache.nifi.components.ValidationContext;
 import org.apache.nifi.components.ValidationResult;
 import org.apache.nifi.components.state.Scope;
 import org.apache.nifi.components.state.StateMap;
+import org.apache.nifi.database.dialect.service.api.ColumnDefinition;
+import org.apache.nifi.database.dialect.service.api.StandardColumnDefinition;
+import org.apache.nifi.database.dialect.service.api.DatabaseDialectService;
+import org.apache.nifi.database.dialect.service.api.QueryStatementRequest;
+import org.apache.nifi.database.dialect.service.api.StandardQueryStatementRequest;
+import org.apache.nifi.database.dialect.service.api.StatementResponse;
+import org.apache.nifi.database.dialect.service.api.StatementType;
+import org.apache.nifi.database.dialect.service.api.TableDefinition;
 import org.apache.nifi.dbcp.DBCPService;
 import org.apache.nifi.expression.AttributeExpression;
 import org.apache.nifi.expression.ExpressionLanguageScope;
@@ -36,7 +44,6 @@ import org.apache.nifi.processor.ProcessSessionFactory;
 import org.apache.nifi.processor.Relationship;
 import org.apache.nifi.processor.exception.ProcessException;
 import org.apache.nifi.processor.util.StandardValidators;
-import org.apache.nifi.processors.standard.db.DatabaseAdapter;
 import org.apache.nifi.processors.standard.sql.SqlWriter;
 import org.apache.nifi.util.StopWatch;
 import org.apache.nifi.util.db.JdbcCommon;
@@ -56,13 +63,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
 
 public abstract class AbstractQueryDatabaseTable extends AbstractDatabaseFetchProcessor {
 
@@ -214,23 +220,6 @@ public abstract class AbstractQueryDatabaseTable extends AbstractDatabaseFetchPr
                     .build());
         }
 
-        final Boolean propertyAutoCommit = validationContext.getProperty(AUTO_COMMIT).evaluateAttributeExpressions().asBoolean();
-        final Integer fetchSize = validationContext.getProperty(FETCH_SIZE).evaluateAttributeExpressions().asInteger();
-        final DatabaseAdapter dbAdapter = dbAdapters.get(validationContext.getProperty(DB_TYPE).getValue());
-        final Boolean adapterAutoCommit = dbAdapter == null
-                ? null
-                : dbAdapter.getAutoCommitForReads(fetchSize).orElse(null);
-        if (adapterAutoCommit != null && propertyAutoCommit != null
-            && propertyAutoCommit != adapterAutoCommit ) {
-            results.add(new ValidationResult.Builder().valid(false)
-                    .subject(AUTO_COMMIT.getDisplayName())
-                    .input(String.valueOf(propertyAutoCommit))
-                    .explanation(String.format("'%s' must be set to '%s' because '%s' %s requires it to be '%s'",
-                            AUTO_COMMIT.getDisplayName(), adapterAutoCommit,
-                            dbAdapter.getName(), DB_TYPE.getDisplayName(), adapterAutoCommit))
-                    .build());
-        }
-
         return results;
     }
 
@@ -258,7 +247,8 @@ public abstract class AbstractQueryDatabaseTable extends AbstractDatabaseFetchPr
         final ComponentLog logger = getLogger();
 
         final DBCPService dbcpService = context.getProperty(DBCP_SERVICE).asControllerService(DBCPService.class);
-        final DatabaseAdapter dbAdapter = dbAdapters.get(context.getProperty(DB_TYPE).getValue());
+        final DatabaseDialectService databaseDialectService = getDatabaseDialectService(context);
+        final String databaseType = context.getProperty(DB_TYPE).getValue();
         final String tableName = context.getProperty(TABLE_NAME).evaluateAttributeExpressions().getValue();
         final String columnNames = context.getProperty(COLUMN_NAMES).evaluateAttributeExpressions().getValue();
         final String sqlQuery = context.getProperty(SQL_QUERY).evaluateAttributeExpressions().getValue();
@@ -296,7 +286,7 @@ public abstract class AbstractQueryDatabaseTable extends AbstractDatabaseFetchPr
         //If an initial max value for column(s) has been specified using properties, and this column is not in the state manager, sync them to the state property map
         for (final Map.Entry<String, String> maxProp : maxValueProperties.entrySet()) {
             String maxPropKey = maxProp.getKey().toLowerCase();
-            String fullyQualifiedMaxPropKey = getStateKey(tableName, maxPropKey, dbAdapter);
+            String fullyQualifiedMaxPropKey = getStateKey(tableName, maxPropKey);
             if (!statePropertyMap.containsKey(fullyQualifiedMaxPropKey)) {
                 String newMaxPropValue;
                 // If we can't find the value at the fully-qualified key name, it is possible (under a previous scheme)
@@ -317,11 +307,15 @@ public abstract class AbstractQueryDatabaseTable extends AbstractDatabaseFetchPr
                 : Arrays.asList(maxValueColumnNames.split("\\s*,\\s*"));
 
         if (maxValueColumnNameList != null && statePropertyMap.isEmpty() && initialLoadStrategy.equals(INITIAL_LOAD_STRATEGY_NEW_ROWS.getValue())) {
-            final String columnsClause = maxValueColumnNameList.stream()
+            final List<ColumnDefinition> maxValueColumnDefinitions = maxValueColumnNameList.stream()
                     .map(columnName -> String.format("MAX(%s) %s", columnName, columnName))
-                    .collect(Collectors.joining(", "));
-
-            final String selectMaxQuery = dbAdapter.getSelectStatement(tableName, columnsClause, null, null, null, null);
+                    .map(StandardColumnDefinition::new)
+                    .map(ColumnDefinition.class::cast)
+                    .toList();
+            final TableDefinition tableDefinition = new TableDefinition(Optional.empty(), Optional.empty(), tableName, maxValueColumnDefinitions);
+            final QueryStatementRequest statementRequest = new StandardQueryStatementRequest(StatementType.SELECT, tableDefinition);
+            final StatementResponse maxValueStatementResponse = databaseDialectService.getStatement(statementRequest);
+            final String selectMaxQuery = maxValueStatementResponse.sql();
 
             try (final Connection con = dbcpService.getConnection(Collections.emptyMap());
                  final Statement st = con.createStatement()) {
@@ -334,7 +328,7 @@ public abstract class AbstractQueryDatabaseTable extends AbstractDatabaseFetchPr
 
                 try (final ResultSet resultSet = st.executeQuery(selectMaxQuery)) {
                     if (resultSet.next()) {
-                        final MaxValueResultSetRowCollector maxValCollector = new MaxValueResultSetRowCollector(tableName, statePropertyMap, dbAdapter);
+                        final MaxValueResultSetRowCollector maxValCollector = new MaxValueResultSetRowCollector(tableName, statePropertyMap);
                         maxValCollector.processRow(resultSet);
                         maxValCollector.applyStateChanges();
                     }
@@ -345,7 +339,14 @@ public abstract class AbstractQueryDatabaseTable extends AbstractDatabaseFetchPr
             }
         }
 
-        final String selectQuery = getQuery(dbAdapter, tableName, sqlQuery, columnNames, maxValueColumnNameList, customWhereClause, statePropertyMap);
+        final List<String> parsedColumnNames;
+        if (columnNames == null) {
+            parsedColumnNames = List.of();
+        } else {
+            parsedColumnNames = Arrays.asList(columnNames.split(", "));
+        }
+
+        final String selectQuery = getQuery(databaseDialectService, databaseType, tableName, sqlQuery, parsedColumnNames, maxValueColumnNameList, customWhereClause, statePropertyMap);
         final StopWatch stopWatch = new StopWatch(true);
         final String fragmentIdentifier = UUID.randomUUID().toString();
 
@@ -381,12 +382,8 @@ public abstract class AbstractQueryDatabaseTable extends AbstractDatabaseFetchPr
             }
 
             final boolean originalAutoCommit = con.getAutoCommit();
-            final Boolean propertyAutoCommitValue = context.getProperty(AUTO_COMMIT).evaluateAttributeExpressions().asBoolean();
+            final Boolean setAutoCommitValue = context.getProperty(AUTO_COMMIT).evaluateAttributeExpressions().asBoolean();
             // If user sets AUTO_COMMIT property to non-null (i.e. true or false), then the property value overrides the dbAdapter's value
-            final Boolean setAutoCommitValue =
-                    dbAdapter == null || propertyAutoCommitValue != null
-                            ? propertyAutoCommitValue
-                            : dbAdapter.getAutoCommitForReads(fetchSize).orElse(null);
             if (setAutoCommitValue != null && originalAutoCommit != setAutoCommitValue) {
                 try {
                     con.setAutoCommit(setAutoCommitValue);
@@ -400,7 +397,7 @@ public abstract class AbstractQueryDatabaseTable extends AbstractDatabaseFetchPr
             try (final ResultSet resultSet = st.executeQuery(selectQuery)) {
                 int fragmentIndex = 0;
                 // Max values will be updated in the state property map by the callback
-                final MaxValueResultSetRowCollector maxValCollector = new MaxValueResultSetRowCollector(tableName, statePropertyMap, dbAdapter);
+                final MaxValueResultSetRowCollector maxValCollector = new MaxValueResultSetRowCollector(tableName, statePropertyMap);
 
                 while (true) {
                     final AtomicLong nrOfRows = new AtomicLong(0L);
@@ -530,31 +527,39 @@ public abstract class AbstractQueryDatabaseTable extends AbstractDatabaseFetchPr
         }
     }
 
-    protected String getQuery(DatabaseAdapter dbAdapter, String tableName, String columnNames, List<String> maxValColumnNames,
-                              String customWhereClause, Map<String, String> stateMap) {
-
-        return getQuery(dbAdapter, tableName, null, columnNames, maxValColumnNames, customWhereClause, stateMap);
-    }
-
-    protected String getQuery(DatabaseAdapter dbAdapter, String tableName, String sqlQuery, String columnNames, List<String> maxValColumnNames,
-                              String customWhereClause, Map<String, String> stateMap) {
+    private String getQuery(
+            final DatabaseDialectService databaseDialectService,
+            final String databaseType,
+            final String tableName,
+            final String sqlQuery,
+            final List<String> columnNames,
+            final List<String> maxValColumnNames,
+            final String customWhereClause,
+            final Map<String, String> stateMap
+    ) {
         if (StringUtils.isEmpty(tableName)) {
             throw new IllegalArgumentException("Table name must be specified");
         }
-        final StringBuilder query;
 
-        if (StringUtils.isEmpty(sqlQuery)) {
-            query = new StringBuilder(dbAdapter.getSelectStatement(tableName, columnNames, null, null, null, null));
-        } else {
-            query = getWrappedQuery(dbAdapter, sqlQuery, tableName);
-        }
+        final Optional<String> derivedTableQuery = Optional.ofNullable(sqlQuery);
+
+        final List<ColumnDefinition> columnDefinitions = columnNames.stream()
+                .map(StandardColumnDefinition::new)
+                .map(ColumnDefinition.class::cast)
+                .toList();
+        final TableDefinition tableDefinition = new TableDefinition(Optional.empty(), Optional.empty(), tableName, columnDefinitions);
+        final QueryStatementRequest statementRequest = new StandardQueryStatementRequest(StatementType.SELECT, tableDefinition, derivedTableQuery, List.of(), Optional.empty());
+        final StatementResponse statementResponse = databaseDialectService.getStatement(statementRequest);
+
+        final StringBuilder query = new StringBuilder();
+        query.append(statementResponse.sql());
 
         List<String> whereClauses = new ArrayList<>();
         // Check state map for last max values
         if (stateMap != null && !stateMap.isEmpty() && maxValColumnNames != null) {
             IntStream.range(0, maxValColumnNames.size()).forEach((index) -> {
                 String colName = maxValColumnNames.get(index);
-                String maxValueKey = getStateKey(tableName, colName, dbAdapter);
+                String maxValueKey = getStateKey(tableName, colName);
                 String maxValue = stateMap.get(maxValueKey);
                 if (StringUtils.isEmpty(maxValue)) {
                     // If we can't find the value at the fully-qualified key name, it is possible (under a previous scheme)
@@ -569,7 +574,7 @@ public abstract class AbstractQueryDatabaseTable extends AbstractDatabaseFetchPr
                         throw new IllegalArgumentException("No column type found for: " + colName);
                     }
                     // Add a condition for the WHERE clause
-                    whereClauses.add(colName + (index == 0 ? " > " : " >= ") + getLiteralByType(type, maxValue, dbAdapter.getName()));
+                    whereClauses.add(colName + (index == 0 ? " > " : " >= ") + getLiteralByType(type, maxValue, databaseType));
                 }
             });
         }
@@ -587,13 +592,11 @@ public abstract class AbstractQueryDatabaseTable extends AbstractDatabaseFetchPr
     }
 
     public class MaxValueResultSetRowCollector implements JdbcCommon.ResultSetRowCallback {
-        DatabaseAdapter dbAdapter;
         final Map<String, String> newColMap;
         final Map<String, String> originalState;
         String tableName;
 
-        public MaxValueResultSetRowCollector(String tableName, Map<String, String> stateMap, DatabaseAdapter dbAdapter) {
-            this.dbAdapter = dbAdapter;
+        public MaxValueResultSetRowCollector(String tableName, Map<String, String> stateMap) {
             this.originalState = stateMap;
 
             this.newColMap = new HashMap<>();
@@ -614,7 +617,7 @@ public abstract class AbstractQueryDatabaseTable extends AbstractDatabaseFetchPr
                 if (nrOfColumns > 0) {
                     for (int i = 1; i <= nrOfColumns; i++) {
                         String colName = meta.getColumnName(i).toLowerCase();
-                        String fullyQualifiedMaxValueKey = getStateKey(tableName, colName, dbAdapter);
+                        String fullyQualifiedMaxValueKey = getStateKey(tableName, colName);
                         Integer type = columnTypeMap.get(fullyQualifiedMaxValueKey);
                         // Skip any columns we're not keeping track of or whose value is null
                         if (type == null || resultSet.getObject(i) == null) {
@@ -627,7 +630,7 @@ public abstract class AbstractQueryDatabaseTable extends AbstractDatabaseFetchPr
                         if (StringUtils.isEmpty(maxValueString)) {
                             maxValueString = newColMap.get(colName);
                         }
-                        String newMaxValueString = getMaxValueFromRow(resultSet, i, type, maxValueString, dbAdapter.getName());
+                        String newMaxValueString = getMaxValueFromRow(resultSet, i, type, maxValueString);
                         if (newMaxValueString != null) {
                             newColMap.put(fullyQualifiedMaxValueKey, newMaxValueString);
                         }

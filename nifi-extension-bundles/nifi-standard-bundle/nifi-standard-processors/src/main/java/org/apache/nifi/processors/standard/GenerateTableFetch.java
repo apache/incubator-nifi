@@ -35,6 +35,18 @@ import org.apache.nifi.components.ValidationContext;
 import org.apache.nifi.components.ValidationResult;
 import org.apache.nifi.components.state.Scope;
 import org.apache.nifi.components.state.StateMap;
+import org.apache.nifi.database.dialect.service.api.ColumnDefinition;
+import org.apache.nifi.database.dialect.service.api.StandardColumnDefinition;
+import org.apache.nifi.database.dialect.service.api.DatabaseDialectService;
+import org.apache.nifi.database.dialect.service.api.PageRequest;
+import org.apache.nifi.database.dialect.service.api.QueryClause;
+import org.apache.nifi.database.dialect.service.api.QueryClauseType;
+import org.apache.nifi.database.dialect.service.api.QueryStatementRequest;
+import org.apache.nifi.database.dialect.service.api.StandardPageRequest;
+import org.apache.nifi.database.dialect.service.api.StandardQueryStatementRequest;
+import org.apache.nifi.database.dialect.service.api.StatementResponse;
+import org.apache.nifi.database.dialect.service.api.StatementType;
+import org.apache.nifi.database.dialect.service.api.TableDefinition;
 import org.apache.nifi.dbcp.DBCPService;
 import org.apache.nifi.expression.AttributeExpression;
 import org.apache.nifi.expression.ExpressionLanguageScope;
@@ -46,7 +58,6 @@ import org.apache.nifi.processor.ProcessSessionFactory;
 import org.apache.nifi.processor.Relationship;
 import org.apache.nifi.processor.exception.ProcessException;
 import org.apache.nifi.processor.util.StandardValidators;
-import org.apache.nifi.processors.standard.db.DatabaseAdapter;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -62,11 +73,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
-
 
 @TriggerSerially
 @InputRequirement(Requirement.INPUT_ALLOWED)
@@ -167,6 +179,7 @@ public class GenerateTableFetch extends AbstractDatabaseFetchProcessor {
     private static final List<PropertyDescriptor> PROPERTIES = List.of(
             DBCP_SERVICE,
             DB_TYPE,
+            DATABASE_DIALECT_SERVICE,
             TABLE_NAME,
             COLUMN_NAMES,
             MAX_VALUE_COLUMN_NAMES,
@@ -266,7 +279,9 @@ public class GenerateTableFetch extends AbstractDatabaseFetchProcessor {
         final ComponentLog logger = getLogger();
 
         final DBCPService dbcpService = context.getProperty(DBCP_SERVICE).asControllerService(DBCPService.class);
-        final DatabaseAdapter dbAdapter = dbAdapters.get(context.getProperty(DB_TYPE).getValue());
+        final DatabaseDialectService databaseDialectService = getDatabaseDialectService(context);
+        final String databaseType = context.getProperty(DB_TYPE).getValue();
+
         final String tableName = context.getProperty(TABLE_NAME).evaluateAttributeExpressions(fileToProcess).getValue();
         final String columnNames = context.getProperty(COLUMN_NAMES).evaluateAttributeExpressions(fileToProcess).getValue();
         final String maxValueColumnNames = context.getProperty(MAX_VALUE_COLUMN_NAMES).evaluateAttributeExpressions(fileToProcess).getValue();
@@ -297,7 +312,7 @@ public class GenerateTableFetch extends AbstractDatabaseFetchProcessor {
             // If an initial max value for column(s) has been specified using properties, and this column is not in the state manager, sync them to the state property map
             for (final Map.Entry<String, String> maxProp : maxValueProperties.entrySet()) {
                 String maxPropKey = maxProp.getKey().toLowerCase();
-                String fullyQualifiedMaxPropKey = getStateKey(tableName, maxPropKey, dbAdapter);
+                String fullyQualifiedMaxPropKey = getStateKey(tableName, maxPropKey);
                 if (!statePropertyMap.containsKey(fullyQualifiedMaxPropKey)) {
                     String newMaxPropValue;
                     // If we can't find the value at the fully-qualified key name, it is possible (under a previous scheme)
@@ -316,7 +331,6 @@ public class GenerateTableFetch extends AbstractDatabaseFetchProcessor {
             // executed SQL query will retrieve the count of all records after the filter(s) have been applied, as well as the new maximum values for the
             // specified columns. This allows the processor to generate the correctly partitioned SQL statements as well as to update the state with the
             // latest observed maximum values.
-            String whereClause = null;
             List<String> maxValueColumnNameList = StringUtils.isEmpty(maxValueColumnNames)
                     ? new ArrayList<>(0)
                     : Arrays.asList(maxValueColumnNames.split("\\s*,\\s*"));
@@ -326,7 +340,6 @@ public class GenerateTableFetch extends AbstractDatabaseFetchProcessor {
             Long maxValueForPartitioning = null;
             Long minValueForPartitioning = null;
 
-            String columnsClause = null;
             List<String> maxValueSelectColumns = new ArrayList<>(numMaxValueColumns + 1);
 
             // replace unnecessary row count with -1 stub value when column values for paging is used, or when partition size is zero.
@@ -341,16 +354,16 @@ public class GenerateTableFetch extends AbstractDatabaseFetchProcessor {
                 String colName = maxValueColumnNameList.get(index);
 
                 maxValueSelectColumns.add("MAX(" + colName + ") " + colName);
-                String maxValue = getColumnStateMaxValue(tableName, statePropertyMap, colName, dbAdapter);
+                String maxValue = getColumnStateMaxValue(tableName, statePropertyMap, colName);
                 if (!StringUtils.isEmpty(maxValue)) {
-                    if (columnTypeMap.isEmpty() || getColumnType(tableName, colName, dbAdapter) == null) {
+                    if (columnTypeMap.isEmpty() || getColumnType(tableName, colName) == null) {
                         // This means column type cache is clean after instance reboot. We should re-cache column type
                         super.setup(context, false, finalFileToProcess);
                     }
-                    Integer type = getColumnType(tableName, colName, dbAdapter);
+                    Integer type = getColumnType(tableName, colName);
 
                     // Add a condition for the WHERE clause
-                    maxValueClauses.add(colName + (index == 0 ? " > " : " >= ") + getLiteralByType(type, maxValue, dbAdapter.getName()));
+                    maxValueClauses.add(colName + (index == 0 ? " > " : " >= ") + getLiteralByType(type, maxValue, databaseType));
                 }
 
             });
@@ -369,17 +382,18 @@ public class GenerateTableFetch extends AbstractDatabaseFetchProcessor {
                 maxValueClauses.add("(" + customWhereClause + ")");
             }
 
-            whereClause = StringUtils.join(maxValueClauses, " AND ");
-            columnsClause = StringUtils.join(maxValueSelectColumns, ", ");
+            final String maxWhereClause = StringUtils.join(maxValueClauses, " AND ");
+            final QueryStatementRequest queryStatementRequest = getMaxColumnStatementRequest(tableName, maxValueSelectColumns, maxWhereClause);
 
             // Build a SELECT query with maximum-value columns (if present)
-            final String selectQuery = dbAdapter.getSelectStatement(tableName, columnsClause, whereClause, null, null, null);
-            long rowCount = 0;
+            final StatementResponse statementResponse = databaseDialectService.getStatement(queryStatementRequest);
+            final String selectQuery = statementResponse.sql();
+            long rowCount;
 
             try (final Connection con = dbcpService.getConnection(finalFileToProcess == null ? Collections.emptyMap() : finalFileToProcess.getAttributes());
                  final Statement st = con.createStatement()) {
 
-                final Integer queryTimeout = context.getProperty(QUERY_TIMEOUT).evaluateAttributeExpressions(fileToProcess).asTimePeriod(TimeUnit.SECONDS).intValue();
+                final int queryTimeout = context.getProperty(QUERY_TIMEOUT).evaluateAttributeExpressions(fileToProcess).asTimePeriod(TimeUnit.SECONDS).intValue();
                 st.setQueryTimeout(queryTimeout); // timeout in seconds
 
                 logger.debug("Executing {}", selectQuery);
@@ -399,7 +413,7 @@ public class GenerateTableFetch extends AbstractDatabaseFetchProcessor {
                         // Since this column has been aliased lets check the label first,
                         // if there is no label we'll use the column name.
                         String resultColumnName = (StringUtils.isNotEmpty(rsmd.getColumnLabel(i)) ? rsmd.getColumnLabel(i) : rsmd.getColumnName(i)).toLowerCase();
-                        String fullyQualifiedStateKey = getStateKey(tableName, resultColumnName, dbAdapter);
+                        String fullyQualifiedStateKey = getStateKey(tableName, resultColumnName);
                         String resultColumnCurrentMax = statePropertyMap.get(fullyQualifiedStateKey);
                         if (StringUtils.isEmpty(resultColumnCurrentMax) && !isDynamicTableName) {
                             // If we can't find the value at the fully-qualified key name and the table name is static, it is possible (under a previous scheme)
@@ -414,7 +428,7 @@ public class GenerateTableFetch extends AbstractDatabaseFetchProcessor {
                             columnTypeMap.put(fullyQualifiedStateKey, type);
                         }
                         try {
-                            String newMaxValue = getMaxValueFromRow(resultSet, i, type, resultColumnCurrentMax, dbAdapter.getName());
+                            String newMaxValue = getMaxValueFromRow(resultSet, i, type, resultColumnCurrentMax);
                             if (newMaxValue != null) {
                                 statePropertyMap.put(fullyQualifiedStateKey, newMaxValue);
                             }
@@ -440,16 +454,16 @@ public class GenerateTableFetch extends AbstractDatabaseFetchProcessor {
                 IntStream.range(0, numMaxValueColumns).forEach((index) -> {
                     String colName = maxValueColumnNameList.get(index);
 
-                    String maxValue = getColumnStateMaxValue(tableName, statePropertyMap, colName, dbAdapter);
+                    String maxValue = getColumnStateMaxValue(tableName, statePropertyMap, colName);
                     if (!StringUtils.isEmpty(maxValue)) {
-                        if (columnTypeMap.isEmpty() || getColumnType(tableName, colName, dbAdapter) == null) {
+                        if (columnTypeMap.isEmpty() || getColumnType(tableName, colName) == null) {
                             // This means column type cache is clean after instance reboot. We should re-cache column type
                             super.setup(context, false, finalFileToProcess);
                         }
-                        Integer type = getColumnType(tableName, colName, dbAdapter);
+                        Integer type = getColumnType(tableName, colName);
 
                         // Add a condition for the WHERE clause
-                        maxValueClauses.add(colName + " <= " + getLiteralByType(type, maxValue, dbAdapter.getName()));
+                        maxValueClauses.add(colName + " <= " + getLiteralByType(type, maxValue, databaseType));
                     }
                 });
 
@@ -484,8 +498,8 @@ public class GenerateTableFetch extends AbstractDatabaseFetchProcessor {
                     FlowFile emptyFlowFile = (fileToProcess == null) ? session.create() : session.create(fileToProcess);
                     Map<String, String> attributesToAdd = new HashMap<>();
 
-                    whereClause = maxValueClauses.isEmpty() ? "1=1" : StringUtils.join(maxValueClauses, " AND ");
-                    attributesToAdd.put("generatetablefetch.whereClause", whereClause);
+                    final String fetchWhereClause = maxValueClauses.isEmpty() ? "1=1" : StringUtils.join(maxValueClauses, " AND ");
+                    attributesToAdd.put("generatetablefetch.whereClause", fetchWhereClause);
 
                     attributesToAdd.put("generatetablefetch.limit", null);
                     if (partitionSize != 0) {
@@ -507,12 +521,22 @@ public class GenerateTableFetch extends AbstractDatabaseFetchProcessor {
                         }
 
                         //Update WHERE list to include new right hand boundaries
-                        whereClause = maxValueClauses.isEmpty() ? "1=1" : StringUtils.join(maxValueClauses, " AND ");
+                        final String whereClause = maxValueClauses.isEmpty() ? "1=1" : StringUtils.join(maxValueClauses, " AND ");
                         Long offset = partitionSize == 0 ? null : i * partitionSize + (useColumnValsForPaging ? minValueForPartitioning : 0);
                         // Don't use an ORDER BY clause if there's only one partition
                         final String orderByClause = partitionSize == 0 ? null : (maxColumnNames.isEmpty() ? customOrderByColumn : maxColumnNames);
 
-                        final String query = dbAdapter.getSelectStatement(tableName, columnNames, whereClause, orderByClause, limit, offset, columnForPartitioning);
+                        final List<String> namedColumns;
+                        if (columnNames == null) {
+                            namedColumns = List.of();
+                        } else {
+                            namedColumns = Arrays.asList(columnNames.split(", "));
+                        }
+
+                        final QueryStatementRequest selectStatementRequest = getSelectStatementRequest(tableName, namedColumns, whereClause, orderByClause, offset, limit, columnForPartitioning);
+                        final StatementResponse selectStatementResponse = databaseDialectService.getStatement(selectStatementRequest);
+                        final String query = selectStatementResponse.sql();
+
                         FlowFile sqlFlowFile = (fileToProcess == null) ? session.create() : session.create(fileToProcess);
                         sqlFlowFile = session.write(sqlFlowFile, out -> out.write(query.getBytes()));
                         Map<String, String> attributesToAdd = new HashMap<>();
@@ -567,23 +591,78 @@ public class GenerateTableFetch extends AbstractDatabaseFetchProcessor {
         }
     }
 
-    private String getColumnStateMaxValue(String tableName, Map<String, String> statePropertyMap, String colName, DatabaseAdapter adapter) {
-        final String fullyQualifiedStateKey = getStateKey(tableName, colName, adapter);
+    private QueryStatementRequest getMaxColumnStatementRequest(final String tableName, final List<String> maxValueSelectColumns, final String whereClause) {
+        final List<ColumnDefinition> maxValueColumns = maxValueSelectColumns.stream()
+                .map(StandardColumnDefinition::new)
+                .map(ColumnDefinition.class::cast)
+                .toList();
+        final TableDefinition tableDefinition = new TableDefinition(Optional.empty(), Optional.empty(), tableName, maxValueColumns);
+        return new StandardQueryStatementRequest(
+                StatementType.SELECT,
+                tableDefinition,
+                Optional.empty(),
+                List.of(new QueryClause(QueryClauseType.WHERE, whereClause)),
+                Optional.empty()
+        );
+    }
+
+    private QueryStatementRequest getSelectStatementRequest(
+            final String tableName,
+            final List<String> namedColumns,
+            final String whereClause,
+            final String orderByClause,
+            final Long offset,
+            final Long limit,
+            final String indexColumnName
+    ) {
+        final List<ColumnDefinition> maxValueColumns = (namedColumns).stream()
+                .map(StandardColumnDefinition::new)
+                .map(ColumnDefinition.class::cast)
+                .toList();
+        final TableDefinition tableDefinition = new TableDefinition(Optional.empty(), Optional.empty(), tableName, maxValueColumns);
+
+        final List<QueryClause> queryClauses = new ArrayList<>();
+        if (orderByClause != null) {
+            final QueryClause queryClause = new QueryClause(QueryClauseType.ORDER_BY, orderByClause);
+            queryClauses.add(queryClause);
+        }
+        final QueryClause whereQueryClause = new QueryClause(QueryClauseType.WHERE, whereClause);
+        queryClauses.add(whereQueryClause);
+
+        final PageRequest pageRequest;
+        if (offset == null) {
+            pageRequest = null;
+        } else {
+            final OptionalLong pageLimit = limit == null ? OptionalLong.empty() : OptionalLong.of(limit);
+            pageRequest = new StandardPageRequest(offset, pageLimit, Optional.ofNullable(indexColumnName));
+        }
+
+        return new StandardQueryStatementRequest(
+                StatementType.SELECT,
+                tableDefinition,
+                Optional.empty(),
+                queryClauses,
+                Optional.ofNullable(pageRequest)
+        );
+    }
+
+    private String getColumnStateMaxValue(String tableName, Map<String, String> statePropertyMap, String colName) {
+        final String fullyQualifiedStateKey = getStateKey(tableName, colName);
         String maxValue = statePropertyMap.get(fullyQualifiedStateKey);
         if (StringUtils.isEmpty(maxValue) && !isDynamicTableName) {
             // If the table name is static and the fully-qualified key was not found, try just the column name
-            maxValue = statePropertyMap.get(getStateKey(null, colName, adapter));
+            maxValue = statePropertyMap.get(getStateKey(null, colName));
         }
 
         return maxValue;
     }
 
-    private Integer getColumnType(String tableName, String colName, DatabaseAdapter adapter) {
-        final String fullyQualifiedStateKey = getStateKey(tableName, colName, adapter);
+    private Integer getColumnType(String tableName, String colName) {
+        final String fullyQualifiedStateKey = getStateKey(tableName, colName);
         Integer type = columnTypeMap.get(fullyQualifiedStateKey);
         if (type == null && !isDynamicTableName) {
             // If the table name is static and the fully-qualified key was not found, try just the column name
-            type = columnTypeMap.get(getStateKey(null, colName, adapter));
+            type = columnTypeMap.get(getStateKey(null, colName));
         }
 
         return type;

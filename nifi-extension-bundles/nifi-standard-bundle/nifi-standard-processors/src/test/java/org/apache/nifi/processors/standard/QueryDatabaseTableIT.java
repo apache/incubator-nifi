@@ -18,16 +18,10 @@ package org.apache.nifi.processors.standard;
 
 import org.apache.nifi.dbcp.DBCPConnectionPool;
 import org.apache.nifi.dbcp.utils.DBCPProperties;
-import org.apache.nifi.processors.standard.db.DatabaseAdapter;
-import org.apache.nifi.processors.standard.db.impl.PostgreSQLDatabaseAdapter;
 import org.apache.nifi.reporting.InitializationException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class QueryDatabaseTableIT extends QueryDatabaseTableTest {
     private static PostgreSQLContainer<?> postgres;
@@ -48,8 +42,8 @@ public class QueryDatabaseTableIT extends QueryDatabaseTableTest {
     }
 
     @Override
-    public DatabaseAdapter createDatabaseAdapter() {
-        return new PostgreSQLDatabaseAdapter();
+    public String getDatabaseType() {
+        return "PostgreSQL";
     }
 
     @Override
@@ -61,14 +55,5 @@ public class QueryDatabaseTableIT extends QueryDatabaseTableTest {
         runner.setProperty(connectionPool, DBCPProperties.DB_PASSWORD, postgres.getPassword());
         runner.setProperty(connectionPool, DBCPProperties.DB_DRIVERNAME, postgres.getDriverClassName());
         runner.enableControllerService(connectionPool);
-    }
-
-    @Test
-    public void testAddedRowsAutoCommitTrue() {
-        // this test in the base class is not valid for PostgreSQL so check the validation error message.
-        final AssertionError assertionError = assertThrows(AssertionError.class, super::testAddedRowsAutoCommitTrue);
-        assertEquals(assertionError.getMessage(), "Processor has 1 validation failures:\n" +
-                "'Set Auto Commit' validated against 'true' is invalid because 'Set Auto Commit' " +
-                "must be set to 'false' because 'PostgreSQL' Database Type requires it to be 'false'\n");
     }
 }

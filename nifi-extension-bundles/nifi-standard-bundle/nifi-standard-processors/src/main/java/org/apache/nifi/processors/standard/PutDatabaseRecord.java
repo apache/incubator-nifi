@@ -49,7 +49,6 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -71,6 +70,15 @@ import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.PropertyDescriptor.Builder;
 import org.apache.nifi.components.ValidationContext;
 import org.apache.nifi.components.ValidationResult;
+import org.apache.nifi.context.PropertyContext;
+import org.apache.nifi.database.dialect.service.api.ColumnDefinition;
+import org.apache.nifi.database.dialect.service.api.StandardColumnDefinition;
+import org.apache.nifi.database.dialect.service.api.DatabaseDialectService;
+import org.apache.nifi.database.dialect.service.api.StandardStatementRequest;
+import org.apache.nifi.database.dialect.service.api.StatementRequest;
+import org.apache.nifi.database.dialect.service.api.StatementResponse;
+import org.apache.nifi.database.dialect.service.api.StatementType;
+import org.apache.nifi.database.dialect.service.api.TableDefinition;
 import org.apache.nifi.dbcp.DBCPService;
 import org.apache.nifi.flowfile.FlowFile;
 import org.apache.nifi.logging.ComponentLog;
@@ -82,11 +90,13 @@ import org.apache.nifi.processor.exception.ProcessException;
 import org.apache.nifi.processor.util.StandardValidators;
 import org.apache.nifi.processor.util.pattern.RollbackOnFailure;
 import org.apache.nifi.processors.standard.db.ColumnDescription;
-import org.apache.nifi.processors.standard.db.DatabaseAdapter;
+import org.apache.nifi.processors.standard.db.DatabaseAdapterDescriptor;
 import org.apache.nifi.processors.standard.db.NameNormalizer;
 import org.apache.nifi.processors.standard.db.NameNormalizerFactory;
 import org.apache.nifi.processors.standard.db.TableSchema;
 import org.apache.nifi.processors.standard.db.TranslationStrategy;
+import org.apache.nifi.processors.standard.db.impl.DatabaseAdapterDatabaseDialectService;
+import org.apache.nifi.processors.standard.db.impl.DatabaseDialectServiceDatabaseAdapter;
 import org.apache.nifi.record.path.FieldValue;
 import org.apache.nifi.record.path.RecordPath;
 import org.apache.nifi.record.path.RecordPathResult;
@@ -425,63 +435,42 @@ public class PutDatabaseRecord extends AbstractProcessor {
             .required(false)
             .build();
 
-    static final PropertyDescriptor DB_TYPE;
+    static final PropertyDescriptor DB_TYPE = DatabaseAdapterDescriptor.getDatabaseTypeDescriptor("db-type");
+    static final PropertyDescriptor DATABASE_DIALECT_SERVICE = DatabaseAdapterDescriptor.getDatabaseDialectServiceDescriptor(DB_TYPE);
 
-    protected static final Map<String, DatabaseAdapter> dbAdapters;
-    protected static List<PropertyDescriptor> properties;
+    protected static final List<PropertyDescriptor> properties = List.of(
+            RECORD_READER_FACTORY,
+            DB_TYPE,
+            DATABASE_DIALECT_SERVICE,
+            STATEMENT_TYPE,
+            STATEMENT_TYPE_RECORD_PATH,
+            DATA_RECORD_PATH,
+            DBCP_SERVICE,
+            CATALOG_NAME,
+            SCHEMA_NAME,
+            TABLE_NAME,
+            BINARY_STRING_FORMAT,
+            TRANSLATE_FIELD_NAMES,
+            TRANSLATION_STRATEGY,
+            TRANSLATION_PATTERN,
+            UNMATCHED_FIELD_BEHAVIOR,
+            UNMATCHED_COLUMN_BEHAVIOR,
+            UPDATE_KEYS,
+            DELETE_KEYS,
+            FIELD_CONTAINING_SQL,
+            ALLOW_MULTIPLE_STATEMENTS,
+            QUOTE_IDENTIFIERS,
+            QUOTE_TABLE_IDENTIFIER,
+            QUERY_TIMEOUT,
+            RollbackOnFailure.ROLLBACK_ON_FAILURE,
+            TABLE_SCHEMA_CACHE_SIZE,
+            MAX_BATCH_SIZE,
+            AUTO_COMMIT
+    );
+
     private Cache<SchemaKey, TableSchema> schemaCache;
 
-    static {
-        dbAdapters = new HashMap<>();
-        ArrayList<AllowableValue> dbAdapterValues = new ArrayList<>();
-
-        ServiceLoader<DatabaseAdapter> dbAdapterLoader = ServiceLoader.load(DatabaseAdapter.class);
-        dbAdapterLoader.forEach(databaseAdapter -> {
-            dbAdapters.put(databaseAdapter.getName(), databaseAdapter);
-            dbAdapterValues.add(new AllowableValue(databaseAdapter.getName(), databaseAdapter.getName(), databaseAdapter.getDescription()));
-        });
-
-        DB_TYPE = new Builder()
-                .name("db-type")
-                .displayName("Database Type")
-                .description("The type/flavor of database, used for generating database-specific code. In many cases the Generic type "
-                        + "should suffice, but some databases (such as Oracle) require custom SQL clauses. ")
-                .allowableValues(dbAdapterValues.toArray(new AllowableValue[0]))
-                .defaultValue("Generic")
-                .required(false)
-                .build();
-
-        properties = List.of(
-                RECORD_READER_FACTORY,
-                DB_TYPE,
-                STATEMENT_TYPE,
-                STATEMENT_TYPE_RECORD_PATH,
-                DATA_RECORD_PATH,
-                DBCP_SERVICE,
-                CATALOG_NAME,
-                SCHEMA_NAME,
-                TABLE_NAME,
-                BINARY_STRING_FORMAT,
-                TRANSLATE_FIELD_NAMES,
-                TRANSLATION_STRATEGY,
-                TRANSLATION_PATTERN,
-                UNMATCHED_FIELD_BEHAVIOR,
-                UNMATCHED_COLUMN_BEHAVIOR,
-                UPDATE_KEYS,
-                DELETE_KEYS,
-                FIELD_CONTAINING_SQL,
-                ALLOW_MULTIPLE_STATEMENTS,
-                QUOTE_IDENTIFIERS,
-                QUOTE_TABLE_IDENTIFIER,
-                QUERY_TIMEOUT,
-                RollbackOnFailure.ROLLBACK_ON_FAILURE,
-                TABLE_SCHEMA_CACHE_SIZE,
-                MAX_BATCH_SIZE,
-                AUTO_COMMIT
-        );
-    }
-
-    private DatabaseAdapter databaseAdapter;
+    private volatile DatabaseDialectService databaseDialectService;
     private volatile Function<Record, String> recordPathOperationType;
     private volatile RecordPath dataRecordPath;
 
@@ -497,18 +486,30 @@ public class PutDatabaseRecord extends AbstractProcessor {
 
     @Override
     protected Collection<ValidationResult> customValidate(ValidationContext validationContext) {
-        Collection<ValidationResult> validationResults = new ArrayList<>(super.customValidate(validationContext));
+        final Collection<ValidationResult> validationResults = new ArrayList<>(super.customValidate(validationContext));
 
-        DatabaseAdapter databaseAdapter = dbAdapters.get(validationContext.getProperty(DB_TYPE).getValue());
-        String statementType = validationContext.getProperty(STATEMENT_TYPE).getValue();
-        if ((UPSERT_TYPE.equals(statementType) && !databaseAdapter.supportsUpsert())
-                || (INSERT_IGNORE_TYPE.equals(statementType) && !databaseAdapter.supportsInsertIgnore())) {
-            validationResults.add(new ValidationResult.Builder()
-                    .subject(STATEMENT_TYPE.getDisplayName())
-                    .valid(false)
-                    .explanation(databaseAdapter.getName() + " does not support " + statementType)
-                    .build()
-            );
+        final DatabaseDialectService dialectService = getDatabaseDialectService(validationContext);
+        final Set<StatementType> supportedStatementTypes = dialectService.getSupportedStatementTypes();
+        final String configuredStatementType = validationContext.getProperty(STATEMENT_TYPE).getValue();
+        if (INSERT_IGNORE_TYPE.equals(configuredStatementType)) {
+            if (!supportedStatementTypes.contains(StatementType.INSERT_IGNORE)) {
+                validationResults.add(new ValidationResult.Builder()
+                        .subject(STATEMENT_TYPE.getDisplayName())
+                        .valid(false)
+                        .explanation("INSERT IGNORE not supported with Database Dialect")
+                        .build()
+                );
+            }
+        }
+        if (UPSERT_TYPE.equals(configuredStatementType)) {
+            if (!supportedStatementTypes.contains(StatementType.UPSERT)) {
+                validationResults.add(new ValidationResult.Builder()
+                        .subject(STATEMENT_TYPE.getDisplayName())
+                        .valid(false)
+                        .explanation("UPSERT not supported with Database Dialect")
+                        .build()
+                );
+            }
         }
 
         final Boolean autoCommit = validationContext.getProperty(AUTO_COMMIT).asBoolean();
@@ -549,7 +550,7 @@ public class PutDatabaseRecord extends AbstractProcessor {
 
     @OnScheduled
     public void onScheduled(final ProcessContext context) {
-        databaseAdapter = dbAdapters.get(context.getProperty(DB_TYPE).getValue());
+        databaseDialectService = getDatabaseDialectService(context);
 
         final int tableSchemaCacheSize = context.getProperty(TABLE_SCHEMA_CACHE_SIZE).asInteger();
         schemaCache = Caffeine.newBuilder()
@@ -606,6 +607,19 @@ public class PutDatabaseRecord extends AbstractProcessor {
         } finally {
             closeConnection(connection, originalAutoCommit);
         }
+    }
+
+    private DatabaseDialectService getDatabaseDialectService(final PropertyContext context) {
+        final String databaseType = context.getProperty(DB_TYPE).getValue();
+
+        final DatabaseDialectService service;
+        if (DatabaseDialectServiceDatabaseAdapter.NAME.equals(databaseType)) {
+            service = context.getProperty(DATABASE_DIALECT_SERVICE).asControllerService(DatabaseDialectService.class);
+        } else {
+            service = new DatabaseAdapterDatabaseDialectService(databaseType);
+        }
+
+        return service;
     }
 
     private void routeOnException(final ProcessContext context, final ProcessSession session,
@@ -843,9 +857,9 @@ public class PutDatabaseRecord extends AbstractProcessor {
                         } else if (DELETE_TYPE.equalsIgnoreCase(statementType)) {
                             sqlHolder = generateDelete(recordSchema, fqTableName, deleteKeys, tableSchema, settings, normalizer);
                         } else if (UPSERT_TYPE.equalsIgnoreCase(statementType)) {
-                            sqlHolder = generateUpsert(recordSchema, fqTableName, updateKeys, tableSchema, settings, normalizer);
+                            sqlHolder = getSqlStatement(StatementType.UPSERT, recordSchema, fqTableName, updateKeys, tableSchema, settings, normalizer);
                         } else if (INSERT_IGNORE_TYPE.equalsIgnoreCase(statementType)) {
-                            sqlHolder = generateInsertIgnore(recordSchema, fqTableName, updateKeys, tableSchema, settings, normalizer);
+                            sqlHolder = getSqlStatement(StatementType.INSERT_IGNORE, recordSchema, fqTableName, updateKeys, tableSchema, settings, normalizer);
                         } else {
                             throw new IllegalArgumentException(format("Statement Type %s is not valid, FlowFile %s", statementType, flowFile));
                         }
@@ -864,7 +878,8 @@ public class PutDatabaseRecord extends AbstractProcessor {
                             }
                         }
 
-                        preparedSqlAndColumns = new PreparedSqlAndColumns(sqlHolder, preparedStatement);
+                        final int parameterCount = getParameterCount(sqlHolder.sql);
+                        preparedSqlAndColumns = new PreparedSqlAndColumns(sqlHolder, preparedStatement, parameterCount);
                         preparedSql.put(statementType, preparedSqlAndColumns);
                     }
 
@@ -970,7 +985,8 @@ public class PutDatabaseRecord extends AbstractProcessor {
                                 setParameter(ps, ++deleteIndex, currentValue, fieldSqlType, sqlType);
                             }
                         } else if (UPSERT_TYPE.equalsIgnoreCase(statementType)) {
-                            final int timesToAddObjects = databaseAdapter.getTimesToAddColumnObjectsForUpsert();
+                            // Calculate the number of times to set the parameter based on fields divided by parameters
+                            final int timesToAddObjects = fieldIndexes.size() / preparedSqlAndColumns.parameterCount;
                             for (int j = 0; j < timesToAddObjects; j++) {
                                 setParameter(ps, i + (fieldIndexes.size() * j) + 1, currentValue, fieldSqlType, sqlType);
                             }
@@ -1285,113 +1301,78 @@ public class PutDatabaseRecord extends AbstractProcessor {
         return new SqlAndIncludedColumns(sqlBuilder.toString(), includedColumns);
     }
 
-    SqlAndIncludedColumns generateUpsert(final RecordSchema recordSchema, final String tableName, final String updateKeys,
-                                         final TableSchema tableSchema, final DMLSettings settings, NameNormalizer normalizer)
-            throws IllegalArgumentException, SQLException, MalformedRecordException {
-
+    private SqlAndIncludedColumns getSqlStatement(
+            final StatementType statementType,
+            final RecordSchema recordSchema,
+            final String qualifiedTableName,
+            final String updateKeys,
+            final TableSchema tableSchema,
+            final DMLSettings settings,
+            final NameNormalizer normalizer
+    ) throws MalformedRecordException, SQLDataException, SQLIntegrityConstraintViolationException {
         checkValuesForRequiredColumns(recordSchema, tableSchema, settings, normalizer);
 
-        Set<String> keyColumnNames = getUpdateKeyColumnNames(tableName, updateKeys, tableSchema);
+        final Set<String> keyColumnNames = getUpdateKeyColumnNames(qualifiedTableName, updateKeys, tableSchema);
         normalizeKeyColumnNamesAndCheckForValues(recordSchema, updateKeys, settings, keyColumnNames, normalizer);
 
-        List<String> usedColumnNames = new ArrayList<>();
-        List<Integer> usedColumnIndices = new ArrayList<>();
+        final List<ColumnDefinition> columnDefinitions = new ArrayList<>();
+        final List<Integer> usedColumnIndices = new ArrayList<>();
+        final List<String> fieldNames = recordSchema.getFieldNames();
+        final int fieldCount = fieldNames.size();
+        for (int i = 0; i < fieldCount; i++) {
+            final RecordField field = recordSchema.getField(i);
+            final String fieldName = field.getFieldName();
 
-        List<String> fieldNames = recordSchema.getFieldNames();
-        if (fieldNames != null) {
-            int fieldCount = fieldNames.size();
-
-            for (int i = 0; i < fieldCount; i++) {
-                RecordField field = recordSchema.getField(i);
-                String fieldName = field.getFieldName();
-
-                final ColumnDescription desc = tableSchema.getColumns().get(TableSchema.normalizedName(fieldName, settings.translateFieldNames, normalizer));
-                if (desc == null && !settings.ignoreUnmappedFields) {
-                    throw new SQLDataException("Cannot map field '" + fieldName + "' to any column in the database\n"
-                            + (settings.translateFieldNames ? "Normalized " : "") + "Columns: " + String.join(",", tableSchema.getColumns().keySet()));
-                }
-
-                if (desc != null) {
-                    if (settings.escapeColumnNames) {
-                        usedColumnNames.add(tableSchema.getQuotedIdentifierString() + desc.getColumnName() + tableSchema.getQuotedIdentifierString());
-                    } else {
-                        usedColumnNames.add(desc.getColumnName());
-                    }
-                    usedColumnIndices.add(i);
+            final String columnNameNormalized = TableSchema.normalizedName(fieldName, settings.translateFieldNames, normalizer);
+            final ColumnDescription columnDescription = tableSchema.getColumns().get(columnNameNormalized);
+            if (columnDescription == null) {
+                if (settings.ignoreUnmappedFields) {
+                    continue;
                 } else {
-                    // User is ignoring unmapped fields, but log at debug level just in case
-                    getLogger().debug("Did not map field '{}' to any column in the database\n{}Columns: {}",
-                            fieldName, (settings.translateFieldNames ? "Normalized " : ""), String.join(",", tableSchema.getColumns().keySet()));
+                    final String tableColumnNames = String.join(",", tableSchema.getColumns().keySet());
+                    final String message = "Record Field [%s] not mapped to Table Columns [%s]".formatted(fieldName, tableColumnNames);
+                    throw new SQLDataException(message);
                 }
             }
+
+            final String columnName;
+            if (settings.escapeColumnNames) {
+                final String quotedIdentifier = tableSchema.getQuotedIdentifierString();
+                columnName = quotedIdentifier + columnDescription.getColumnName() + quotedIdentifier;
+            } else {
+                columnName = columnDescription.getColumnName();
+            }
+
+            final ColumnDefinition columnDefinition = getColumnDefinition(columnDescription, keyColumnNames, columnName);
+            columnDefinitions.add(columnDefinition);
+
+            usedColumnIndices.add(i);
         }
 
-        final Set<String> literalKeyColumnNames = new HashSet<>(keyColumnNames.size());
-        for (String literalKeyColumnName : keyColumnNames) {
-            if (settings.escapeColumnNames) {
-                literalKeyColumnNames.add(tableSchema.getQuotedIdentifierString() + literalKeyColumnName + tableSchema.getQuotedIdentifierString());
-            } else {
-                literalKeyColumnNames.add(literalKeyColumnName);
-            }
-        }
-        String sql = databaseAdapter.getUpsertStatement(tableName, usedColumnNames, literalKeyColumnNames);
+        final TableDefinition tableDefinition = new TableDefinition(
+                Optional.empty(),
+                Optional.empty(),
+                qualifiedTableName,
+                columnDefinitions
+        );
+        final StatementRequest statementRequest = new StandardStatementRequest(statementType, tableDefinition);
+        final StatementResponse statementResponse = databaseDialectService.getStatement(statementRequest);
+        final String sql = statementResponse.sql();
 
         return new SqlAndIncludedColumns(sql, usedColumnIndices);
     }
 
-    SqlAndIncludedColumns generateInsertIgnore(final RecordSchema recordSchema, final String tableName, final String updateKeys,
-                                               final TableSchema tableSchema, final DMLSettings settings, NameNormalizer normalizer)
-            throws IllegalArgumentException, SQLException, MalformedRecordException {
-
-        checkValuesForRequiredColumns(recordSchema, tableSchema, settings, normalizer);
-
-        Set<String> keyColumnNames = getUpdateKeyColumnNames(tableName, updateKeys, tableSchema);
-        normalizeKeyColumnNamesAndCheckForValues(recordSchema, updateKeys, settings, keyColumnNames, normalizer);
-
-        List<String> usedColumnNames = new ArrayList<>();
-        List<Integer> usedColumnIndices = new ArrayList<>();
-
-        List<String> fieldNames = recordSchema.getFieldNames();
-        if (fieldNames != null) {
-            int fieldCount = fieldNames.size();
-
-            for (int i = 0; i < fieldCount; i++) {
-                RecordField field = recordSchema.getField(i);
-                String fieldName = field.getFieldName();
-
-                final ColumnDescription desc = tableSchema.getColumns().get(TableSchema.normalizedName(fieldName, settings.translateFieldNames, normalizer));
-                if (desc == null && !settings.ignoreUnmappedFields) {
-                    throw new SQLDataException("Cannot map field '" + fieldName + "' to any column in the database\n"
-                            + (settings.translateFieldNames ? "Normalized " : "") + "Columns: " + String.join(",", tableSchema.getColumns().keySet()));
-                }
-
-                if (desc != null) {
-                    if (settings.escapeColumnNames) {
-                        usedColumnNames.add(tableSchema.getQuotedIdentifierString() + desc.getColumnName() + tableSchema.getQuotedIdentifierString());
-                    } else {
-                        usedColumnNames.add(desc.getColumnName());
-                    }
-                    usedColumnIndices.add(i);
-                } else {
-                    // User is ignoring unmapped fields, but log at debug level just in case
-                    getLogger().debug("Did not map field '{}' to any column in the database\n{}Columns: {}",
-                            fieldName, (settings.translateFieldNames ? "Normalized " : ""), String.join(",", tableSchema.getColumns().keySet()));
-                }
-            }
-        }
-
-        final Set<String> literalKeyColumnNames = new HashSet<>(keyColumnNames.size());
-        for (String literalKeyColumnName : keyColumnNames) {
-            if (settings.escapeColumnNames) {
-                literalKeyColumnNames.add(tableSchema.getQuotedIdentifierString() + literalKeyColumnName + tableSchema.getQuotedIdentifierString());
-            } else {
-                literalKeyColumnNames.add(literalKeyColumnName);
-            }
-        }
-
-        String sql = databaseAdapter.getInsertIgnoreStatement(tableName, usedColumnNames, literalKeyColumnNames);
-
-        return new SqlAndIncludedColumns(sql, usedColumnIndices);
+    private ColumnDefinition getColumnDefinition(final ColumnDescription columnDescription, final Set<String> keyColumnNames, final String columnName) {
+        final int dataType = columnDescription.getDataType();
+        final boolean primaryKey = keyColumnNames.contains(columnDescription.getColumnName());
+        final StandardColumnDefinition.Nullable nullable = columnDescription.isNullable() ? StandardColumnDefinition.Nullable.YES : StandardColumnDefinition.Nullable.NO;
+        return new StandardColumnDefinition(
+                columnName,
+                dataType,
+                nullable,
+                Optional.empty(),
+                primaryKey
+        );
     }
 
     SqlAndIncludedColumns generateUpdate(final RecordSchema recordSchema, final String tableName, final String updateKeys,
@@ -1657,6 +1638,16 @@ public class PutDatabaseRecord extends AbstractProcessor {
         }
     }
 
+    private int getParameterCount(final String sql) {
+        int parameterCount = 0;
+        for (char character : sql.toCharArray()) {
+            if ('?' == character) {
+                parameterCount++;
+            }
+        }
+        return parameterCount;
+    }
+
     static class SchemaKey {
         private final String catalog;
         private final String schemaName;
@@ -1721,10 +1712,12 @@ public class PutDatabaseRecord extends AbstractProcessor {
     static class PreparedSqlAndColumns {
         private final SqlAndIncludedColumns sqlAndIncludedColumns;
         private final PreparedStatement preparedStatement;
+        private final int parameterCount;
 
-        public PreparedSqlAndColumns(final SqlAndIncludedColumns sqlAndIncludedColumns, final PreparedStatement preparedStatement) {
+        public PreparedSqlAndColumns(final SqlAndIncludedColumns sqlAndIncludedColumns, final PreparedStatement preparedStatement, final int parameterCount) {
             this.sqlAndIncludedColumns = sqlAndIncludedColumns;
             this.preparedStatement = preparedStatement;
+            this.parameterCount = parameterCount;
         }
 
         public SqlAndIncludedColumns getSqlAndIncludedColumns() {

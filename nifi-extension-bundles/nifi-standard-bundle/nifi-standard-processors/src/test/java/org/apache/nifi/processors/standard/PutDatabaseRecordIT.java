@@ -56,6 +56,16 @@ public class PutDatabaseRecordIT {
     private final long NANOS_AFTER_SECOND = 351567000L;
     private final Instant INSTANT_MICROS_PRECISION = Instant.ofEpochMilli(MILLIS_TIMESTAMP_LONG).plusNanos(NANOS_AFTER_SECOND).minusMillis(MILLIS_TIMESTAMP_LONG % 1000);
 
+    private static final String SIMPLE_INPUT_RECORD = """
+            {
+              "name": "John Doe",
+              "age": 50,
+              "favorite_color": "blue"
+            }
+            """;
+
+    private static final String FAVORITE_COLOR_FIELD = "favorite_color";
+    private static final String FAVORITE_COLOR = "blue";
 
     private static PostgreSQLContainer<?> postgres;
     private TestRunner runner;
@@ -106,18 +116,36 @@ public class PutDatabaseRecordIT {
 
     @Test
     public void testSimplePut() throws SQLException {
-        runner.enqueue("""
-            {
-              "name": "John Doe",
-              "age": 50,
-              "favorite_color": "blue"
-            }
-            """);
+        runner.enqueue(SIMPLE_INPUT_RECORD);
         runner.run();
         runner.assertAllFlowFilesTransferred(PutDatabaseRecord.REL_SUCCESS, 1);
 
         final Map<String, Object> results = getResults();
-        assertEquals("blue", results.get("favorite_color"));
+        assertEquals(FAVORITE_COLOR, results.get(FAVORITE_COLOR_FIELD));
+    }
+
+    @Test
+    public void testUpsert() throws SQLException {
+        runner.setProperty(PutDatabaseRecord.STATEMENT_TYPE, "UPSERT");
+
+        runner.enqueue(SIMPLE_INPUT_RECORD);
+        runner.run();
+        runner.assertAllFlowFilesTransferred(PutDatabaseRecord.REL_SUCCESS, 1);
+
+        final Map<String, Object> results = getResults();
+        assertEquals(FAVORITE_COLOR, results.get(FAVORITE_COLOR_FIELD));
+    }
+
+    @Test
+    public void testInsertIgnore() throws SQLException {
+        runner.setProperty(PutDatabaseRecord.STATEMENT_TYPE, "INSERT_IGNORE");
+
+        runner.enqueue(SIMPLE_INPUT_RECORD);
+        runner.run();
+        runner.assertAllFlowFilesTransferred(PutDatabaseRecord.REL_SUCCESS, 1);
+
+        final Map<String, Object> results = getResults();
+        assertEquals(FAVORITE_COLOR, results.get(FAVORITE_COLOR_FIELD));
     }
 
     @Test

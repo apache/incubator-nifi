@@ -25,7 +25,6 @@ import java.util.List;
 import org.apache.nifi.processors.standard.db.ColumnDescription;
 import org.apache.nifi.processors.standard.db.NameNormalizer;
 import org.apache.nifi.processors.standard.db.NameNormalizerFactory;
-import org.apache.nifi.processors.standard.db.DatabaseAdapter;
 import org.apache.nifi.processors.standard.db.TableSchema;
 import org.apache.nifi.processors.standard.db.TranslationStrategy;
 import org.junit.jupiter.api.Test;
@@ -36,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestOracle12DatabaseAdapter {
 
-    private final DatabaseAdapter db = new Oracle12DatabaseAdapter();
+    private final Oracle12DatabaseAdapter db = new Oracle12DatabaseAdapter();
 
     @Test
     public void testGeneration() {
