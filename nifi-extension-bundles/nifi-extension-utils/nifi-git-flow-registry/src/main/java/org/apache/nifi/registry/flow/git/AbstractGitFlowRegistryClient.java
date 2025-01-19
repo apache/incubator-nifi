@@ -252,6 +252,7 @@ public abstract class AbstractGitFlowRegistryClient extends AbstractFlowRegistry
         final String commitMessage = DEREGISTER_FLOW_MESSAGE_FORMAT.formatted(flowLocation.getFlowId());
         try (final InputStream deletedSnapshotContent = repositoryClient.deleteContent(filePath, commitMessage, branch)) {
             final RegisteredFlowSnapshot deletedSnapshot = getSnapshot(deletedSnapshotContent);
+            populateFlowAndSnapshotMetadata(deletedSnapshot, flowLocation);
             updateBucketReferences(repositoryClient, deletedSnapshot, flowLocation.getBucketId());
             return deletedSnapshot.getFlow();
         }
@@ -579,9 +580,9 @@ public abstract class AbstractGitFlowRegistryClient extends AbstractFlowRegistry
         if (!clientInitialized.get()) {
             getLogger().info("Initializing repository client");
             repositoryClient = createRepositoryClient(context);
-            clientInitialized.set(true);
             initializeDefaultBucket(context);
             directoryExclusionPattern = Pattern.compile(context.getProperty(DIRECTORY_FILTER_EXCLUDE).getValue());
+            clientInitialized.set(true);
         }
         return repositoryClient;
     }
