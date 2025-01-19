@@ -67,7 +67,7 @@ import { initialState } from '../../state/flow/flow.reducer';
 import { CanvasContextMenu } from '../../service/canvas-context-menu.service';
 import { getStatusHistoryAndOpenDialog } from '../../../../state/status-history/status-history.actions';
 import { concatLatestFrom } from '@ngrx/operators';
-import { ComponentType, isDefinedAndNotNull, selectUrl, Storage } from '@nifi/shared';
+import { ComponentType, isDefinedAndNotNull, NiFiCommon, selectUrl, Storage } from '@nifi/shared';
 import { CanvasUtils } from '../../service/canvas-utils.service';
 import { CanvasActionsService } from '../../service/canvas-actions.service';
 import { MatDialog } from '@angular/material/dialog';
@@ -95,7 +95,8 @@ export class Canvas implements OnInit, OnDestroy {
         private canvasUtils: CanvasUtils,
         public canvasContextMenu: CanvasContextMenu,
         private canvasActionsService: CanvasActionsService,
-        private dialog: MatDialog
+        private dialog: MatDialog,
+        public nifiCommon: NiFiCommon
     ) {
         this.store
             .select(selectTransform)
@@ -736,7 +737,7 @@ export class Canvas implements OnInit, OnDestroy {
         }
     }
 
-    private toCopyResponseEntity(json: string): CopyResponseEntity | null {
+    toCopyResponseEntity(json: string): CopyResponseEntity | null {
         try {
             const copyResponse: CopyResponseEntity = JSON.parse(json);
             const supportedKeys: string[] = [
@@ -759,10 +760,45 @@ export class Canvas implements OnInit, OnDestroy {
                 return copyResponse;
             }
 
-            // attempting to paste something other than CopyResponseEntity
+            // check to see if this is a FlowDefinition
+            const maybeFlowDefinition: any = JSON.parse(json);
+            const isFlowDefinition = this.nifiCommon.isDefinedAndNotNull(maybeFlowDefinition.flowContents);
+            if (isFlowDefinition) {
+                // make sure the flow has some components
+                const flowHasCopiedContent = Object.entries(maybeFlowDefinition.flowContents).some((entry) => {
+                    return supportedKeys.includes(entry[0]) && Array.isArray(entry[1]) && entry[1].length > 0;
+                });
+                if (flowHasCopiedContent) {
+                    // construct a new CopyResponseEntity from the FlowDefinition
+                    const copiedFlow: CopyResponseEntity = {
+                        id: maybeFlowDefinition.flowContents.identifier,
+                        processGroups: [
+                            {
+                                ...maybeFlowDefinition.flowContents
+                            }
+                        ]
+                    };
+
+                    // include parameter contexts, providers, and external cs if defined
+                    if (this.nifiCommon.isDefinedAndNotNull(maybeFlowDefinition.parameterContexts)) {
+                        copiedFlow.parameterContexts = { ...maybeFlowDefinition.parameterContexts };
+                    }
+                    if (this.nifiCommon.isDefinedAndNotNull(maybeFlowDefinition.parameterProviders)) {
+                        copiedFlow.parameterProviders = { ...maybeFlowDefinition.parameterProviders };
+                    }
+                    if (this.nifiCommon.isDefinedAndNotNull(maybeFlowDefinition.externalControllerServices)) {
+                        copiedFlow.externalControllerServiceReferences = {
+                            ...maybeFlowDefinition.externalControllerServices
+                        };
+                    }
+                    return copiedFlow;
+                }
+            }
+
+            // attempting to paste something other than CopyResponseEntity or a flow definition
             return null;
         } catch (e) {
-            // attempting to paste something other than CopyResponseEntity
+            // attempting to paste something other than CopyResponseEntity or a flow definition
             return null;
         }
     }
