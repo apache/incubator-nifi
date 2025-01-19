@@ -16,9 +16,6 @@
  */
 package org.apache.nifi.registry.web.api;
 
-import java.net.URI;
-import java.util.List;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
@@ -27,7 +24,6 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.Consumes;
@@ -54,6 +50,9 @@ import org.apache.nifi.registry.revision.web.LongParameter;
 import org.apache.nifi.registry.web.service.ServiceFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.net.URI;
+import java.util.List;
 
 /**
  * RESTful endpoints for managing tenants, ie, users and user groups.
@@ -86,7 +85,14 @@ public class TenantResource extends ApplicationResource {
     @Operation(
             summary = "Create user",
             description = NON_GUARANTEED_ENDPOINT,
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = User.class))),
+            responses = {
+                    @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(implementation = User.class))),
+                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
@@ -94,14 +100,6 @@ public class TenantResource extends ApplicationResource {
                             @ExtensionProperty(name = "resource", value = "/tenants")}
                     )
             }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)}
     )
     public Response createUser(
             @Context final HttpServletRequest httpServletRequest,
@@ -126,7 +124,13 @@ public class TenantResource extends ApplicationResource {
     @Operation(
             summary = "Get all users",
             description = NON_GUARANTEED_ENDPOINT,
-            responses = @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = User.class)))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(array = @ArraySchema(schema = @Schema(implementation = User.class)))),
+                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
@@ -134,13 +138,6 @@ public class TenantResource extends ApplicationResource {
                             @ExtensionProperty(name = "resource", value = "/tenants")}
                     )
             }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)}
     )
     public Response getUsers() {
         // get all the users
@@ -163,7 +160,14 @@ public class TenantResource extends ApplicationResource {
     @Operation(
             summary = "Get user",
             description = NON_GUARANTEED_ENDPOINT,
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = User.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = User.class))),
+                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
@@ -171,14 +175,6 @@ public class TenantResource extends ApplicationResource {
                             @ExtensionProperty(name = "resource", value = "/tenants")}
                     )
             }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)}
     )
     public Response getUser(
             @Parameter(description = "The user id.", required = true)
@@ -202,22 +198,20 @@ public class TenantResource extends ApplicationResource {
     @Operation(
             summary = "Update user",
             description = NON_GUARANTEED_ENDPOINT,
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = User.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = User.class))),
+                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
                             @ExtensionProperty(name = "action", value = "write"),
                             @ExtensionProperty(name = "resource", value = "/tenants")}
                     )
-            }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
             }
     )
     public Response updateUser(
@@ -253,22 +247,20 @@ public class TenantResource extends ApplicationResource {
     @Operation(
             summary = "Delete user",
             description = NON_GUARANTEED_ENDPOINT,
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = User.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = User.class))),
+                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
                             @ExtensionProperty(name = "action", value = "delete"),
                             @ExtensionProperty(name = "resource", value = "/tenants")}
                     )
-            }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
             }
     )
     public Response removeUser(
@@ -304,22 +296,20 @@ public class TenantResource extends ApplicationResource {
     @Operation(
             summary = "Create user group",
             description = NON_GUARANTEED_ENDPOINT,
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = UserGroup.class))),
+            responses = {
+                    @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(implementation = UserGroup.class))),
+                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
                             @ExtensionProperty(name = "action", value = "write"),
                             @ExtensionProperty(name = "resource", value = "/tenants")}
                     )
-            }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
             }
     )
     public Response createUserGroup(
@@ -345,7 +335,14 @@ public class TenantResource extends ApplicationResource {
     @Operation(
             summary = "Get user groups",
             description = NON_GUARANTEED_ENDPOINT,
-            responses = @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserGroup.class)))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserGroup.class)))),
+                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
@@ -353,14 +350,6 @@ public class TenantResource extends ApplicationResource {
                             @ExtensionProperty(name = "resource", value = "/tenants")}
                     )
             }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)}
     )
     public Response getUserGroups() {
         final List<UserGroup> userGroups = serviceFacade.getUserGroups();
@@ -380,22 +369,20 @@ public class TenantResource extends ApplicationResource {
     @Operation(
             summary = "Get user group",
             description = NON_GUARANTEED_ENDPOINT,
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = UserGroup.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = UserGroup.class))),
+                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
                             @ExtensionProperty(name = "action", value = "read"),
                             @ExtensionProperty(name = "resource", value = "/tenants")}
                     )
-            }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
             }
     )
     public Response getUserGroup(
@@ -420,22 +407,20 @@ public class TenantResource extends ApplicationResource {
     @Operation(
             summary = "Update user group",
             description = NON_GUARANTEED_ENDPOINT,
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = UserGroup.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = UserGroup.class))),
+                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
                             @ExtensionProperty(name = "action", value = "write"),
                             @ExtensionProperty(name = "resource", value = "/tenants")}
                     )
-            }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
             }
     )
     public Response updateUserGroup(
@@ -471,22 +456,20 @@ public class TenantResource extends ApplicationResource {
     @Operation(
             summary = "Delete user group",
             description = NON_GUARANTEED_ENDPOINT,
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = UserGroup.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = UserGroup.class))),
+                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
                             @ExtensionProperty(name = "action", value = "delete"),
                             @ExtensionProperty(name = "resource", value = "/tenants")}
                     )
-            }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
             }
     )
     public Response removeUserGroup(

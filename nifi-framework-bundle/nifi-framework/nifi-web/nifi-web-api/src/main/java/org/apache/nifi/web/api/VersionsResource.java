@@ -17,20 +17,11 @@
 
 package org.apache.nifi.web.api;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.Consumes;
@@ -87,6 +78,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
 @Controller
 @Path("/versions")
 @Tag(name = "Versions")
@@ -108,19 +107,17 @@ public class VersionsResource extends FlowUpdateResource<VersionControlInformati
     @Path("process-groups/{id}")
     @Operation(
             summary = "Gets the Version Control information for a process group",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = VersionControlInformationEntity.class))),
-            description = NON_GUARANTEED_ENDPOINT,
-            security = {
-                    @SecurityRequirement(name = "Read - /process-groups/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = VersionControlInformationEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            description = NON_GUARANTEED_ENDPOINT,
+            security = {
+                    @SecurityRequirement(name = "Read - /process-groups/{uuid}")
             }
     )
     public Response getVersionInformation(@Parameter(description = "The process group id.", required = true) @PathParam("id") final String groupId) {
@@ -152,18 +149,16 @@ public class VersionsResource extends FlowUpdateResource<VersionControlInformati
     @Path("process-groups/{id}/download")
     @Operation(
             summary = "Gets the latest version of a Process Group for download",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = String.class))),
-            security = {
-                    @SecurityRequirement(name = "Read - /process-groups/{uuid}")
-            }
-    )
-    @ApiResponses(
-            {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = String.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Read - /process-groups/{uuid}")
             }
     )
     public Response exportFlowVersion(@Parameter(description = "The process group id.", required = true) @PathParam("id") final String groupId) {
@@ -216,22 +211,20 @@ public class VersionsResource extends FlowUpdateResource<VersionControlInformati
     @Path("active-requests")
     @Operation(
             summary = "Create a version control request",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = String.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = String.class))),
+                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
+                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
+                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
+                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
+                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
             description = "Creates a request so that a Process Group can be placed under Version Control or have its Version Control configuration changed. Creating this request will "
                     + "prevent any other threads from simultaneously saving local changes to Version Control. It will not, however, actually save the local flow to the Flow Registry. A "
                     + "POST to /versions/process-groups/{id} should be used to initiate saving of the local flow to the Flow Registry. "
                     + NON_GUARANTEED_ENDPOINT,
             security = {
                     @SecurityRequirement(name = "Write - /process-groups/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
-                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
-                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
-                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
-                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
             }
     )
     public Response createVersionControlRequest(
@@ -284,19 +277,17 @@ public class VersionsResource extends FlowUpdateResource<VersionControlInformati
     @Path("active-requests/{id}")
     @Operation(
             summary = "Updates the request with the given ID",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = VersionControlInformationEntity.class))),
-            description = NON_GUARANTEED_ENDPOINT,
-            security = {
-                    @SecurityRequirement(name = "Only the user that submitted the request can update it")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = VersionControlInformationEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            description = NON_GUARANTEED_ENDPOINT,
+            security = {
+                    @SecurityRequirement(name = "Only the user that submitted the request can update it")
             }
     )
     public Response updateVersionControlRequest(@Parameter(description = "The request ID.") @PathParam("id") final String requestId,
@@ -407,17 +398,16 @@ public class VersionsResource extends FlowUpdateResource<VersionControlInformati
             description = "Deletes the Version Control Request with the given ID. This will allow other threads to save flows to the Flow Registry. See also the documentation "
                     + "for POSTing to /versions/active-requests for information regarding why this is done. "
                     + NON_GUARANTEED_ENDPOINT,
-            security = {
-                    @SecurityRequirement(name = "Only the user that submitted the request can remove it")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200"),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Only the user that submitted the request can remove it")
             }
     )
     public Response deleteVersionControlRequest(
@@ -472,7 +462,14 @@ public class VersionsResource extends FlowUpdateResource<VersionControlInformati
     @Path("process-groups/{id}")
     @Operation(
             summary = "Save the Process Group with the given ID",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = VersionControlInformationEntity.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = VersionControlInformationEntity.class))),
+                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
+                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
+                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
+                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
+                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
             description = "Begins version controlling the Process Group with the given ID or commits changes to the Versioned Flow, "
                     + "depending on if the provided VersionControlInformation includes a flowId. "
                     + NON_GUARANTEED_ENDPOINT,
@@ -481,15 +478,6 @@ public class VersionsResource extends FlowUpdateResource<VersionControlInformati
                     @SecurityRequirement(name = "Write - /process-groups/{uuid}"),
                     @SecurityRequirement(name = "Read - /{component-type}/{uuid} - For all encapsulated components"),
                     @SecurityRequirement(name = "Read - any referenced Controller Services by any encapsulated components - /controller-services/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
-                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
-                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
-                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
-                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
             }
     )
     public Response saveToFlowRegistry(
@@ -731,21 +719,19 @@ public class VersionsResource extends FlowUpdateResource<VersionControlInformati
     @Path("process-groups/{id}")
     @Operation(
             summary = "Stops version controlling the Process Group with the given ID",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = VersionControlInformationEntity.class))),
-            description = "Stops version controlling the Process Group with the given ID. The Process Group will no longer track to any Versioned Flow. "
-                    + NON_GUARANTEED_ENDPOINT,
-            security = {
-                    @SecurityRequirement(name = "Read - /process-groups/{uuid}"),
-                    @SecurityRequirement(name = "Write - /process-groups/{uuid}"),
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = VersionControlInformationEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            description = "Stops version controlling the Process Group with the given ID. The Process Group will no longer track to any Versioned Flow. "
+                    + NON_GUARANTEED_ENDPOINT,
+            security = {
+                    @SecurityRequirement(name = "Read - /process-groups/{uuid}"),
+                    @SecurityRequirement(name = "Write - /process-groups/{uuid}"),
             }
     )
     public Response stopVersionControl(
@@ -799,22 +785,20 @@ public class VersionsResource extends FlowUpdateResource<VersionControlInformati
     @Path("process-groups/{id}")
     @Operation(
             summary = "Update the version of a Process Group with the given ID",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = VersionControlInformationEntity.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = VersionControlInformationEntity.class))),
+                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
+                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
+                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
+                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
+                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
             description = "For a Process Group that is already under Version Control, this will update the version of the flow to a different version. This endpoint expects "
                     + "that the given snapshot will not modify any Processor that is currently running or any Controller Service that is enabled. "
                     + NON_GUARANTEED_ENDPOINT,
             security = {
                     @SecurityRequirement(name = "Read - /process-groups/{uuid}"),
                     @SecurityRequirement(name = "Write - /process-groups/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
-                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
-                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
-                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
-                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
             }
     )
     public Response updateFlowVersion(@Parameter(description = "The process group id.") @PathParam("id") final String groupId,
@@ -901,22 +885,20 @@ public class VersionsResource extends FlowUpdateResource<VersionControlInformati
     @Path("update-requests/{id}")
     @Operation(
             summary = "Returns the Update Request with the given ID",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = VersionedFlowUpdateRequestEntity.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = VersionedFlowUpdateRequestEntity.class))),
+                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
+                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
+                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
+                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
+                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
             description = "Returns the Update Request with the given ID. Once an Update Request has been created by performing a POST to /versions/update-requests/process-groups/{id}, "
                     + "that request can subsequently be retrieved via this endpoint, and the request that is fetched will contain the updated state, such as percent complete, the "
                     + "current state of the request, and any failures. "
                     + NON_GUARANTEED_ENDPOINT,
             security = {
                     @SecurityRequirement(name = "Only the user that submitted the request can get it")
-            }
-    )
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
-                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
-                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
-                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
-                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
             }
     )
     public Response getUpdateRequest(@Parameter(description = "The ID of the Update Request") @PathParam("id") final String updateRequestId) {
@@ -929,22 +911,20 @@ public class VersionsResource extends FlowUpdateResource<VersionControlInformati
     @Path("revert-requests/{id}")
     @Operation(
             summary = "Returns the Revert Request with the given ID",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = VersionedFlowUpdateRequestEntity.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = VersionedFlowUpdateRequestEntity.class))),
+                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
+                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
+                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
+                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
+                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
             description = "Returns the Revert Request with the given ID. Once a Revert Request has been created by performing a POST to /versions/revert-requests/process-groups/{id}, "
                     + "that request can subsequently be retrieved via this endpoint, and the request that is fetched will contain the updated state, such as percent complete, the "
                     + "current state of the request, and any failures. "
                     + NON_GUARANTEED_ENDPOINT,
             security = {
                     @SecurityRequirement(name = "Only the user that submitted the request can get it")
-            }
-    )
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
-                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
-                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
-                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
-                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
             }
     )
     public Response getRevertRequest(@Parameter(description = "The ID of the Revert Request") @PathParam("id") final String revertRequestId) {
@@ -957,22 +937,20 @@ public class VersionsResource extends FlowUpdateResource<VersionControlInformati
     @Path("update-requests/{id}")
     @Operation(
             summary = "Deletes the Update Request with the given ID",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = VersionedFlowUpdateRequestEntity.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = VersionedFlowUpdateRequestEntity.class))),
+                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
+                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
+                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
+                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
+                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
             description = "Deletes the Update Request with the given ID. After a request is created via a POST to /versions/update-requests/process-groups/{id}, it is expected "
                     + "that the client will properly clean up the request by DELETE'ing it, once the Update process has completed. If the request is deleted before the request "
                     + "completes, then the Update request will finish the step that it is currently performing and then will cancel any subsequent steps. "
                     + NON_GUARANTEED_ENDPOINT,
             security = {
                     @SecurityRequirement(name = "Only the user that submitted the request can remove it")
-            }
-    )
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
-                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
-                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
-                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
-                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
             }
     )
     public Response deleteUpdateRequest(
@@ -991,22 +969,20 @@ public class VersionsResource extends FlowUpdateResource<VersionControlInformati
     @Path("revert-requests/{id}")
     @Operation(
             summary = "Deletes the Revert Request with the given ID",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = VersionedFlowUpdateRequestEntity.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = VersionedFlowUpdateRequestEntity.class))),
+                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
+                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
+                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
+                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
+                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
             description = "Deletes the Revert Request with the given ID. After a request is created via a POST to /versions/revert-requests/process-groups/{id}, it is expected "
                     + "that the client will properly clean up the request by DELETE'ing it, once the Revert process has completed. If the request is deleted before the request "
                     + "completes, then the Revert request will finish the step that it is currently performing and then will cancel any subsequent steps. "
                     + NON_GUARANTEED_ENDPOINT,
             security = {
                     @SecurityRequirement(name = "Only the user that submitted the request can remove it")
-            }
-    )
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
-                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
-                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
-                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
-                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
             }
     )
     public Response deleteRevertRequest(
@@ -1025,7 +1001,14 @@ public class VersionsResource extends FlowUpdateResource<VersionControlInformati
     @Path("update-requests/process-groups/{id}")
     @Operation(
             summary = "Initiate the Update Request of a Process Group with the given ID",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = VersionedFlowUpdateRequestEntity.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = VersionedFlowUpdateRequestEntity.class))),
+                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
+                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
+                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
+                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
+                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
             description = "For a Process Group that is already under Version Control, this will initiate the action of changing "
                     + "from a specific version of the flow in the Flow Registry to a different version of the flow. This can be a lengthy "
                     + "process, as it will stop any Processors and disable any Controller Services necessary to perform the action and then restart them. As a result, "
@@ -1040,15 +1023,6 @@ public class VersionsResource extends FlowUpdateResource<VersionControlInformati
                     @SecurityRequirement(name = "Write - /{component-type}/{uuid} - For all encapsulated components"),
                     @SecurityRequirement(name = "Write - if the template contains any restricted components - /restricted-components"),
                     @SecurityRequirement(name = "Read - /parameter-contexts/{uuid} - For any Parameter Context that is referenced by a Property that is changed, added, or removed")
-            }
-    )
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
-                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
-                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
-                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
-                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
             }
     )
     public Response initiateVersionControlUpdate(
@@ -1096,7 +1070,14 @@ public class VersionsResource extends FlowUpdateResource<VersionControlInformati
     @Path("revert-requests/process-groups/{id}")
     @Operation(
             summary = "Initiate the Revert Request of a Process Group with the given ID",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = VersionedFlowUpdateRequestEntity.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = VersionedFlowUpdateRequestEntity.class))),
+                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
+                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
+                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
+                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
+                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
             description = "For a Process Group that is already under Version Control, this will initiate the action of reverting "
                     + "any local changes that have been made to the Process Group since it was last synchronized with the Flow Registry. This will result in the "
                     + "flow matching the Versioned Flow that exists in the Flow Registry. This can be a lengthy "
@@ -1112,15 +1093,6 @@ public class VersionsResource extends FlowUpdateResource<VersionControlInformati
                     @SecurityRequirement(name = "Write - /{component-type}/{uuid} - For all encapsulated components"),
                     @SecurityRequirement(name = "Write - if the template contains any restricted components - /restricted-components"),
                     @SecurityRequirement(name = "Read - /parameter-contexts/{uuid} - For any Parameter Context that is referenced by a Property that is changed, added, or removed")
-            }
-    )
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
-                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
-                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
-                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
-                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
             }
     )
     public Response initiateRevertFlowVersion(@Parameter(description = "The process group id.") @PathParam("id") final String groupId,

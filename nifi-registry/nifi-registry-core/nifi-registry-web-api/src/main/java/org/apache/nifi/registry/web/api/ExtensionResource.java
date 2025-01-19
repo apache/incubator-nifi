@@ -16,17 +16,12 @@
  */
 package org.apache.nifi.registry.web.api;
 
-import java.util.Collections;
-import java.util.Set;
-import java.util.SortedSet;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -46,6 +41,10 @@ import org.apache.nifi.registry.extension.bundle.BundleType;
 import org.apache.nifi.registry.web.service.ServiceFacade;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
+import java.util.Set;
+import java.util.SortedSet;
+
 @Component
 @Path("/extensions")
 @Tag(name = "Extensions")
@@ -63,15 +62,14 @@ public class ExtensionResource extends ApplicationResource {
             description = "Gets the metadata for all extensions that match the filter params and are part of bundles located in buckets the " +
                     "current user is authorized for. If the user is not authorized to any buckets, an empty result set will be returned." +
                     NON_GUARANTEED_ENDPOINT,
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ExtensionMetadataContainer.class)))
-    )
-    @ApiResponses(
-            {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ExtensionMetadataContainer.class))),
                     @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
                     @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
                     @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
                     @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)}
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
+            }
     )
     public Response getExtensions(
             @QueryParam("bundleType")
@@ -107,10 +105,8 @@ public class ExtensionResource extends ApplicationResource {
             description = "Gets the metadata for extensions that provide the specified API and are part of bundles located in buckets the " +
                     "current user is authorized for. If the user is not authorized to any buckets, an empty result set will be returned." +
                     NON_GUARANTEED_ENDPOINT,
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ExtensionMetadataContainer.class)))
-    )
-    @ApiResponses(
-            {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ExtensionMetadataContainer.class))),
                     @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
                     @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
                     @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
@@ -151,10 +147,8 @@ public class ExtensionResource extends ApplicationResource {
             summary = "Get extension tags",
             description = "Gets all the extension tags known to this NiFi Registry instance, along with the " +
                     "number of extensions that have the given tag." + NON_GUARANTEED_ENDPOINT,
-            responses = @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = TagCount.class))))
-    )
-    @ApiResponses(
-            {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(array = @ArraySchema(schema = @Schema(implementation = TagCount.class)))),
                     @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
                     @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
                     @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),

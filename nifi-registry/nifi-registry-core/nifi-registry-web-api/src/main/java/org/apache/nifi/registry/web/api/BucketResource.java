@@ -16,9 +16,6 @@
  */
 package org.apache.nifi.registry.web.api;
 
-import java.util.List;
-import java.util.Set;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
@@ -27,7 +24,6 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
@@ -54,6 +50,9 @@ import org.apache.nifi.registry.web.service.ServiceFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.Set;
+
 @Component
 @Path("/buckets")
 @Tag(name = "Buckets")
@@ -69,20 +68,18 @@ public class BucketResource extends ApplicationResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(
             summary = "Create bucket",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = Bucket.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = Bucket.class))),
+                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
                             @ExtensionProperty(name = "action", value = "write"),
                             @ExtensionProperty(name = "resource", value = "/buckets")}
                     )
-            }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403)
             }
     )
     public Response createBucket(
@@ -102,9 +99,11 @@ public class BucketResource extends ApplicationResource {
             summary = "Get all buckets",
             description = "The returned list will include only buckets for which the user is authorized." +
                     "If the user is not authorized for any buckets, this returns an empty list.",
-            responses = @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = Bucket.class))))
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Bucket.class)))),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401)
+            }
     )
-    @ApiResponses({@ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401)})
     public Response getBuckets() {
         // ServiceFacade will determine which buckets the user is authorized for
         // Note: We don't explicitly check for access to (READ, /buckets) because
@@ -125,20 +124,18 @@ public class BucketResource extends ApplicationResource {
     @Operation(
             summary = "Get bucket",
             description = "Gets the bucket with the given id.",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = Bucket.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = Bucket.class))),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
                             @ExtensionProperty(name = "action", value = "read"),
                             @ExtensionProperty(name = "resource", value = "/buckets/{bucketId}")}
                     )
-            }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404)
             }
     )
     public Response getBucket(
@@ -156,22 +153,20 @@ public class BucketResource extends ApplicationResource {
     @Operation(
             summary = "Update bucket",
             description = "Updates the bucket with the given id.",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = Bucket.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = Bucket.class))),
+                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
                             @ExtensionProperty(name = "action", value = "write"),
                             @ExtensionProperty(name = "resource", value = "/buckets/{bucketId}")}
                     )
-            }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
             }
     )
     public Response updateBucket(
@@ -205,21 +200,19 @@ public class BucketResource extends ApplicationResource {
     @Operation(
             summary = "Delete bucket",
             description = "Deletes the bucket with the given id, along with all objects stored in the bucket",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = Bucket.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = Bucket.class))),
+                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
                             @ExtensionProperty(name = "action", value = "delete"),
                             @ExtensionProperty(name = "resource", value = "/buckets/{bucketId}")}
                     )
-            }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404)
             }
     )
     public Response deleteBucket(

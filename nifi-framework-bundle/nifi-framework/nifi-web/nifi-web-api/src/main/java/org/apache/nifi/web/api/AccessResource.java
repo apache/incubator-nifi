@@ -16,17 +16,10 @@
  */
 package org.apache.nifi.web.api;
 
-import java.net.URI;
-import java.time.Instant;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.UUID;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -63,6 +56,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.stereotype.Controller;
 
+import java.net.URI;
+import java.time.Instant;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.UUID;
+
 /**
  * RESTful endpoint for managing access.
  */
@@ -97,10 +96,8 @@ public class AccessResource extends ApplicationResource {
             description = "The token returned is formatted as a JSON Web Token (JWT). The token is base64 encoded and comprised of three parts. The header, " +
                     "the body, and the signature. The expiration of the token is a contained within the body. It is stored in the browser as a cookie, but also returned in" +
                     "the response body to be stored/used by third party client scripts.",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)))
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(implementation = String.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it."),
@@ -158,10 +155,8 @@ public class AccessResource extends ApplicationResource {
     @Path("/logout")
     @Operation(
             summary = "Performs a logout for other providers that have been issued a JWT.",
-            description = NON_GUARANTEED_ENDPOINT
-    )
-    @ApiResponses(
-            value = {
+            description = NON_GUARANTEED_ENDPOINT,
+            responses = {
                     @ApiResponse(responseCode = "200", description = "User was logged out successfully."),
                     @ApiResponse(responseCode = "401", description = "Authentication token provided was empty or not in the correct JWT format."),
                     @ApiResponse(responseCode = "500", description = "Client failed to log out."),
@@ -204,11 +199,9 @@ public class AccessResource extends ApplicationResource {
     @Path("/logout/complete")
     @Operation(
             summary = "Completes the logout sequence by removing the cached Logout Request and Cookie if they existed and redirects to /nifi/login.",
-            description = NON_GUARANTEED_ENDPOINT
-    )
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "200", description = "User was logged out successfully."),
+            description = NON_GUARANTEED_ENDPOINT,
+            responses = {
+                    @ApiResponse(responseCode = "302", description = "User was logged out successfully."),
                     @ApiResponse(responseCode = "401", description = "Authentication token provided was empty or not in the correct JWT format."),
                     @ApiResponse(responseCode = "500", description = "Client failed to log out."),
             }

@@ -16,13 +16,10 @@
  */
 package org.apache.nifi.web.api;
 
-import java.util.List;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.Consumes;
@@ -41,6 +38,8 @@ import org.apache.nifi.web.api.dto.ResourceDTO;
 import org.apache.nifi.web.api.entity.ResourcesEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+
+import java.util.List;
 
 /**
  * RESTful endpoint for retrieving system diagnostics.
@@ -70,15 +69,13 @@ public class ResourceResource extends ApplicationResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(
             summary = "Gets the available resources that support access/authorization policies",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ResourcesEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Read - /resources")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ResourcesEntity.class))),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
+            },
+            security = {
+                    @SecurityRequirement(name = "Read - /resources")
             }
     )
     public Response getResources() {

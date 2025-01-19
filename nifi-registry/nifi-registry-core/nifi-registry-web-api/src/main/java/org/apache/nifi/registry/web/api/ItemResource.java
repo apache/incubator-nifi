@@ -16,9 +16,6 @@
  */
 package org.apache.nifi.registry.web.api;
 
-import java.util.List;
-import java.util.Set;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
@@ -27,7 +24,6 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -44,6 +40,9 @@ import org.apache.nifi.registry.field.Fields;
 import org.apache.nifi.registry.web.service.ServiceFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Set;
 
 @Component
 @Path("/items")
@@ -66,9 +65,11 @@ public class ItemResource extends ApplicationResource {
             summary = "Get all items",
             description = "Get items across all buckets. The returned items will include only items from buckets for which the user is authorized. " +
                     "If the user is not authorized to any buckets, an empty list will be returned.",
-            responses = @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = BucketItem.class))))
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(array = @ArraySchema(schema = @Schema(implementation = BucketItem.class)))),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401)
+            }
     )
-    @ApiResponses({@ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401)})
     public Response getItems() {
         // Service facade with return only items from authorized buckets
         // Note: We don't explicitly check for access to (READ, /buckets) or
@@ -89,21 +90,19 @@ public class ItemResource extends ApplicationResource {
     @Operation(
             summary = "Get bucket items",
             description = "Gets the items located in the given bucket.",
-            responses = @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = BucketItem.class)))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(array = @ArraySchema(schema = @Schema(implementation = BucketItem.class)))),
+                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
                             @ExtensionProperty(name = "action", value = "read"),
                             @ExtensionProperty(name = "resource", value = "/buckets/{bucketId}")}
                     )
-            }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404)
             }
     )
     public Response getItems(

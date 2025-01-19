@@ -21,7 +21,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.PostConstruct;
@@ -42,8 +41,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.nifi.asset.AssetComponentManager;
 import org.apache.nifi.asset.Asset;
+import org.apache.nifi.asset.AssetComponentManager;
 import org.apache.nifi.asset.AssetManager;
 import org.apache.nifi.authorization.AuthorizableLookup;
 import org.apache.nifi.authorization.Authorizer;
@@ -181,19 +180,17 @@ public class ParameterContextResource extends AbstractParameterResource {
     @Path("{id}")
     @Operation(
             summary = "Returns the Parameter Context with the given ID",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ParameterContextEntity.class))),
-            description = "Returns the Parameter Context with the given ID.",
-            security = {
-                    @SecurityRequirement(name = "Read - /parameter-contexts/{id}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ParameterContextEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            description = "Returns the Parameter Context with the given ID.",
+            security = {
+                    @SecurityRequirement(name = "Read - /parameter-contexts/{id}")
             }
     )
     public Response getParameterContext(
@@ -224,19 +221,17 @@ public class ParameterContextResource extends AbstractParameterResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(
             summary = "Create a Parameter Context",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ParameterContextEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Write - /parameter-contexts"),
-                    @SecurityRequirement(name = "Read - for every inherited parameter context")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(implementation = ParameterContextEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Write - /parameter-contexts"),
+                    @SecurityRequirement(name = "Read - for every inherited parameter context")
             }
     )
     public Response createParameterContext(
@@ -292,22 +287,20 @@ public class ParameterContextResource extends AbstractParameterResource {
     @Path("{id}")
     @Operation(
             summary = "Modifies a Parameter Context",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ParameterContextEntity.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ParameterContextEntity.class))),
+                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
+                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
+                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
+                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
+                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
             description = "This endpoint will update a Parameter Context to match the provided entity. However, this request will fail if any component is running and is referencing a Parameter in " +
                     "the Parameter Context. Generally, this endpoint is not called directly. Instead, an update request should be submitted by making a POST to the " +
                     "/parameter-contexts/update-requests endpoint. That endpoint will, in turn, call this endpoint.",
             security = {
                     @SecurityRequirement(name = "Read - /parameter-contexts/{id}"),
                     @SecurityRequirement(name = "Write - /parameter-contexts/{id}")
-            }
-    )
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
-                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
-                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
-                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
-                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
             }
     )
     public Response updateParameterContext(
@@ -365,7 +358,14 @@ public class ParameterContextResource extends AbstractParameterResource {
     @Path("{contextId}/assets")
     @Operation(
             summary = "Creates a new Asset in the given Parameter Context",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = AssetEntity.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = AssetEntity.class))),
+                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
+                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
+                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
+                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
+                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
             description = "This endpoint will create a new Asset in the given Parameter Context. The Asset will be created with the given name and the contents of the file that is uploaded. " +
                     "The Asset will be created in the given Parameter Context, and will be available for use by any component that references the Parameter Context.",
             security = {
@@ -375,15 +375,6 @@ public class ParameterContextResource extends AbstractParameterResource {
                 @SecurityRequirement(name = "Write - for every component that is affected by the update"),
                 @SecurityRequirement(name = "Read - for every currently inherited parameter context")
             }
-    )
-    @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
-            @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
-            @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
-            @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
-            @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
-        }
     )
     public Response createAsset(
             @PathParam("contextId") final String contextId,
@@ -477,19 +468,17 @@ public class ParameterContextResource extends AbstractParameterResource {
     @Path("{contextId}/assets")
     @Operation(
             summary = "Lists the assets that belong to the Parameter Context with the given ID",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = AssetsEntity.class))),
-            description = "Lists the assets that belong to the Parameter Context with the given ID.",
-            security = {
-                    @SecurityRequirement(name = "Read - /parameter-contexts/{id}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = AssetsEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            description = "Lists the assets that belong to the Parameter Context with the given ID.",
+            security = {
+                    @SecurityRequirement(name = "Read - /parameter-contexts/{id}")
             }
     )
     public Response getAssets(
@@ -520,18 +509,16 @@ public class ParameterContextResource extends AbstractParameterResource {
     @Path("{contextId}/assets/{assetId}")
     @Operation(
             summary = "Retrieves the content of the asset with the given id",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = byte[].class))),
-            security = {
-                    @SecurityRequirement(name = "Read - /parameter-contexts/{id}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = byte[].class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Read - /parameter-contexts/{id}")
             }
     )
     public Response getAssetContent(
@@ -573,7 +560,14 @@ public class ParameterContextResource extends AbstractParameterResource {
     @Path("{contextId}/assets/{assetId}")
     @Operation(
             summary = "Deletes an Asset from the given Parameter Context",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = AssetEntity.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = AssetEntity.class))),
+                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
+                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
+                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
+                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
+                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
             description = "This endpoint will create a new Asset in the given Parameter Context. The Asset will be created with the given name and the contents of the file that is uploaded. " +
                     "The Asset will be created in the given Parameter Context, and will be available for use by any component that references the Parameter Context.",
             security = {
@@ -582,15 +576,6 @@ public class ParameterContextResource extends AbstractParameterResource {
                     @SecurityRequirement(name = "Read - for every component that is affected by the update"),
                     @SecurityRequirement(name = "Write - for every component that is affected by the update"),
                     @SecurityRequirement(name = "Read - for every currently inherited parameter context")
-            }
-    )
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
-                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
-                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
-                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
-                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
             }
     )
     public Response deleteAsset(
@@ -653,7 +638,14 @@ public class ParameterContextResource extends AbstractParameterResource {
     @Path("{contextId}/update-requests")
     @Operation(
             summary = "Initiate the Update Request of a Parameter Context",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ParameterContextUpdateRequestEntity.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ParameterContextUpdateRequestEntity.class))),
+                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
+                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
+                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
+                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
+                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
             description = "This will initiate the process of updating a Parameter Context. Changing the value of a Parameter may require that one or more components be stopped and " +
                     "restarted, so this action may take significantly more time than many other REST API actions. As a result, this endpoint will immediately return a " +
                     "ParameterContextUpdateRequestEntity, " +
@@ -667,15 +659,6 @@ public class ParameterContextResource extends AbstractParameterResource {
                     @SecurityRequirement(name = "Write - for every component that is affected by the update"),
                     @SecurityRequirement(name = "Read - for every currently inherited parameter context"),
                     @SecurityRequirement(name = "Read - for any new inherited parameter context")
-            }
-    )
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
-                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
-                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
-                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
-                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
             }
     )
     public Response submitParameterContextUpdate(
@@ -863,21 +846,19 @@ public class ParameterContextResource extends AbstractParameterResource {
     @Path("{contextId}/update-requests/{requestId}")
     @Operation(
             summary = "Returns the Update Request with the given ID",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ParameterContextUpdateRequestEntity.class))),
-            description = "Returns the Update Request with the given ID. Once an Update Request has been created by performing a POST to /nifi-api/parameter-contexts, "
-                    + "that request can subsequently be retrieved via this endpoint, and the request that is fetched will contain the updated state, such as percent complete, the "
-                    + "current state of the request, and any failures. ",
-            security = {
-                    @SecurityRequirement(name = "Only the user that submitted the request can get it")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ParameterContextUpdateRequestEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            description = "Returns the Update Request with the given ID. Once an Update Request has been created by performing a POST to /nifi-api/parameter-contexts, "
+                    + "that request can subsequently be retrieved via this endpoint, and the request that is fetched will contain the updated state, such as percent complete, the "
+                    + "current state of the request, and any failures. ",
+            security = {
+                    @SecurityRequirement(name = "Only the user that submitted the request can get it")
             }
     )
     public Response getParameterContextUpdate(
@@ -898,21 +879,19 @@ public class ParameterContextResource extends AbstractParameterResource {
     @Path("{contextId}/update-requests/{requestId}")
     @Operation(
             summary = "Deletes the Update Request with the given ID",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ParameterContextUpdateRequestEntity.class))),
-            description = "Deletes the Update Request with the given ID. After a request is created via a POST to /nifi-api/parameter-contexts/update-requests, it is expected "
-                    + "that the client will properly clean up the request by DELETE'ing it, once the Update process has completed. If the request is deleted before the request "
-                    + "completes, then the Update request will finish the step that it is currently performing and then will cancel any subsequent steps.",
-            security = {
-                    @SecurityRequirement(name = "Only the user that submitted the request can remove it")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ParameterContextUpdateRequestEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            description = "Deletes the Update Request with the given ID. After a request is created via a POST to /nifi-api/parameter-contexts/update-requests, it is expected "
+                    + "that the client will properly clean up the request by DELETE'ing it, once the Update process has completed. If the request is deleted before the request "
+                    + "completes, then the Update request will finish the step that it is currently performing and then will cancel any subsequent steps.",
+            security = {
+                    @SecurityRequirement(name = "Only the user that submitted the request can remove it")
             }
     )
     public Response deleteUpdateRequest(
@@ -935,22 +914,20 @@ public class ParameterContextResource extends AbstractParameterResource {
     @Path("{id}")
     @Operation(
             summary = "Deletes the Parameter Context with the given ID",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ParameterContextEntity.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ParameterContextEntity.class))),
+                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
+                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
+                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
+                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
+                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
             description = "Deletes the Parameter Context with the given ID.",
             security = {
                     @SecurityRequirement(name = "Read - /parameter-contexts/{uuid}"),
                     @SecurityRequirement(name = "Write - /parameter-contexts/{uuid}"),
                     @SecurityRequirement(name = "Read - /process-groups/{uuid}, for any Process Group that is currently bound to the Parameter Context"),
                     @SecurityRequirement(name = "Write - /process-groups/{uuid}, for any Process Group that is currently bound to the Parameter Context")
-            }
-    )
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
-                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
-                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
-                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
-                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
             }
     )
     public Response deleteParameterContext(
@@ -1014,7 +991,14 @@ public class ParameterContextResource extends AbstractParameterResource {
     @Path("{contextId}/validation-requests")
     @Operation(
             summary = "Initiate a Validation Request to determine how the validity of components will change if a Parameter Context were to be updated",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ParameterContextValidationRequestEntity.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ParameterContextValidationRequestEntity.class))),
+                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
+                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
+                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
+                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
+                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
             description = "This will initiate the process of validating all components whose Process Group is bound to the specified Parameter Context. Performing validation against " +
                     "an arbitrary number of components may be expect and take significantly more time than many other REST API actions. As a result, this endpoint will immediately return " +
                     "a ParameterContextValidationRequestEntity, " +
@@ -1023,15 +1007,6 @@ public class ParameterContextResource extends AbstractParameterResource {
                     "/parameter-contexts/validation-requests/{requestId}.",
             security = {
                     @SecurityRequirement(name = "Read - /parameter-contexts/{parameterContextId}")
-            }
-    )
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
-                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
-                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
-                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
-                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
             }
     )
     public Response submitValidationRequest(
@@ -1096,21 +1071,19 @@ public class ParameterContextResource extends AbstractParameterResource {
     @Path("{contextId}/validation-requests/{id}")
     @Operation(
             summary = "Returns the Validation Request with the given ID",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ParameterContextValidationRequestEntity.class))),
-            description = "Returns the Validation Request with the given ID. Once a Validation Request has been created by performing a POST to /nifi-api/validation-contexts, "
-                    + "that request can subsequently be retrieved via this endpoint, and the request that is fetched will contain the updated state, such as percent complete, the "
-                    + "current state of the request, and any failures. ",
-            security = {
-                    @SecurityRequirement(name = "Only the user that submitted the request can get it")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ParameterContextValidationRequestEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            description = "Returns the Validation Request with the given ID. Once a Validation Request has been created by performing a POST to /nifi-api/validation-contexts, "
+                    + "that request can subsequently be retrieved via this endpoint, and the request that is fetched will contain the updated state, such as percent complete, the "
+                    + "current state of the request, and any failures. ",
+            security = {
+                    @SecurityRequirement(name = "Only the user that submitted the request can get it")
             }
     )
     public Response getValidationRequest(
@@ -1134,21 +1107,19 @@ public class ParameterContextResource extends AbstractParameterResource {
     @Path("{contextId}/validation-requests/{id}")
     @Operation(
             summary = "Deletes the Validation Request with the given ID",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ParameterContextValidationRequestEntity.class))),
-            description = "Deletes the Validation Request with the given ID. After a request is created via a POST to /nifi-api/validation-contexts, it is expected "
-                    + "that the client will properly clean up the request by DELETE'ing it, once the validation process has completed. If the request is deleted before the request "
-                    + "completes, then the Validation request will finish the step that it is currently performing and then will cancel any subsequent steps.",
-            security = {
-                    @SecurityRequirement(name = "Only the user that submitted the request can remove it")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ParameterContextValidationRequestEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            description = "Deletes the Validation Request with the given ID. After a request is created via a POST to /nifi-api/validation-contexts, it is expected "
+                    + "that the client will properly clean up the request by DELETE'ing it, once the validation process has completed. If the request is deleted before the request "
+                    + "completes, then the Validation request will finish the step that it is currently performing and then will cancel any subsequent steps.",
+            security = {
+                    @SecurityRequirement(name = "Only the user that submitted the request can remove it")
             }
     )
     public Response deleteValidationRequest(

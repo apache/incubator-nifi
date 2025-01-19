@@ -16,14 +16,11 @@
  */
 package org.apache.nifi.web.api;
 
-import java.net.URI;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.Consumes;
@@ -59,6 +56,8 @@ import org.apache.nifi.web.api.request.LongParameter;
 import org.apache.nifi.web.dao.AccessPolicyDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+
+import java.net.URI;
 
 /**
  * RESTful endpoint for managing access policies.
@@ -120,18 +119,16 @@ public class AccessPolicyResource extends ApplicationResource {
                     + "have permissions to that policy, the response will not include the policy and the permissions in the response "
                     + "will be marked accordingly. If the client does not have permissions to the policy of the desired action and resource "
                     + "a 403 response will be returned.",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = AccessPolicyEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Read - /policies/{resource}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = AccessPolicyEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Read - /policies/{resource}")
             }
     )
     public Response getAccessPolicyForResource(
@@ -187,18 +184,16 @@ public class AccessPolicyResource extends ApplicationResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(
             summary = "Creates an access policy",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = AccessPolicyEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Write - /policies/{resource}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(implementation = AccessPolicyEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Write - /policies/{resource}")
             }
     )
     public Response createAccessPolicy(
@@ -279,18 +274,16 @@ public class AccessPolicyResource extends ApplicationResource {
     @Path("{id}")
     @Operation(
             summary = "Gets an access policy",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = AccessPolicyEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Read - /policies/{resource}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = AccessPolicyEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Read - /policies/{resource}")
             }
     )
     public Response getAccessPolicy(
@@ -335,18 +328,16 @@ public class AccessPolicyResource extends ApplicationResource {
     @Path("{id}")
     @Operation(
             summary = "Updates a access policy",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = AccessPolicyEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Write - /policies/{resource}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = AccessPolicyEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Write - /policies/{resource}")
             }
     )
     public Response updateAccessPolicy(
@@ -426,19 +417,17 @@ public class AccessPolicyResource extends ApplicationResource {
     @Path("{id}")
     @Operation(
             summary = "Deletes an access policy",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = AccessPolicyEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Write - /policies/{resource}"),
-                    @SecurityRequirement(name = "Write - Policy of the parent resource - /policies/{resource}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = AccessPolicyEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Write - /policies/{resource}"),
+                    @SecurityRequirement(name = "Write - Policy of the parent resource - /policies/{resource}")
             }
     )
     public Response removeAccessPolicy(

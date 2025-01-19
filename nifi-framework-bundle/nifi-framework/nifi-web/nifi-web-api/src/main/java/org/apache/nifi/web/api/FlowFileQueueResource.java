@@ -16,14 +16,11 @@
  */
 package org.apache.nifi.web.api;
 
-import java.net.URI;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.Consumes;
@@ -65,6 +62,8 @@ import org.apache.nifi.web.api.streaming.StreamingOutputResponseBuilder;
 import org.apache.nifi.web.util.ResponseBuilderUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+
+import java.net.URI;
 
 /**
  * RESTful endpoint for managing a flowfile queue.
@@ -124,18 +123,16 @@ public class FlowFileQueueResource extends ApplicationResource {
     @Path("{id}/flowfiles/{flowfile-uuid}")
     @Operation(
             summary = "Gets a FlowFile from a Connection.",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = FlowFileEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Read Source Data - /data/{component-type}/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = FlowFileEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Read Source Data - /data/{component-type}/{uuid}")
             }
     )
     public Response getFlowFile(
@@ -198,13 +195,8 @@ public class FlowFileQueueResource extends ApplicationResource {
     @Path("{id}/flowfiles/{flowfile-uuid}/content")
     @Operation(
             summary = "Gets the content for a FlowFile in a Connection.",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = StreamingOutput.class))),
-            security = {
-                    @SecurityRequirement(name = "Read Source Data - /data/{component-type}/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = StreamingOutput.class))),
                     @ApiResponse(responseCode = "206", description = "Partial Content with range of bytes requested"),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
@@ -212,6 +204,9 @@ public class FlowFileQueueResource extends ApplicationResource {
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it."),
                     @ApiResponse(responseCode = "416", description = "Requested Range Not Satisfiable based on bytes requested")
+            },
+            security = {
+                    @SecurityRequirement(name = "Read Source Data - /data/{component-type}/{uuid}")
             }
     )
     public Response downloadFlowFileContent(
@@ -282,19 +277,19 @@ public class FlowFileQueueResource extends ApplicationResource {
     @Path("{id}/listing-requests")
     @Operation(
             summary = "Lists the contents of the queue in this connection.",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ListingRequestEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Read Source Data - /data/{component-type}/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "202", description = "The request has been accepted. A HTTP response header will contain the URI where the response can be polled."),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "202", description = "The request has been accepted. A HTTP response header will contain the URI where the response can be polled.",
+                            content = @Content(schema = @Schema(implementation = ListingRequestEntity.class))
+                    ),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Read Source Data - /data/{component-type}/{uuid}")
             }
     )
     public Response createFlowFileListing(
@@ -349,18 +344,16 @@ public class FlowFileQueueResource extends ApplicationResource {
     @Path("{id}/listing-requests/{listing-request-id}")
     @Operation(
             summary = "Gets the current status of a listing request for the specified connection.",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ListingRequestEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Read Source Data - /data/{component-type}/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ListingRequestEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Read Source Data - /data/{component-type}/{uuid}")
             }
     )
     public Response getListingRequest(
@@ -410,18 +403,16 @@ public class FlowFileQueueResource extends ApplicationResource {
     @Path("{id}/listing-requests/{listing-request-id}")
     @Operation(
             summary = "Cancels and/or removes a request to list the contents of this connection.",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ListingRequestEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Read Source Data - /data/{component-type}/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ListingRequestEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Read Source Data - /data/{component-type}/{uuid}")
             }
     )
     public Response deleteListingRequest(
@@ -498,19 +489,19 @@ public class FlowFileQueueResource extends ApplicationResource {
     @Path("{id}/drop-requests")
     @Operation(
             summary = "Creates a request to drop the contents of the queue in this connection.",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = DropRequestEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Write Source Data - /data/{component-type}/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "202", description = "The request has been accepted. A HTTP response header will contain the URI where the response can be polled."),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "202", description = "The request has been accepted. A HTTP response header will contain the URI where the response can be polled.",
+                            content = @Content(schema = @Schema(implementation = DropRequestEntity.class))
+                    ),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Write Source Data - /data/{component-type}/{uuid}")
             }
     )
     public Response createDropRequest(
@@ -568,18 +559,16 @@ public class FlowFileQueueResource extends ApplicationResource {
     @Path("{id}/drop-requests/{drop-request-id}")
     @Operation(
             summary = "Gets the current status of a drop request for the specified connection.",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = DropRequestEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Write Source Data - /data/{component-type}/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = DropRequestEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Write Source Data - /data/{component-type}/{uuid}")
             }
     )
     public Response getDropRequest(
@@ -629,18 +618,16 @@ public class FlowFileQueueResource extends ApplicationResource {
     @Path("{id}/drop-requests/{drop-request-id}")
     @Operation(
             summary = "Cancels and/or removes a request to drop the contents of this connection.",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = DropRequestEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Write Source Data - /data/{component-type}/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = DropRequestEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Write Source Data - /data/{component-type}/{uuid}")
             }
     )
     public Response removeDropRequest(

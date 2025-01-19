@@ -16,10 +16,6 @@
  */
 package org.apache.nifi.registry.web.api;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
@@ -28,7 +24,6 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -50,6 +45,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 
 @Component
 @Path("/buckets/{bucketId}/bundles")
@@ -78,7 +77,14 @@ public class BucketBundleResource extends ApplicationResource {
                     "If supplied, then this value will be compared against the SHA-256 computed by the server, and the bundle " +
                     "will be rejected if the values do not match. If not supplied, the bundle will be accepted, but will be marked " +
                     "to indicate that the client did not supply a SHA-256 during creation. " + NON_GUARANTEED_ENDPOINT,
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = BundleVersion.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = BundleVersion.class))),
+                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
@@ -86,14 +92,6 @@ public class BucketBundleResource extends ApplicationResource {
                             @ExtensionProperty(name = "resource", value = "/buckets/{bucketId}")}
                     )
             }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)}
     )
     public Response createExtensionBundleVersion(
             @PathParam("bucketId")
@@ -121,7 +119,14 @@ public class BucketBundleResource extends ApplicationResource {
     @Operation(
             summary = "Get extension bundles by bucket",
             description = NON_GUARANTEED_ENDPOINT,
-            responses = @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = Bundle.class)))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Bundle.class)))),
+                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
@@ -129,14 +134,6 @@ public class BucketBundleResource extends ApplicationResource {
                             @ExtensionProperty(name = "resource", value = "/buckets/{bucketId}")}
                     )
             }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)}
     )
     public Response getExtensionBundles(
             @PathParam("bucketId")

@@ -16,10 +16,6 @@
  */
 package org.apache.nifi.registry.web.api;
 
-import java.net.URI;
-import java.util.List;
-import java.util.SortedSet;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
@@ -28,7 +24,6 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.BadRequestException;
@@ -63,6 +58,10 @@ import org.apache.nifi.registry.web.service.ServiceFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.net.URI;
+import java.util.List;
+import java.util.SortedSet;
+
 @Component
 @Path("/buckets/{bucketId}/flows")
 @Tag(name = "BucketFlows")
@@ -79,22 +78,20 @@ public class BucketFlowResource extends ApplicationResource {
     @Operation(
             summary = "Create flow",
             description = "Creates a flow in the given bucket. The flow id is created by the server and populated in the returned entity.",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = VersionedFlow.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = VersionedFlow.class))),
+                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
                             @ExtensionProperty(name = "action", value = "write"),
                             @ExtensionProperty(name = "resource", value = "/buckets/{bucketId}")}
                     )
-            }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
             }
     )
     public Response createFlow(
@@ -115,22 +112,20 @@ public class BucketFlowResource extends ApplicationResource {
     @Operation(
             summary = "Get bucket flows",
             description = "Retrieves all flows in the given bucket.",
-            responses = @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = VersionedFlow.class)))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(array = @ArraySchema(schema = @Schema(implementation = VersionedFlow.class)))),
+                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
                             @ExtensionProperty(name = "action", value = "read"),
                             @ExtensionProperty(name = "resource", value = "/buckets/{bucketId}")}
                     )
-            }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
             }
     )
     public Response getFlows(
@@ -148,22 +143,20 @@ public class BucketFlowResource extends ApplicationResource {
     @Operation(
             summary = "Get bucket flow",
             description = "Retrieves the flow with the given id in the given bucket.",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = VersionedFlow.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = VersionedFlow.class))),
+                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
                             @ExtensionProperty(name = "action", value = "read"),
                             @ExtensionProperty(name = "resource", value = "/buckets/{bucketId}")}
                     )
-            }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
             }
     )
     public Response getFlow(
@@ -183,22 +176,20 @@ public class BucketFlowResource extends ApplicationResource {
     @Operation(
             summary = "Update bucket flow",
             description = "Updates the flow with the given id in the given bucket.",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = VersionedFlow.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = VersionedFlow.class))),
+                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
                             @ExtensionProperty(name = "action", value = "write"),
                             @ExtensionProperty(name = "resource", value = "/buckets/{bucketId}")}
                     )
-            }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
             }
     )
     public Response updateFlow(
@@ -225,21 +216,19 @@ public class BucketFlowResource extends ApplicationResource {
     @Operation(
             summary = "Delete bucket flow",
             description = "Deletes a flow, including all saved versions of that flow.",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = VersionedFlow.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = VersionedFlow.class))),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
                             @ExtensionProperty(name = "action", value = "delete"),
                             @ExtensionProperty(name = "resource", value = "/buckets/{bucketId}")}
                     )
-            }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
             }
     )
     public Response deleteFlow(
@@ -268,22 +257,20 @@ public class BucketFlowResource extends ApplicationResource {
             summary = "Create flow version",
             description = "Creates the next version of a flow. The version number of the object being created must be the " +
                     "next available version integer. Flow versions are immutable after they are created.",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = VersionedFlowSnapshot.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = VersionedFlowSnapshot.class))),
+                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
                             @ExtensionProperty(name = "action", value = "write"),
                             @ExtensionProperty(name = "resource", value = "/buckets/{bucketId}")}
                     )
-            }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
             }
     )
     public Response createFlowVersion(
@@ -326,23 +313,20 @@ public class BucketFlowResource extends ApplicationResource {
             summary = "Import flow version",
             description = "Import the next version of a flow. The version number of the object being created will be the " +
                     "next available version integer. Flow versions are immutable after they are created.",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = VersionedFlowSnapshot.class))),
+            responses = {
+                    @ApiResponse(responseCode = "201", description = HttpStatusMessages.MESSAGE_201, content = @Content(schema = @Schema(implementation = VersionedFlowSnapshot.class))),
+                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
                             @ExtensionProperty(name = "action", value = "write"),
                             @ExtensionProperty(name = "resource", value = "/buckets/{bucketId}")}
                     )
-            }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "201", description = HttpStatusMessages.MESSAGE_201),
-                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
             }
     )
     public Response importVersionedFlow(
@@ -366,21 +350,19 @@ public class BucketFlowResource extends ApplicationResource {
     @Operation(
             summary = "Get bucket flow versions",
             description = "Gets summary information for all versions of a flow. Versions are ordered newest->oldest.",
-            responses = @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = VersionedFlowSnapshotMetadata.class)))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(array = @ArraySchema(schema = @Schema(implementation = VersionedFlowSnapshotMetadata.class)))),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
                             @ExtensionProperty(name = "action", value = "read"),
                             @ExtensionProperty(name = "resource", value = "/buckets/{bucketId}")}
                     )
-            }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
             }
     )
     public Response getFlowVersions(
@@ -400,21 +382,19 @@ public class BucketFlowResource extends ApplicationResource {
     @Operation(
             summary = "Get latest bucket flow version content",
             description = "Gets the latest version of a flow, including the metadata and content of the flow.",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = VersionedFlowSnapshot.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = VersionedFlowSnapshot.class))),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
                             @ExtensionProperty(name = "action", value = "read"),
                             @ExtensionProperty(name = "resource", value = "/buckets/{bucketId}")}
                     )
-            }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
             }
     )
     public Response getLatestFlowVersion(
@@ -434,21 +414,19 @@ public class BucketFlowResource extends ApplicationResource {
     @Operation(
             summary = "Get latest bucket flow version metadata",
             description = "Gets the metadata for the latest version of a flow.",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = VersionedFlowSnapshotMetadata.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = VersionedFlowSnapshotMetadata.class))),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
                             @ExtensionProperty(name = "action", value = "read"),
                             @ExtensionProperty(name = "resource", value = "/buckets/{bucketId}")}
                     )
-            }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
             }
     )
     public Response getLatestFlowVersionMetadata(
@@ -468,21 +446,19 @@ public class BucketFlowResource extends ApplicationResource {
     @Operation(
             summary = "Exports specified bucket flow version content",
             description = "Exports the specified version of a flow, including the metadata and content of the flow.",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = VersionedFlowSnapshot.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = VersionedFlowSnapshot.class))),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
                             @ExtensionProperty(name = "action", value = "read"),
                             @ExtensionProperty(name = "resource", value = "/buckets/{bucketId}")}
                     )
-            }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
             }
     )
     public Response exportVersionedFlow(
@@ -514,22 +490,20 @@ public class BucketFlowResource extends ApplicationResource {
     @Operation(
             summary = "Get bucket flow version",
             description = "Gets the given version of a flow, including the metadata and content for the version.",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = VersionedFlowSnapshot.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = VersionedFlowSnapshot.class))),
+                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
                             @ExtensionProperty(name = "action", value = "read"),
                             @ExtensionProperty(name = "resource", value = "/buckets/{bucketId}")}
                     )
-            }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
             }
     )
     public Response getFlowVersion(
@@ -551,22 +525,20 @@ public class BucketFlowResource extends ApplicationResource {
     @Operation(
             summary = "Get bucket flow diff",
             description = "Computes the differences between two given versions of a flow.",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = VersionedFlowDifference.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = VersionedFlowDifference.class))),
+                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
                             @ExtensionProperty(name = "action", value = "read"),
                             @ExtensionProperty(name = "resource", value = "/buckets/{bucketId}")}
                     )
-            }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
             }
     )
     public Response getFlowDiff(

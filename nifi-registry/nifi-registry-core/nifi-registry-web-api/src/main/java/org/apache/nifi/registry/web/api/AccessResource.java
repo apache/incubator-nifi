@@ -26,23 +26,10 @@ import com.nimbusds.openid.connect.sdk.AuthenticationErrorResponse;
 import com.nimbusds.openid.connect.sdk.AuthenticationResponseParser;
 import com.nimbusds.openid.connect.sdk.AuthenticationSuccessResponse;
 import io.jsonwebtoken.JwtException;
-
-import java.io.IOException;
-import java.net.URI;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import javax.net.ssl.SSLContext;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -93,6 +80,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+
+import javax.net.ssl.SSLContext;
+import java.io.IOException;
+import java.net.URI;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Component
 @Path("/access")
@@ -147,11 +145,10 @@ public class AccessResource extends ApplicationResource {
     @Operation(
             summary = "Get access status",
             description = "Returns the current client's authenticated identity and permissions to top-level resources",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = CurrentUser.class)))
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409 + " The NiFi Registry might be running unsecured.")}
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = CurrentUser.class))),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409 + " The NiFi Registry might be running unsecured.")
+            }
     )
     public Response getAccessStatus(@Context HttpServletRequest httpServletRequest) {
 
@@ -183,14 +180,14 @@ public class AccessResource extends ApplicationResource {
             description = "Creates a token for accessing the REST API via auto-detected method of verifying client identity claim credentials. " +
                     "The token returned is formatted as a JSON Web Token (JWT). The token is base64 encoded and comprised of three parts. The header, " +
                     "the body, and the signature. The expiration of the token is a contained within the body. The token can be used in the Authorization header " +
-                    "in the format 'Authorization: Bearer <token>'."
-    )
-    @ApiResponses(
-            {
+                    "in the format 'Authorization: Bearer <token>'.",
+            responses = {
+                    @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(implementation = String.class))),
                     @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
                     @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
                     @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409 + " The NiFi Registry may not be configured to support login with username/password."),
-                    @ApiResponse(responseCode = "500", description = HttpStatusMessages.MESSAGE_500)}
+                    @ApiResponse(responseCode = "500", description = HttpStatusMessages.MESSAGE_500)
+            }
     )
     public Response createAccessTokenByTryingAllProviders(@Context HttpServletRequest httpServletRequest) {
 
@@ -251,14 +248,14 @@ public class AccessResource extends ApplicationResource {
                     "That is: 'Authorization: Basic <credentials>', where <credentials> is the base64 encoded value of '<username>:<password>'. " +
                     "The token returned is formatted as a JSON Web Token (JWT). The token is base64 encoded and comprised of three parts. The header, " +
                     "the body, and the signature. The expiration of the token is a contained within the body. The token can be used in the Authorization header " +
-                    "in the format 'Authorization: Bearer <token>'."
-    )
-    @ApiResponses(
-            {
+                    "in the format 'Authorization: Bearer <token>'.",
+            responses = {
+                    @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(implementation = String.class))),
                     @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
                     @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
                     @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409 + " The NiFi Registry may not be configured to support login with username/password."),
-                    @ApiResponse(responseCode = "500", description = HttpStatusMessages.MESSAGE_500)}
+                    @ApiResponse(responseCode = "500", description = HttpStatusMessages.MESSAGE_500)
+            }
     )
     public Response createAccessTokenUsingBasicAuthCredentials(@Context HttpServletRequest httpServletRequest) {
 
@@ -305,10 +302,8 @@ public class AccessResource extends ApplicationResource {
     @Path("/logout")
     @Operation(
             summary = "Performs a logout for other providers that have been issued a JWT.",
-            description = NON_GUARANTEED_ENDPOINT
-    )
-    @ApiResponses(
-            value = {
+            description = NON_GUARANTEED_ENDPOINT,
+            responses = {
                     @ApiResponse(responseCode = "200", description = "User was logged out successfully."),
                     @ApiResponse(responseCode = "401", description = "Authentication token provided was empty or not in the correct JWT format."),
                     @ApiResponse(responseCode = "500", description = "Client failed to log out."),
@@ -341,10 +336,8 @@ public class AccessResource extends ApplicationResource {
     @Path("/logout/complete")
     @Operation(
             summary = "Completes the logout sequence.",
-            description = NON_GUARANTEED_ENDPOINT
-    )
-    @ApiResponses(
-            value = {
+            description = NON_GUARANTEED_ENDPOINT,
+            responses = {
                     @ApiResponse(responseCode = "200", description = "User was logged out successfully."),
                     @ApiResponse(responseCode = "401", description = "Authentication token provided was empty or not in the correct JWT format."),
                     @ApiResponse(responseCode = "500", description = "Client failed to log out."),
@@ -368,14 +361,14 @@ public class AccessResource extends ApplicationResource {
             description = "Creates a token for accessing the REST API via Kerberos Service Tickets or SPNEGO Tokens (which includes Kerberos Service Tickets). " +
                     "The token returned is formatted as a JSON Web Token (JWT). The token is base64 encoded and comprised of three parts. The header, " +
                     "the body, and the signature. The expiration of the token is a contained within the body. The token can be used in the Authorization header " +
-                    "in the format 'Authorization: Bearer <token>'."
-    )
-    @ApiResponses(
-            {
+                    "in the format 'Authorization: Bearer <token>'.",
+            responses = {
+                    @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(implementation = String.class))),
                     @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
                     @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
                     @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409 + " The NiFi Registry may not be configured to support login Kerberos credentials."),
-                    @ApiResponse(responseCode = "500", description = HttpStatusMessages.MESSAGE_500)}
+                    @ApiResponse(responseCode = "500", description = HttpStatusMessages.MESSAGE_500)
+            }
     )
     public Response createAccessTokenUsingKerberosTicket(@Context HttpServletRequest httpServletRequest) {
 
@@ -427,14 +420,14 @@ public class AccessResource extends ApplicationResource {
                     "The exact format of the user credentials expected by the custom identity provider can be discovered by 'GET /access/token/identity-provider/usage'. " +
                     "The token returned is formatted as a JSON Web Token (JWT). The token is base64 encoded and comprised of three parts. The header, " +
                     "the body, and the signature. The expiration of the token is a contained within the body. The token can be used in the Authorization header " +
-                    "in the format 'Authorization: Bearer <token>'."
-    )
-    @ApiResponses(
-            {
+                    "in the format 'Authorization: Bearer <token>'.",
+            responses = {
+                    @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(implementation = String.class))),
                     @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
                     @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
                     @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409 + " The NiFi Registry may not be configured to support login with customized credentials."),
-                    @ApiResponse(responseCode = "500", description = HttpStatusMessages.MESSAGE_500)}
+                    @ApiResponse(responseCode = "500", description = HttpStatusMessages.MESSAGE_500)
+            }
     )
     public Response createAccessTokenUsingIdentityProviderCredentials(@Context HttpServletRequest httpServletRequest) {
 
@@ -481,13 +474,13 @@ public class AccessResource extends ApplicationResource {
     @Path("/token/identity-provider/usage")
     @Operation(
             summary = "Get identity provider usage",
-            description = "Provides a description of how the currently configured identity provider expects credentials to be passed to POST /access/token/identity-provider"
-    )
-    @ApiResponses(
-            {
+            description = "Provides a description of how the currently configured identity provider expects credentials to be passed to POST /access/token/identity-provider",
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = String.class))),
                     @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
                     @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409 + " The NiFi Registry may not be configured to support login with customized credentials."),
-                    @ApiResponse(responseCode = "500", description = HttpStatusMessages.MESSAGE_500)}
+                    @ApiResponse(responseCode = "500", description = HttpStatusMessages.MESSAGE_500)
+            }
     )
     public Response getIdentityProviderUsageInstructions(@Context HttpServletRequest httpServletRequest) {
 
@@ -526,14 +519,14 @@ public class AccessResource extends ApplicationResource {
     @Operation(
             summary = "Test identity provider",
             description = "Tests the format of the credentials against this identity provider without preforming authentication on the credentials to validate them. " +
-                    "The user credentials should be passed in a format understood by the custom identity provider as defined by 'GET /access/token/identity-provider/usage'."
-    )
-    @ApiResponses(
-            {
+                    "The user credentials should be passed in a format understood by the custom identity provider as defined by 'GET /access/token/identity-provider/usage'.",
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = String.class))),
                     @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
                     @ApiResponse(responseCode = "401", description = "The format of the credentials were not recognized by the currently configured identity provider."),
                     @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409 + " The NiFi Registry may not be configured to support login with customized credentials."),
-                    @ApiResponse(responseCode = "500", description = HttpStatusMessages.MESSAGE_500)}
+                    @ApiResponse(responseCode = "500", description = HttpStatusMessages.MESSAGE_500)
+            }
     )
     public Response testIdentityProviderRecognizesCredentialsFormat(@Context HttpServletRequest httpServletRequest) {
 

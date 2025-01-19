@@ -16,15 +16,11 @@
  */
 package org.apache.nifi.web.api;
 
-import java.util.List;
-import java.util.Set;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.Consumes;
@@ -56,6 +52,9 @@ import org.apache.nifi.web.api.request.ClientIdParameter;
 import org.apache.nifi.web.api.request.LongParameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * RESTful endpoint for managing a Connection.
@@ -105,19 +104,17 @@ public class ConnectionResource extends ApplicationResource {
     @Path("/{id}")
     @Operation(
             summary = "Gets a connection",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ConnectionEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Read Source - /{component-type}/{uuid}"),
-                    @SecurityRequirement(name = "Read Destination - /{component-type}/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ConnectionEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Read Source - /{component-type}/{uuid}"),
+                    @SecurityRequirement(name = "Read Destination - /{component-type}/{uuid}")
             }
     )
     public Response getConnection(
@@ -160,21 +157,19 @@ public class ConnectionResource extends ApplicationResource {
     @Path("/{id}")
     @Operation(
             summary = "Updates a connection",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ConnectionEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Write Source - /{component-type}/{uuid}"),
-                    @SecurityRequirement(name = "Write Destination - /{component-type}/{uuid}"),
-                    @SecurityRequirement(name = "Write New Destination - /{component-type}/{uuid} - if updating Destination"),
-                    @SecurityRequirement(name = "Write Process Group - /process-groups/{uuid} - if updating Destination")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ConnectionEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Write Source - /{component-type}/{uuid}"),
+                    @SecurityRequirement(name = "Write Destination - /{component-type}/{uuid}"),
+                    @SecurityRequirement(name = "Write New Destination - /{component-type}/{uuid} - if updating Destination"),
+                    @SecurityRequirement(name = "Write Process Group - /process-groups/{uuid} - if updating Destination")
             }
     )
     public Response updateConnection(
@@ -291,20 +286,18 @@ public class ConnectionResource extends ApplicationResource {
     @Path("/{id}")
     @Operation(
             summary = "Deletes a connection",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ConnectionEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Write Source - /{component-type}/{uuid}"),
-                    @SecurityRequirement(name = "Write - Parent Process Group - /process-groups/{uuid}"),
-                    @SecurityRequirement(name = "Write Destination - /{component-type}/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ConnectionEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Write Source - /{component-type}/{uuid}"),
+                    @SecurityRequirement(name = "Write - Parent Process Group - /process-groups/{uuid}"),
+                    @SecurityRequirement(name = "Write Destination - /{component-type}/{uuid}")
             }
     )
     public Response deleteConnection(

@@ -16,14 +16,11 @@
  */
 package org.apache.nifi.web.api;
 
-import java.util.Collection;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.Consumes;
@@ -49,6 +46,8 @@ import org.apache.nifi.web.api.entity.SystemDiagnosticsEntity;
 import org.apache.nifi.web.api.metrics.jmx.JmxMetricsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+
+import java.util.Collection;
 
 /**
  * RESTful endpoint for retrieving system diagnostics.
@@ -79,15 +78,14 @@ public class SystemDiagnosticsResource extends ApplicationResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(
             summary = "Gets the diagnostics for the system NiFi is running on",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = SystemDiagnosticsEntity.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = SystemDiagnosticsEntity.class))),
+                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
+                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
+            },
             security = {
                     @SecurityRequirement(name = "Read - /system")
             }
-    )
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
-                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."), }
     )
     public Response getSystemDiagnostics(
             @Parameter(
@@ -159,18 +157,16 @@ public class SystemDiagnosticsResource extends ApplicationResource {
     @Operation(
             summary = "Retrieve available JMX metrics",
             description = NON_GUARANTEED_ENDPOINT,
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = JmxMetricsResultsEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Read - /system")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = JmxMetricsResultsEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Read - /system")
             }
     )
     public Response getJmxMetrics(

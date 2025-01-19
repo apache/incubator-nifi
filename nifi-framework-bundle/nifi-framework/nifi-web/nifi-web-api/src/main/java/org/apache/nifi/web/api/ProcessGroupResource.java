@@ -20,26 +20,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jakarta.xmlbind.JakartaXmlBindAnnotationIntrospector;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.Consumes;
@@ -115,7 +100,6 @@ import org.apache.nifi.web.api.entity.ConnectionsEntity;
 import org.apache.nifi.web.api.entity.ControllerServiceEntity;
 import org.apache.nifi.web.api.entity.CopyRequestEntity;
 import org.apache.nifi.web.api.entity.CopyResponseEntity;
-import org.apache.nifi.web.api.entity.PasteRequestEntity;
 import org.apache.nifi.web.api.entity.CopySnippetRequestEntity;
 import org.apache.nifi.web.api.entity.DropRequestEntity;
 import org.apache.nifi.web.api.entity.Entity;
@@ -128,6 +112,7 @@ import org.apache.nifi.web.api.entity.LabelEntity;
 import org.apache.nifi.web.api.entity.LabelsEntity;
 import org.apache.nifi.web.api.entity.OutputPortsEntity;
 import org.apache.nifi.web.api.entity.ParameterContextReferenceEntity;
+import org.apache.nifi.web.api.entity.PasteRequestEntity;
 import org.apache.nifi.web.api.entity.PasteResponseEntity;
 import org.apache.nifi.web.api.entity.PortEntity;
 import org.apache.nifi.web.api.entity.ProcessGroupEntity;
@@ -148,6 +133,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * RESTful endpoint for managing a Group.
@@ -241,18 +239,16 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}")
     @Operation(
             summary = "Gets a process group",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ProcessGroupEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Read - /process-groups/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ProcessGroupEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Read - /process-groups/{uuid}")
             }
     )
     public Response getProcessGroup(
@@ -292,18 +288,16 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}/download")
     @Operation(
             summary = "Gets a process group for download",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = String.class))),
-            security = {
-                    @SecurityRequirement(name = "Read - /process-groups/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = String.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Read - /process-groups/{uuid}")
             }
     )
     public Response exportProcessGroup(
@@ -349,18 +343,16 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}/copy")
     @Operation(
             summary = "Generates a copy response for the given copy request",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = CopyResponseEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Read - /{component-type}/{uuid} - For all encapsulated components")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = CopyResponseEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Read - /{component-type}/{uuid} - For all encapsulated components")
             }
     )
     public Response copy(
@@ -431,19 +423,17 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}/local-modifications")
     @Operation(
             summary = "Gets a list of local modifications to the Process Group since it was last synchronized with the Flow Registry",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = FlowComparisonEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Read - /process-groups/{uuid}"),
-                    @SecurityRequirement(name = "Read - /{component-type}/{uuid} - For all encapsulated components")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = FlowComparisonEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Read - /process-groups/{uuid}"),
+                    @SecurityRequirement(name = "Read - /{component-type}/{uuid} - For all encapsulated components")
             }
     )
     public Response getLocalModifications(
@@ -473,18 +463,16 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}")
     @Operation(
             summary = "Updates a process group",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ProcessGroupEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Write - /process-groups/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ProcessGroupEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Write - /process-groups/{uuid}")
             }
     )
     public Response updateProcessGroup(
@@ -686,20 +674,20 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}/empty-all-connections-requests")
     @Operation(
             summary = "Creates a request to drop all flowfiles of all connection queues in this process group.",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = DropRequestEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Read - /process-groups/{uuid} - For this and all encapsulated process groups"),
-                    @SecurityRequirement(name = "Write Source Data - /data/{component-type}/{uuid} - For all encapsulated connections")
-            }
-    )
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "202", description = "The request has been accepted. An HTTP response header will contain the URI where the status can be polled."),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "202", description = "The request has been accepted. An HTTP response header will contain the URI where the status can be polled.",
+                            content = @Content(schema = @Schema(implementation = DropRequestEntity.class))
+                    ),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Read - /process-groups/{uuid} - For this and all encapsulated process groups"),
+                    @SecurityRequirement(name = "Write Source Data - /data/{component-type}/{uuid} - For all encapsulated connections")
             }
     )
     public Response createEmptyAllConnectionsRequest(
@@ -750,19 +738,17 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}/empty-all-connections-requests/{drop-request-id}")
     @Operation(
             summary = "Gets the current status of a drop all flowfiles request.",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = DropRequestEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Read - /process-groups/{uuid} - For this and all encapsulated process groups"),
-                    @SecurityRequirement(name = "Write Source Data - /data/{component-type}/{uuid} - For all encapsulated connections")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = DropRequestEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Read - /process-groups/{uuid} - For this and all encapsulated process groups"),
+                    @SecurityRequirement(name = "Write Source Data - /data/{component-type}/{uuid} - For all encapsulated connections")
             }
     )
     public Response getDropAllFlowfilesRequest(
@@ -808,19 +794,17 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}/empty-all-connections-requests/{drop-request-id}")
     @Operation(
             summary = "Cancels and/or removes a request to drop all flowfiles.",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = DropRequestEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Read - /process-groups/{uuid} - For this and all encapsulated process groups"),
-                    @SecurityRequirement(name = "Write Source Data - /data/{component-type}/{uuid} - For all encapsulated connections")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = DropRequestEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Read - /process-groups/{uuid} - For this and all encapsulated process groups"),
+                    @SecurityRequirement(name = "Write Source Data - /data/{component-type}/{uuid} - For all encapsulated connections")
             }
     )
     public Response removeDropRequest(
@@ -879,21 +863,19 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}")
     @Operation(
             summary = "Deletes a process group",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ProcessGroupEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Write - /process-groups/{uuid}"),
-                    @SecurityRequirement(name = "Write - Parent Process Group - /process-groups/{uuid}"),
-                    @SecurityRequirement(name = "Read - any referenced Controller Services by any encapsulated components - /controller-services/{uuid}"),
-                    @SecurityRequirement(name = "Write - /{component-type}/{uuid} - For all encapsulated components")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ProcessGroupEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Write - /process-groups/{uuid}"),
+                    @SecurityRequirement(name = "Write - Parent Process Group - /process-groups/{uuid}"),
+                    @SecurityRequirement(name = "Read - any referenced Controller Services by any encapsulated components - /controller-services/{uuid}"),
+                    @SecurityRequirement(name = "Write - /{component-type}/{uuid} - For all encapsulated components")
             }
     )
     public Response removeProcessGroup(
@@ -965,18 +947,16 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}/process-groups")
     @Operation(
             summary = "Creates a process group",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ProcessGroupEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Write - /process-groups/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(implementation = ProcessGroupEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Write - /process-groups/{uuid}")
             }
     )
     public Response createProcessGroup(
@@ -1170,18 +1150,16 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}/process-groups")
     @Operation(
             summary = "Gets all process groups",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ProcessGroupsEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Read - /process-groups/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ProcessGroupsEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Read - /process-groups/{uuid}")
             }
     )
     public Response getProcessGroups(
@@ -1236,20 +1214,18 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}/processors")
     @Operation(
             summary = "Creates a new processor",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ProcessorEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Write - /process-groups/{uuid}"),
-                    @SecurityRequirement(name = "Read - any referenced Controller Services - /controller-services/{uuid}"),
-                    @SecurityRequirement(name = "Write - if the Processor is restricted - /restricted-components")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(implementation = ProcessorEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Write - /process-groups/{uuid}"),
+                    @SecurityRequirement(name = "Read - any referenced Controller Services - /controller-services/{uuid}"),
+                    @SecurityRequirement(name = "Write - if the Processor is restricted - /restricted-components")
             }
     )
     public Response createProcessor(
@@ -1358,18 +1334,16 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}/processors")
     @Operation(
             summary = "Gets all processors",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ProcessorsEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Read - /process-groups/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ProcessorsEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Read - /process-groups/{uuid}")
             }
     )
     public Response getProcessors(
@@ -1420,18 +1394,16 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}/input-ports")
     @Operation(
             summary = "Creates an input port",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = PortEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Write - /process-groups/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(implementation = PortEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Write - /process-groups/{uuid}")
             }
     )
     public Response createInputPort(
@@ -1504,18 +1476,16 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}/input-ports")
     @Operation(
             summary = "Gets all input ports",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = InputPortsEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Read - /process-groups/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = InputPortsEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Read - /process-groups/{uuid}")
             }
     )
     public Response getInputPorts(
@@ -1562,18 +1532,16 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}/output-ports")
     @Operation(
             summary = "Creates an output port",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = PortEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Write - /process-groups/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(implementation = PortEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Write - /process-groups/{uuid}")
             }
     )
     public Response createOutputPort(
@@ -1647,18 +1615,16 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}/output-ports")
     @Operation(
             summary = "Gets all output ports",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = OutputPortsEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Read - /process-groups/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = OutputPortsEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Read - /process-groups/{uuid}")
             }
     )
     public Response getOutputPorts(
@@ -1706,18 +1672,16 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}/funnels")
     @Operation(
             summary = "Creates a funnel",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = FunnelEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Write - /process-groups/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(implementation = FunnelEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Write - /process-groups/{uuid}")
             }
     )
     public Response createFunnel(
@@ -1790,18 +1754,16 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}/funnels")
     @Operation(
             summary = "Gets all funnels",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = FunnelsEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Read - /process-groups/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = FunnelsEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Read - /process-groups/{uuid}")
             }
     )
     public Response getFunnels(
@@ -1849,18 +1811,16 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}/labels")
     @Operation(
             summary = "Creates a label",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = LabelEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Write - /process-groups/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(implementation = LabelEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Write - /process-groups/{uuid}")
             }
     )
     public Response createLabel(
@@ -1934,18 +1894,16 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}/labels")
     @Operation(
             summary = "Gets all labels",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = LabelsEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Read - /process-groups/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = LabelsEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Read - /process-groups/{uuid}")
             }
     )
     public Response getLabels(
@@ -1993,18 +1951,16 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}/remote-process-groups")
     @Operation(
             summary = "Creates a new process group",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = RemoteProcessGroupEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Write - /process-groups/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(implementation = RemoteProcessGroupEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Write - /process-groups/{uuid}")
             }
     )
     public Response createRemoteProcessGroup(
@@ -2092,18 +2048,16 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}/remote-process-groups")
     @Operation(
             summary = "Gets all remote process groups",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = RemoteProcessGroupsEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Read - /process-groups/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = RemoteProcessGroupsEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Read - /process-groups/{uuid}")
             }
     )
     public Response getRemoteProcessGroups(
@@ -2158,20 +2112,18 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}/connections")
     @Operation(
             summary = "Creates a connection",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ConnectionEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Write - /process-groups/{uuid}"),
-                    @SecurityRequirement(name = "Write Source - /{component-type}/{uuid}"),
-                    @SecurityRequirement(name = "Write Destination - /{component-type}/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(implementation = ConnectionEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Write - /process-groups/{uuid}"),
+                    @SecurityRequirement(name = "Write Source - /{component-type}/{uuid}"),
+                    @SecurityRequirement(name = "Write Destination - /{component-type}/{uuid}")
             }
     )
     public Response createConnection(
@@ -2314,18 +2266,16 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}/connections")
     @Operation(
             summary = "Gets all connections",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ConnectionsEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Read - /process-groups/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ConnectionsEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Read - /process-groups/{uuid}")
             }
     )
     public Response getConnections(
@@ -2376,20 +2326,18 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}/snippet-instance")
     @Operation(
             summary = "Copies a snippet and discards it.",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = FlowEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Write - /process-groups/{uuid}"),
-                    @SecurityRequirement(name = "Read - /{component-type}/{uuid} - For each component in the snippet and their descendant components"),
-                    @SecurityRequirement(name = "Write - if the snippet contains any restricted Processors - /restricted-components")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(implementation = FlowEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Write - /process-groups/{uuid}"),
+                    @SecurityRequirement(name = "Read - /{component-type}/{uuid} - For each component in the snippet and their descendant components"),
+                    @SecurityRequirement(name = "Write - if the snippet contains any restricted Processors - /restricted-components")
             }
     )
     public Response copySnippet(
@@ -2501,19 +2449,17 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}/controller-services")
     @Operation(
             summary = "Creates a new controller service",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ControllerServiceEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Write - /process-groups/{uuid}"),
-                    @SecurityRequirement(name = "Read - any referenced Controller Services - /controller-services/{uuid}"),
-                    @SecurityRequirement(name = "Write - if the Controller Service is restricted - /restricted-components")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(implementation = ControllerServiceEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Write - /process-groups/{uuid}"),
+                    @SecurityRequirement(name = "Read - any referenced Controller Services - /controller-services/{uuid}"),
+                    @SecurityRequirement(name = "Write - if the Controller Service is restricted - /restricted-components")
             }
     )
     public Response createControllerService(
@@ -2614,7 +2560,14 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}/replace-requests")
     @Operation(
             summary = "Initiate the Replace Request of a Process Group with the given ID",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ProcessGroupReplaceRequestEntity.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ProcessGroupReplaceRequestEntity.class))),
+                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
+                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
+                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
+                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
+                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
             description = "This will initiate the action of replacing a process group with the given process group. This can be a lengthy "
                     + "process, as it will stop any Processors and disable any Controller Services necessary to perform the action and then restart them. As a result, "
                     + "the endpoint will immediately return a ProcessGroupReplaceRequestEntity, and the process of replacing the flow will occur "
@@ -2628,15 +2581,6 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
                     @SecurityRequirement(name = "Write - /{component-type}/{uuid} - For all encapsulated components"),
                     @SecurityRequirement(name = "Write - if the snapshot contains any restricted components - /restricted-components"),
                     @SecurityRequirement(name = "Read - /parameter-contexts/{uuid} - For any Parameter Context that is referenced by a Property that is changed, added, or removed")
-            }
-    )
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
-                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
-                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
-                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
-                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
             }
     )
     public Response initiateReplaceProcessGroup(@Parameter(description = "The process group id.", required = true) @PathParam("id") final String groupId,
@@ -2692,18 +2636,16 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}/process-groups/upload")
     @Operation(
             summary = "Uploads a versioned flow definition and creates a process group",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ProcessGroupEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Write - /process-groups/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(implementation = ProcessGroupEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Write - /process-groups/{uuid}")
             }
     )
     public Response uploadProcessGroup(
@@ -2840,17 +2782,15 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}/process-groups/import")
     @Operation(
             summary = "Imports a specified process group",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ProcessGroupEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Write - /process-groups/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(implementation = ProcessGroupEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Write - /process-groups/{uuid}")
             }
     )
     public Response importProcessGroup(
@@ -2962,17 +2902,15 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}/paste")
     @Operation(
             summary = "Pastes into the specified process group",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = PasteResponseEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Write - /process-groups/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = PasteResponseEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Write - /process-groups/{uuid}")
             }
     )
     public Response paste(
@@ -3289,7 +3227,14 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("{id}/flow-contents")
     @Operation(
             summary = "Replace Process Group contents with the given ID with the specified Process Group contents",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ProcessGroupImportEntity.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ProcessGroupImportEntity.class))),
+                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
+                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
+                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
+                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
+                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
             description = "This endpoint is used for replication within a cluster, when replacing a flow with a new flow. It expects that the flow being"
                     + "replaced is not under version control and that the given snapshot will not modify any Processor that is currently running "
                     + "or any Controller Service that is enabled. "
@@ -3297,15 +3242,6 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
             security = {
                     @SecurityRequirement(name = "Read - /process-groups/{uuid}"),
                     @SecurityRequirement(name = "Write - /process-groups/{uuid}")
-            }
-    )
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
-                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
-                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
-                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
-                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
             }
     )
     public Response replaceProcessGroup(@Parameter(description = "The process group id.", required = true) @PathParam("id") final String groupId,
@@ -3375,22 +3311,20 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("replace-requests/{id}")
     @Operation(
             summary = "Returns the Replace Request with the given ID",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ProcessGroupReplaceRequestEntity.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ProcessGroupReplaceRequestEntity.class))),
+                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
+                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
+                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
+                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
+                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
             description = "Returns the Replace Request with the given ID. Once a Replace Request has been created by performing a POST to /process-groups/{id}/replace-requests, "
                     + "that request can subsequently be retrieved via this endpoint, and the request that is fetched will contain the updated state, such as percent complete, the "
                     + "current state of the request, and any failures. "
                     + NON_GUARANTEED_ENDPOINT,
             security = {
                     @SecurityRequirement(name = "Only the user that submitted the request can get it")
-            }
-    )
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
-                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
-                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
-                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
-                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
             }
     )
     public Response getReplaceProcessGroupRequest(
@@ -3404,22 +3338,20 @@ public class ProcessGroupResource extends FlowUpdateResource<ProcessGroupImportE
     @Path("replace-requests/{id}")
     @Operation(
             summary = "Deletes the Replace Request with the given ID",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ProcessGroupReplaceRequestEntity.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ProcessGroupReplaceRequestEntity.class))),
+                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
+                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
+                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
+                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
+                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
             description = "Deletes the Replace Request with the given ID. After a request is created via a POST to /process-groups/{id}/replace-requests, it is expected "
                     + "that the client will properly clean up the request by DELETE'ing it, once the Replace process has completed. If the request is deleted before the request "
                     + "completes, then the Replace request will finish the step that it is currently performing and then will cancel any subsequent steps. "
                     + NON_GUARANTEED_ENDPOINT,
             security = {
                     @SecurityRequirement(name = "Only the user that submitted the request can remove it")
-            }
-    )
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
-                    @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
-                    @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
-                    @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
-                    @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
             }
     )
     public Response deleteReplaceProcessGroupRequest(

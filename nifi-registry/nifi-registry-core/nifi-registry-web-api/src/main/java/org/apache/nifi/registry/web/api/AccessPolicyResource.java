@@ -16,10 +16,6 @@
  */
 package org.apache.nifi.registry.web.api;
 
-import java.net.URI;
-import java.util.Collections;
-import java.util.List;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
@@ -28,7 +24,6 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.Consumes;
@@ -57,6 +52,10 @@ import org.apache.nifi.registry.web.service.ServiceFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.net.URI;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * RESTful endpoint for managing access policies.
  */
@@ -73,7 +72,7 @@ public class AccessPolicyResource extends ApplicationResource {
     /**
      * Create a new access policy.
      *
-     * @param httpServletRequest request
+     * @param httpServletRequest  request
      * @param requestAccessPolicy the access policy to create.
      * @return The created access policy.
      */
@@ -82,21 +81,19 @@ public class AccessPolicyResource extends ApplicationResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(
             summary = "Create access policy",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = AccessPolicy.class))),
+            responses = {
+                    @ApiResponse(content = @Content(schema = @Schema(implementation = AccessPolicy.class))),
+                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409 + " The NiFi Registry might not be configured to use a ConfigurableAccessPolicyProvider.")
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
                             @ExtensionProperty(name = "action", value = "write"),
                             @ExtensionProperty(name = "resource", value = "/policies")}
                     )
-            }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409 + " The NiFi Registry might not be configured to use a ConfigurableAccessPolicyProvider.")
             }
     )
     public Response createAccessPolicy(
@@ -118,24 +115,21 @@ public class AccessPolicyResource extends ApplicationResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(
             summary = "Get all access policies",
-            responses = @ApiResponse(
-                    content = @Content(
-                            array = @ArraySchema(schema = @Schema(implementation = AccessPolicy.class))
-                    )
-            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            content = @Content(array = @ArraySchema(schema = @Schema(implementation = AccessPolicy.class)))
+                    ),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
                             @ExtensionProperty(name = "action", value = "read"),
                             @ExtensionProperty(name = "resource", value = "/policies")}
                     )
-            }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
             }
     )
     public Response getAccessPolicies() {
@@ -159,21 +153,19 @@ public class AccessPolicyResource extends ApplicationResource {
     @Path("{id}")
     @Operation(
             summary = "Get access policy",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = AccessPolicy.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = AccessPolicy.class))),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
                             @ExtensionProperty(name = "action", value = "read"),
                             @ExtensionProperty(name = "resource", value = "/policies")}
                     )
-            }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
             }
     )
     public Response getAccessPolicy(
@@ -187,7 +179,7 @@ public class AccessPolicyResource extends ApplicationResource {
     /**
      * Retrieve a specified access policy for a given (action, resource) pair.
      *
-     * @param action the action, i.e. "read", "write"
+     * @param action      the action, i.e. "read", "write"
      * @param rawResource the name of the resource as a raw string
      * @return An access policy.
      */
@@ -198,7 +190,14 @@ public class AccessPolicyResource extends ApplicationResource {
     @Operation(
             summary = "Get access policy for resource",
             description = "Gets an access policy for the specified action and resource",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = AccessPolicy.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = AccessPolicy.class))),
+                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
@@ -206,14 +205,6 @@ public class AccessPolicyResource extends ApplicationResource {
                             @ExtensionProperty(name = "resource", value = "/policies")}
                     )
             }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409)}
     )
     public Response getAccessPolicyForResource(
             @Parameter(description = "The request action.", required = true)
@@ -233,8 +224,8 @@ public class AccessPolicyResource extends ApplicationResource {
     /**
      * Update an access policy.
      *
-     * @param httpServletRequest request
-     * @param identifier The id of the access policy to update.
+     * @param httpServletRequest  request
+     * @param identifier          The id of the access policy to update.
      * @param requestAccessPolicy An access policy.
      * @return the updated access policy.
      */
@@ -244,22 +235,20 @@ public class AccessPolicyResource extends ApplicationResource {
     @Path("{id}")
     @Operation(
             summary = "Update access policy",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = AccessPolicy.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = AccessPolicy.class))),
+                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409 + " The NiFi Registry might not be configured to use a ConfigurableAccessPolicyProvider.")
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
                             @ExtensionProperty(name = "action", value = "write"),
                             @ExtensionProperty(name = "resource", value = "/policies")}
                     )
-            }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "400", description = HttpStatusMessages.MESSAGE_400),
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409 + " The NiFi Registry might not be configured to use a ConfigurableAccessPolicyProvider.")
             }
     )
     public Response updateAccessPolicy(
@@ -285,7 +274,7 @@ public class AccessPolicyResource extends ApplicationResource {
      * Remove a specified access policy.
      *
      * @param httpServletRequest request
-     * @param identifier The id of the access policy to remove.
+     * @param identifier         The id of the access policy to remove.
      * @return The deleted access policy
      */
     @DELETE
@@ -294,21 +283,19 @@ public class AccessPolicyResource extends ApplicationResource {
     @Path("{id}")
     @Operation(
             summary = "Delete access policy",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = AccessPolicy.class))),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = AccessPolicy.class))),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
+                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
+                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409 + " The NiFi Registry might not be configured to use a ConfigurableAccessPolicyProvider.")
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
                             @ExtensionProperty(name = "action", value = "delete"),
                             @ExtensionProperty(name = "resource", value = "/policies")}
                     )
-            }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403),
-                    @ApiResponse(responseCode = "404", description = HttpStatusMessages.MESSAGE_404),
-                    @ApiResponse(responseCode = "409", description = HttpStatusMessages.MESSAGE_409 + " The NiFi Registry might not be configured to use a ConfigurableAccessPolicyProvider.")
             }
     )
     public Response removeAccessPolicy(
@@ -338,23 +325,17 @@ public class AccessPolicyResource extends ApplicationResource {
     @Operation(
             summary = "Get available resources",
             description = "Gets the available resources that support access/authorization policies",
-            responses = @ApiResponse(
-                    content = @Content(
-                            array = @ArraySchema(schema = @Schema(implementation = Resource.class))
-                    )
-            ),
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Resource.class)))),
+                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
+                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403)
+            },
             extensions = {
                     @Extension(
                             name = "access-policy", properties = {
                             @ExtensionProperty(name = "action", value = "read"),
                             @ExtensionProperty(name = "resource", value = "/policies")}
                     )
-            }
-    )
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "401", description = HttpStatusMessages.MESSAGE_401),
-                    @ApiResponse(responseCode = "403", description = HttpStatusMessages.MESSAGE_403)
             }
     )
     public Response getResources() {
