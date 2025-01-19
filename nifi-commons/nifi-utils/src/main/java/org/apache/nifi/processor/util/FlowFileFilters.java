@@ -43,22 +43,20 @@ public class FlowFileFilters {
 
             @Override
             public FlowFileFilterResult filter(final FlowFile flowFile) {
-                if (count == 0) {
-                    count++;
-                    size += flowFile.getSize();
+                count += 1;
+                size += flowFile.getSize();
 
+                if (count == 1) {
+                    // first FlowFile is always accepted
                     return FlowFileFilterResult.ACCEPT_AND_CONTINUE;
                 }
 
-                if ((size + flowFile.getSize() > maxBytes) || (count + 1 > maxCount)) {
+                if (size > maxBytes || count > maxCount) {
                     return FlowFileFilterResult.REJECT_AND_TERMINATE;
                 }
 
-                count++;
-                size += flowFile.getSize();
                 return FlowFileFilterResult.ACCEPT_AND_CONTINUE;
             }
-
         };
     }
 
