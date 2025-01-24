@@ -25,10 +25,9 @@ import org.apache.nifi.annotation.behavior.WritesAttributes;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.elasticsearch.ElasticSearchClientService;
+import org.apache.nifi.elasticsearch.ElasticsearchRequestOptions;
 import org.apache.nifi.elasticsearch.OperationResponse;
 import org.apache.nifi.expression.ExpressionLanguageScope;
-
-import java.util.Map;
 
 @WritesAttributes({
         @WritesAttribute(attribute = "elasticsearch.update.took", description = "The amount of time that it took to complete the update operation in ms."),
@@ -70,8 +69,7 @@ public class UpdateByQueryElasticsearch extends AbstractByQueryElasticsearch {
 
     @Override
     OperationResponse performOperation(final ElasticSearchClientService clientService, final String query,
-                                       final String index, final String type, final Map<String, String> requestParameters,
-                                       final Map<String, String> requestHeaders) {
-        return clientService.updateByQuery(query, index, type, requestParameters, requestHeaders);
+                                       final String index, final String type, final ElasticsearchRequestOptions elasticsearchRequestOptions) {
+        return clientService.updateByQuery(query, index, type, elasticsearchRequestOptions);
     }
 }

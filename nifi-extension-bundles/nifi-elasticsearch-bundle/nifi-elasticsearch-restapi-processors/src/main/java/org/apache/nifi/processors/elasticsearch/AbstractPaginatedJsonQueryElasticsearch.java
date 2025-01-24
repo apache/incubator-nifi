@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.nifi.annotation.lifecycle.OnScheduled;
 import org.apache.nifi.components.PropertyDescriptor;
+import org.apache.nifi.elasticsearch.ElasticsearchRequestOptions;
 import org.apache.nifi.elasticsearch.SearchResponse;
 import org.apache.nifi.expression.ExpressionLanguageScope;
 import org.apache.nifi.flowfile.FlowFile;
@@ -111,7 +112,7 @@ public abstract class AbstractPaginatedJsonQueryElasticsearch extends AbstractJs
                 if (!requestParameters.isEmpty()) {
                     getLogger().warn("Elasticsearch _scroll API does not accept query parameters, ignoring dynamic properties {}", requestParameters.keySet());
                 }
-                response = clientService.get().scroll(queryJson, requestHeaders);
+                response = clientService.get().scroll(queryJson, new ElasticsearchRequestOptions(null, requestHeaders));
             } else {
                 if (paginationType == PaginationType.SCROLL) {
                     requestParameters.put("scroll", paginatedJsonQueryParameters.getKeepAlive());
@@ -122,8 +123,7 @@ public abstract class AbstractPaginatedJsonQueryElasticsearch extends AbstractJs
                         // Point in Time uses general /_search API not /index/_search
                         paginationType == PaginationType.POINT_IN_TIME ? null : paginatedJsonQueryParameters.getIndex(),
                         paginatedJsonQueryParameters.getType(),
-                        requestParameters,
-                        requestHeaders
+                        new ElasticsearchRequestOptions(requestParameters, requestHeaders)
                 );
                 paginatedJsonQueryParameters.setPitId(response.getPitId());
                 paginatedJsonQueryParameters.setSearchAfter(response.getSearchAfter());
@@ -202,7 +202,9 @@ public abstract class AbstractPaginatedJsonQueryElasticsearch extends AbstractJs
             // add pit_id to query JSON
             final String queryPitId = newQuery
                     ? clientService.get().initialisePointInTime(
-                            paginatedJsonQueryParameters.getIndex(), paginatedJsonQueryParameters.getKeepAlive(), getRequestHeadersFromDynamicProperties(context, input))
+                            paginatedJsonQueryParameters.getIndex(), paginatedJsonQueryParameters.getKeepAlive(),
+                            new ElasticsearchRequestOptions(null, getRequestHeadersFromDynamicProperties(context, input))
+                    )
                     : paginatedJsonQueryParameters.getPitId();
 
             final ObjectNode pit = JsonNodeFactory.instance.objectNode().put("id", queryPitId);
@@ -296,13 +298,13 @@ public abstract class AbstractPaginatedJsonQueryElasticsearch extends AbstractJs
                 final String scrollId = getScrollId(context, response);
 
                 if (StringUtils.isNotBlank(scrollId)) {
-                    clientService.get().deleteScroll(scrollId, requestHeaders);
+                    clientService.get().deleteScroll(scrollId, new ElasticsearchRequestOptions(null, requestHeaders));
                 }
             } else if (paginationType == PaginationType.POINT_IN_TIME) {
                 final String pitId = getPitId(context, response);
 
                 if (StringUtils.isNotBlank(pitId)) {
-                    clientService.get().deletePointInTime(pitId, requestHeaders);
+                    clientService.get().deletePointInTime(pitId, new ElasticsearchRequestOptions(null, requestHeaders));
                 }
             }
         } catch (final Exception ex) {

@@ -33,6 +33,7 @@ import org.apache.nifi.components.ConfigVerificationResult;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.elasticsearch.ElasticSearchClientService;
 import org.apache.nifi.elasticsearch.ElasticsearchException;
+import org.apache.nifi.elasticsearch.ElasticsearchRequestOptions;
 import org.apache.nifi.expression.ExpressionLanguageScope;
 import org.apache.nifi.flowfile.FlowFile;
 import org.apache.nifi.logging.ComponentLog;
@@ -196,7 +197,8 @@ public class GetElasticsearch extends AbstractProcessor implements Elasticsearch
             try {
                 final Map<String, String> requestParameters = new HashMap<>(getRequestParametersFromDynamicProperties(context, attributes));
                 requestParameters.putIfAbsent("_source", "false");
-                if (verifyClientService.documentExists(index, type, id, requestParameters, getRequestHeadersFromDynamicProperties(context, attributes))) {
+                if (verifyClientService.documentExists(index, type, id, new ElasticsearchRequestOptions(requestParameters,
+                        getRequestHeadersFromDynamicProperties(context, attributes)))) {
                     documentExistsResult.outcome(ConfigVerificationResult.Outcome.SUCCESSFUL)
                             .explanation(String.format("Document [%s] exists in index [%s]", id, index));
                 } else {
@@ -245,7 +247,7 @@ public class GetElasticsearch extends AbstractProcessor implements Elasticsearch
 
             final StopWatch stopWatch = new StopWatch(true);
             final Map<String, Object> doc = clientService.get().get(index, type, id,
-                    getRequestParametersFromDynamicProperties(context, input), getRequestHeadersFromDynamicProperties(context, input));
+                    new ElasticsearchRequestOptions(getRequestParametersFromDynamicProperties(context, input), getRequestHeadersFromDynamicProperties(context, input)));
 
             final Map<String, String> attributes = new HashMap<>(4, 1);
             attributes.put("filename", id);

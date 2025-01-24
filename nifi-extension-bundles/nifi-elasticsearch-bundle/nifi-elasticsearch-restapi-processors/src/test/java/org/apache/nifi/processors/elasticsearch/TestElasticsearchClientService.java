@@ -21,6 +21,7 @@ import org.apache.nifi.controller.AbstractControllerService;
 import org.apache.nifi.controller.ConfigurationContext;
 import org.apache.nifi.elasticsearch.DeleteOperationResponse;
 import org.apache.nifi.elasticsearch.ElasticSearchClientService;
+import org.apache.nifi.elasticsearch.ElasticsearchRequestOptions;
 import org.apache.nifi.elasticsearch.IndexOperationRequest;
 import org.apache.nifi.elasticsearch.IndexOperationResponse;
 import org.apache.nifi.elasticsearch.SearchResponse;
@@ -58,8 +59,7 @@ public class TestElasticsearchClientService extends AbstractControllerService im
     private boolean throwErrorInUpdate;
     private int pageCount = 0;
     private int maxPages = 1;
-    private Map<String, String> requestParameters;
-    private Map<String, String> requestHeaders;
+    private ElasticsearchRequestOptions elasticsearchRequestOptions;
 
     private boolean scrolling = false;
     private String query;
@@ -68,7 +68,7 @@ public class TestElasticsearchClientService extends AbstractControllerService im
         this.returnAggs = returnAggs;
     }
 
-    private void common(final boolean throwError, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) throws IOException {
+    private void common(final boolean throwError, final ElasticsearchRequestOptions elasticsearchRequestOptions) throws IOException {
         if (throwError) {
             if (throwNotFoundInGet) {
                 throw new MockElasticsearchException(false, true);
@@ -77,8 +77,10 @@ public class TestElasticsearchClientService extends AbstractControllerService im
             }
         }
 
-        this.requestParameters = requestParameters;
-        this.requestHeaders = requestHeaders;
+        if (!scrolling && elasticsearchRequestOptions != null) {
+            // ignore the request options for scroll operations if there are request options already being tracked
+            this.elasticsearchRequestOptions = elasticsearchRequestOptions;
+        }
     }
 
     @Override
@@ -87,14 +89,14 @@ public class TestElasticsearchClientService extends AbstractControllerService im
     }
 
     @Override
-    public IndexOperationResponse add(final IndexOperationRequest operation, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
-        return bulk(Collections.singletonList(operation), requestParameters, requestHeaders);
+    public IndexOperationResponse add(final IndexOperationRequest operation, final ElasticsearchRequestOptions elasticsearchRequestOptions) {
+        return bulk(Collections.singletonList(operation), elasticsearchRequestOptions);
     }
 
     @Override
-    public IndexOperationResponse bulk(final List<IndexOperationRequest> operations, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
+    public IndexOperationResponse bulk(final List<IndexOperationRequest> operations, final ElasticsearchRequestOptions elasticsearchRequestOptions) {
         try {
-            common(false, requestParameters, requestHeaders);
+            common(false, elasticsearchRequestOptions);
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
@@ -102,9 +104,9 @@ public class TestElasticsearchClientService extends AbstractControllerService im
     }
 
     @Override
-    public Long count(final String query, final String index, final String type, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
+    public Long count(final String query, final String index, final String type, final ElasticsearchRequestOptions elasticsearchRequestOptions) {
         try {
-            common(false, requestParameters, requestHeaders);
+            common(false, elasticsearchRequestOptions);
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
@@ -113,14 +115,14 @@ public class TestElasticsearchClientService extends AbstractControllerService im
     }
 
     @Override
-    public DeleteOperationResponse deleteById(final String index, final String type, final String id, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
-        return deleteById(index, type, Collections.singletonList(id), requestParameters, requestHeaders);
+    public DeleteOperationResponse deleteById(final String index, final String type, final String id, final ElasticsearchRequestOptions elasticsearchRequestOptions) {
+        return deleteById(index, type, Collections.singletonList(id), elasticsearchRequestOptions);
     }
 
     @Override
-    public DeleteOperationResponse deleteById(final String index, final String type, final List<String> ids, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
+    public DeleteOperationResponse deleteById(final String index, final String type, final List<String> ids, final ElasticsearchRequestOptions elasticsearchRequestOptions) {
         try {
-            common(throwErrorInDelete, requestParameters, requestHeaders);
+            common(throwErrorInDelete, elasticsearchRequestOptions);
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
@@ -128,15 +130,15 @@ public class TestElasticsearchClientService extends AbstractControllerService im
     }
 
     @Override
-    public DeleteOperationResponse deleteByQuery(final String query, final String index, final String type, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
+    public DeleteOperationResponse deleteByQuery(final String query, final String index, final String type, final ElasticsearchRequestOptions elasticsearchRequestOptions) {
         this.query = query;
-        return deleteById(index, type, Collections.singletonList("1"), requestParameters, requestHeaders);
+        return deleteById(index, type, Collections.singletonList("1"), elasticsearchRequestOptions);
     }
 
     @Override
-    public UpdateOperationResponse updateByQuery(final String query, final String index, final String type, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
+    public UpdateOperationResponse updateByQuery(final String query, final String index, final String type, final ElasticsearchRequestOptions elasticsearchRequestOptions) {
         try {
-            common(throwErrorInUpdate, requestParameters, requestHeaders);
+            common(throwErrorInUpdate, elasticsearchRequestOptions);
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
@@ -145,24 +147,24 @@ public class TestElasticsearchClientService extends AbstractControllerService im
     }
 
     @Override
-    public void refresh(final String index, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
+    public void refresh(final String index, final ElasticsearchRequestOptions elasticsearchRequestOptions) {
         // intentionally blank
     }
 
     @Override
-    public boolean exists(final String index, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
+    public boolean exists(final String index, final ElasticsearchRequestOptions elasticsearchRequestOptions) {
         return true;
     }
 
     @Override
-    public boolean documentExists(final String index, final String type, final String id, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
+    public boolean documentExists(final String index, final String type, final String id, final ElasticsearchRequestOptions elasticsearchRequestOptions) {
         return true;
     }
 
     @Override
-    public Map<String, Object> get(final String index, final String type, final String id, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
+    public Map<String, Object> get(final String index, final String type, final String id, final ElasticsearchRequestOptions elasticsearchRequestOptions) {
         try {
-            common(throwErrorInGet || throwNotFoundInGet, requestParameters, requestHeaders);
+            common(throwErrorInGet || throwNotFoundInGet, elasticsearchRequestOptions);
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
@@ -172,9 +174,9 @@ public class TestElasticsearchClientService extends AbstractControllerService im
     }
 
     @Override
-    public SearchResponse search(final String query, final String index, final String type, final Map<String, String> requestParameters, final Map<String, String> requestHeaders) {
+    public SearchResponse search(final String query, final String index, final String type, final ElasticsearchRequestOptions elasticsearchRequestOptions) {
         try {
-            common(throwErrorInSearch, requestParameters, requestHeaders);
+            common(throwErrorInSearch, elasticsearchRequestOptions);
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
@@ -195,19 +197,19 @@ public class TestElasticsearchClientService extends AbstractControllerService im
     }
 
     @Override
-    public SearchResponse scroll(final String scroll, final Map<String, String> requestHeaders) {
+    public SearchResponse scroll(final String scroll, final ElasticsearchRequestOptions elasticsearchRequestOptions) {
         if (throwErrorInSearch) {
             throw new RuntimeException(new IOException("Simulated IOException - scroll"));
         }
 
         scrolling = true;
-        final SearchResponse response = search(null, null, null, requestParameters, requestHeaders);
+        final SearchResponse response = search(null, null, null, elasticsearchRequestOptions);
         scrolling = false;
         return response;
     }
 
     @Override
-    public String initialisePointInTime(final String index, final String keepAlive, final Map<String, String> requestHeaders) {
+    public String initialisePointInTime(final String index, final String keepAlive, final ElasticsearchRequestOptions elasticsearchRequestOptions) {
         if (throwErrorInPit) {
             throw new RuntimeException(new IOException("Simulated IOException - initialisePointInTime"));
         }
@@ -218,7 +220,7 @@ public class TestElasticsearchClientService extends AbstractControllerService im
     }
 
     @Override
-    public DeleteOperationResponse deletePointInTime(final String pitId, final Map<String, String> requestHeaders) {
+    public DeleteOperationResponse deletePointInTime(final String pitId, final ElasticsearchRequestOptions elasticsearchRequestOptions) {
         if (throwErrorInDelete) {
             throw new RuntimeException(new IOException("Simulated IOException - deletePointInTime"));
         }
@@ -227,7 +229,7 @@ public class TestElasticsearchClientService extends AbstractControllerService im
     }
 
     @Override
-    public DeleteOperationResponse deleteScroll(final String scrollId, final Map<String, String> requestHeaders) {
+    public DeleteOperationResponse deleteScroll(final String scrollId, final ElasticsearchRequestOptions elasticsearchRequestOptions) {
         if (throwErrorInDelete) {
             throw new RuntimeException(new IOException("Simulated IOException - deleteScroll"));
         }
@@ -272,12 +274,8 @@ public class TestElasticsearchClientService extends AbstractControllerService im
         this.maxPages = maxPages;
     }
 
-    public Map<String, String> getRequestHeaders() {
-        return this.requestHeaders;
-    }
-
-    public Map<String, String> getRequestParameters() {
-        return this.requestParameters;
+    public ElasticsearchRequestOptions getElasticsearchRequestOptions() {
+        return this.elasticsearchRequestOptions;
     }
 
     public String getQuery() {

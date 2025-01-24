@@ -33,6 +33,7 @@ import org.apache.nifi.annotation.lifecycle.OnScheduled;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.elasticsearch.ElasticSearchClientService;
 import org.apache.nifi.elasticsearch.ElasticsearchException;
+import org.apache.nifi.elasticsearch.ElasticsearchRequestOptions;
 import org.apache.nifi.elasticsearch.IndexOperationRequest;
 import org.apache.nifi.elasticsearch.IndexOperationResponse;
 import org.apache.nifi.expression.ExpressionLanguageScope;
@@ -281,8 +282,8 @@ public class PutElasticsearchJson extends AbstractPutElasticsearch {
 
     private List<FlowFile> indexDocuments(final List<IndexOperationRequest> operations, final List<FlowFile> originals, final ProcessContext context, final ProcessSession session) throws IOException {
         final Map<String, String> dynamicProperties = getRequestParametersFromDynamicProperties(context, originals.getFirst());
-        final IndexOperationResponse response = clientService.get().bulk(operations, getRequestURLParameters(dynamicProperties),
-                getRequestHeadersFromDynamicProperties(context, originals.getFirst()));
+        final IndexOperationResponse response = clientService.get().bulk(operations,
+                new ElasticsearchRequestOptions(getRequestURLParameters(dynamicProperties), getRequestHeadersFromDynamicProperties(context, originals.getFirst())));
 
         final Map<Integer, Map<String, Object>> errors = findElasticsearchResponseErrors(response);
         final List<FlowFile> errorDocuments = new ArrayList<>(errors.size());

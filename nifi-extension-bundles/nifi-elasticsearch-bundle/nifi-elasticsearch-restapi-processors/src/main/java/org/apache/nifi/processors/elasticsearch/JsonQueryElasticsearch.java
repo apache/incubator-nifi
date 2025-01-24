@@ -24,6 +24,7 @@ import org.apache.nifi.annotation.behavior.WritesAttributes;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.SeeAlso;
 import org.apache.nifi.annotation.documentation.Tags;
+import org.apache.nifi.elasticsearch.ElasticsearchRequestOptions;
 import org.apache.nifi.elasticsearch.SearchResponse;
 import org.apache.nifi.expression.ExpressionLanguageScope;
 import org.apache.nifi.flowfile.FlowFile;
@@ -82,8 +83,7 @@ public class JsonQueryElasticsearch extends AbstractJsonQueryElasticsearch<JsonQ
                 queryJsonParameters.getQuery(),
                 queryJsonParameters.getIndex(),
                 queryJsonParameters.getType(),
-                getRequestParametersFromDynamicProperties(context, input),
-                getRequestHeadersFromDynamicProperties(context, input)
+                new ElasticsearchRequestOptions(getRequestParametersFromDynamicProperties(context, input), getRequestHeadersFromDynamicProperties(context, input))
         );
         if (input != null) {
             session.getProvenanceReporter().send(

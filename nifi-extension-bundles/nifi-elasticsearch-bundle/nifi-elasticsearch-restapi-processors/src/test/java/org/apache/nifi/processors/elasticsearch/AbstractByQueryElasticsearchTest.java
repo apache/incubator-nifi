@@ -172,8 +172,8 @@ public abstract class AbstractByQueryElasticsearchTest {
 
         postTest(runner, query);
 
-        assertTrue(client.getRequestParameters().isEmpty());
-        assertTrue(client.getRequestHeaders().isEmpty());
+        assertTrue(client.getElasticsearchRequestOptions().getRequestParameters().isEmpty());
+        assertTrue(client.getElasticsearchRequestOptions().getRequestHeaders().isEmpty());
     }
 
     @Test
@@ -191,12 +191,12 @@ public abstract class AbstractByQueryElasticsearchTest {
 
         postTest(runner, query);
 
-        assertEquals(2, client.getRequestParameters().size());
-        assertEquals("true", client.getRequestParameters().get("refresh"));
-        assertEquals("auto", client.getRequestParameters().get("slices"));
+        assertEquals(2, client.getElasticsearchRequestOptions().getRequestParameters().size());
+        assertEquals("true", client.getElasticsearchRequestOptions().getRequestParameters().get("refresh"));
+        assertEquals("auto", client.getElasticsearchRequestOptions().getRequestParameters().get("slices"));
 
-        assertEquals(1, client.getRequestHeaders().size());
-        assertEquals("application/json", client.getRequestHeaders().get("Accept"));
+        assertEquals(1, client.getElasticsearchRequestOptions().getRequestHeaders().size());
+        assertEquals("application/json", client.getElasticsearchRequestOptions().getRequestHeaders().get("Accept"));
     }
 
     @Test
@@ -269,8 +269,8 @@ public abstract class AbstractByQueryElasticsearchTest {
 
         postTest(runner, query);
 
-        assertTrue(client.getRequestParameters().isEmpty());
-        assertTrue(client.getRequestHeaders().isEmpty());
+        assertTrue(client.getElasticsearchRequestOptions().getRequestParameters().isEmpty());
+        assertTrue(client.getElasticsearchRequestOptions().getRequestHeaders().isEmpty());
     }
 
     @Test
@@ -291,12 +291,12 @@ public abstract class AbstractByQueryElasticsearchTest {
 
         postTest(runner, query);
 
-        assertEquals(2, client.getRequestParameters().size());
-        assertEquals("true", client.getRequestParameters().get("refresh"));
-        assertEquals("auto", client.getRequestParameters().get("slices"));
+        assertEquals(2, client.getElasticsearchRequestOptions().getRequestParameters().size());
+        assertEquals("true", client.getElasticsearchRequestOptions().getRequestParameters().get("refresh"));
+        assertEquals("auto", client.getElasticsearchRequestOptions().getRequestParameters().get("slices"));
 
-        assertEquals(1, client.getRequestHeaders().size());
-        assertEquals("application/json", client.getRequestHeaders().get("Accept"));
+        assertEquals(1, client.getElasticsearchRequestOptions().getRequestHeaders().size());
+        assertEquals("application/json", client.getElasticsearchRequestOptions().getRequestHeaders().get("Accept"));
     }
 
     @ParameterizedTest

@@ -26,11 +26,11 @@ import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.elasticsearch.ElasticSearchClientService;
+import org.apache.nifi.elasticsearch.ElasticsearchRequestOptions;
 import org.apache.nifi.elasticsearch.OperationResponse;
 import org.apache.nifi.expression.ExpressionLanguageScope;
 
 import java.util.List;
-import java.util.Map;
 
 @WritesAttributes({
         @WritesAttribute(attribute = "elasticsearch.delete.took", description = "The amount of time that it took to complete the delete operation in ms."),
@@ -79,8 +79,7 @@ public class DeleteByQueryElasticsearch extends AbstractByQueryElasticsearch {
 
     @Override
     OperationResponse performOperation(final ElasticSearchClientService clientService, final String query,
-                                       final String index, final String type, final Map<String, String> requestParameters,
-                                       final Map<String, String> requestHeaders) {
-        return clientService.deleteByQuery(query, index, type, requestParameters, requestHeaders);
+                                       final String index, final String type, final ElasticsearchRequestOptions elasticsearchRequestOptions) {
+        return clientService.deleteByQuery(query, index, type, elasticsearchRequestOptions);
     }
 }

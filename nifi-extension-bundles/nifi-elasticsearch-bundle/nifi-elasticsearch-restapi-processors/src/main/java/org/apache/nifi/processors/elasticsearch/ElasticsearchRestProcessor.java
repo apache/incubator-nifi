@@ -28,6 +28,7 @@ import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.Validator;
 import org.apache.nifi.elasticsearch.ElasticSearchClientService;
 import org.apache.nifi.elasticsearch.ElasticsearchException;
+import org.apache.nifi.elasticsearch.ElasticsearchRequestOptions;
 import org.apache.nifi.elasticsearch.SearchResponse;
 import org.apache.nifi.expression.ExpressionLanguageScope;
 import org.apache.nifi.flowfile.FlowFile;
@@ -373,7 +374,8 @@ public interface ElasticsearchRestProcessor extends Processor, VerifiableProcess
             if (context.getProperty(INDEX).isSet()) {
                 index = context.getProperty(INDEX).evaluateAttributeExpressions(attributes).getValue();
                 try {
-                    if (verifyClientService.exists(index, getRequestParametersFromDynamicProperties(context, attributes), getRequestHeadersFromDynamicProperties(context, attributes))) {
+                    if (verifyClientService.exists(index, new ElasticsearchRequestOptions(getRequestParametersFromDynamicProperties(context, attributes),
+                            getRequestHeadersFromDynamicProperties(context, attributes)))) {
                         indexExistsResult.outcome(ConfigVerificationResult.Outcome.SUCCESSFUL)
                                 .explanation(String.format("Index [%s] exists", index));
                         indexExists = true;
@@ -432,7 +434,7 @@ public interface ElasticsearchRestProcessor extends Processor, VerifiableProcess
                 requestParameters.putIfAbsent("_source", "false");
 
                 final SearchResponse response = verifyClientService.search(
-                        mapper.writeValueAsString(queryJson), index, type, requestParameters, getRequestHeadersFromDynamicProperties(context, attributes));
+                        mapper.writeValueAsString(queryJson), index, type, new ElasticsearchRequestOptions(requestParameters, getRequestHeadersFromDynamicProperties(context, attributes)));
                 queryValidResult.outcome(ConfigVerificationResult.Outcome.SUCCESSFUL)
                         .explanation(String.format("Query found %d hits and %d aggregations in %d milliseconds, timed out: %s",
                                 response.getNumberOfHits(), response.getAggregations() == null ? 0 : response.getAggregations().size(), response.getTook(), response.isTimedOut()));

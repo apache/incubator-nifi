@@ -209,12 +209,12 @@ class GetElasticsearchTest {
         runProcessor(runner);
 
         final TestElasticsearchClientService service = getService(runner);
-        assertEquals(2, service.getRequestParameters().size());
-        assertEquals("true", service.getRequestParameters().get("refresh"));
-        assertEquals("msg", service.getRequestParameters().get("_source"));
+        assertEquals(2, service.getElasticsearchRequestOptions().getRequestParameters().size());
+        assertEquals("true", service.getElasticsearchRequestOptions().getRequestParameters().get("refresh"));
+        assertEquals("msg", service.getElasticsearchRequestOptions().getRequestParameters().get("_source"));
 
-        assertEquals(1, service.getRequestHeaders().size());
-        assertEquals("application/json", service.getRequestHeaders().get("Accept"));
+        assertEquals(1, service.getElasticsearchRequestOptions().getRequestHeaders().size());
+        assertEquals("application/json", service.getElasticsearchRequestOptions().getRequestHeaders().get("Accept"));
     }
 
     private static void testCounts(final TestRunner runner, final int doc, final int failure, final int notFound) {
