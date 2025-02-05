@@ -26,6 +26,7 @@ import { MockComponent } from 'ng-mocks';
 import { Navigation } from '../../../../ui/common/navigation/navigation.component';
 import { canvasFeatureKey } from '../../state';
 import { controllerServicesFeatureKey } from '../../state/controller-services';
+import { NgxSkeletonLoaderComponent } from 'ngx-skeleton-loader';
 
 describe('ControllerServices', () => {
     let component: ControllerServices;
@@ -34,7 +35,12 @@ describe('ControllerServices', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             declarations: [ControllerServices],
-            imports: [RouterTestingModule, MockComponent(Navigation), HttpClientTestingModule],
+            imports: [
+                RouterTestingModule,
+                MockComponent(Navigation),
+                HttpClientTestingModule,
+                MockComponent(NgxSkeletonLoaderComponent)
+            ],
             providers: [
                 provideMockStore({
                     initialState: {
