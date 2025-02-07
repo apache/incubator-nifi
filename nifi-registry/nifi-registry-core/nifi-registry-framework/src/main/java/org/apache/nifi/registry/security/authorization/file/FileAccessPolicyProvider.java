@@ -199,7 +199,8 @@ public class FileAccessPolicyProvider extends AbstractConfigurableAccessPolicyPr
 
     @Override
     public AccessPolicy getAccessPolicy(String resourceIdentifier, RequestAction action) throws AuthorizationAccessException {
-        return authorizationsHolder.get().getAccessPolicy(resourceIdentifier, action);
+        return AccessPolicyProviderUtils.getAccessPolicy(
+                resourceIdentifier, action, authorizationsHolder.get().getPoliciesByResource());
     }
 
     @Override

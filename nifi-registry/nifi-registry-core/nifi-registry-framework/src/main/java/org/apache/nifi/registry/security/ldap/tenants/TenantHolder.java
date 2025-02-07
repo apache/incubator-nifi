@@ -19,10 +19,10 @@ package org.apache.nifi.registry.security.ldap.tenants;
 
 import org.apache.nifi.registry.security.authorization.Group;
 import org.apache.nifi.registry.security.authorization.User;
+import org.apache.nifi.registry.security.authorization.util.UserGroupProviderUtils;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -53,7 +53,8 @@ public class TenantHolder {
         final Map<String, Group> groupByIdMap = Collections.unmodifiableMap(createGroupByIdMap(allGroups));
 
         // create a convenience map to retrieve the groups for a user identity
-        final Map<String, Set<Group>> groupsByUserIdentityMap = Collections.unmodifiableMap(createGroupsByUserIdentityMap(allGroups, allUsers));
+        final Map<String, Set<Group>> groupsByUserIdentityMap = Collections.unmodifiableMap(
+                UserGroupProviderUtils.createGroupsByUserIdentityMap(allGroups, allUsers));
 
         // set all the holders
         this.allUsers = allUsers;
@@ -104,32 +105,6 @@ public class TenantHolder {
             groupsMap.put(group.getIdentifier(), group);
         }
         return groupsMap;
-    }
-
-    /**
-     * Creates a Map from user identity to the set of Groups for that identity.
-     *
-     * @param groups all groups
-     * @param users all users
-     * @return a Map from User identity to the set of Groups for that identity
-     */
-    private Map<String, Set<Group>> createGroupsByUserIdentityMap(final Set<Group> groups, final Set<User> users) {
-        Map<String, Set<Group>> groupsByUserIdentity = new HashMap<>();
-
-        for (User user : users) {
-            Set<Group> userGroups = new HashSet<>();
-            for (Group group : groups) {
-                for (String groupUser : group.getUsers()) {
-                    if (groupUser.equals(user.getIdentifier())) {
-                        userGroups.add(group);
-                    }
-                }
-            }
-
-            groupsByUserIdentity.put(user.getIdentity(), userGroups);
-        }
-
-        return groupsByUserIdentity;
     }
 
     Set<User> getAllUsers() {

@@ -17,8 +17,10 @@
 package org.apache.nifi.registry.security.authorization.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.nifi.registry.security.authorization.AccessPolicy;
 import org.apache.nifi.registry.security.authorization.AuthorizerConfigurationContext;
 import org.apache.nifi.registry.security.authorization.Group;
+import org.apache.nifi.registry.security.authorization.RequestAction;
 import org.apache.nifi.registry.security.authorization.UserGroupProvider;
 import org.apache.nifi.registry.security.exception.SecurityProviderCreationException;
 import org.apache.nifi.registry.security.identity.IdentityMapper;
@@ -26,6 +28,7 @@ import org.apache.nifi.registry.util.PropertyValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -134,6 +137,65 @@ public final class AccessPolicyProviderUtils {
 
         LOGGER.debug("Group identifier is: {}", group);
         return group;
+    }
+
+    /**
+     * Creates a Map from resource identifier to the set of policies for the given resource.
+     *
+     * @param allPolicies the set of all policies
+     * @return a map from resource identifier to policies
+     */
+    public static Map<String, Set<AccessPolicy>> createResourcePolicyMap(final Set<AccessPolicy> allPolicies) {
+        Map<String, Set<AccessPolicy>> resourcePolicies = new HashMap<>();
+
+        for (AccessPolicy policy : allPolicies) {
+            Set<AccessPolicy> policies = resourcePolicies.computeIfAbsent(policy.getResource(), k -> new HashSet<>());
+            policies.add(policy);
+        }
+
+        return resourcePolicies;
+    }
+
+    /**
+     * Creates a Map from policy identifier to AccessPolicy.
+     *
+     * @param policies the set of all access policies
+     * @return the Map from policy identifier to AccessPolicy
+     */
+    public static Map<String, AccessPolicy> createPoliciesByIdMap(final Set<AccessPolicy> policies) {
+        Map<String, AccessPolicy> policyMap = new HashMap<>();
+        for (AccessPolicy policy : policies) {
+            policyMap.put(policy.getIdentifier(), policy);
+        }
+        return policyMap;
+    }
+
+    /**
+     * Returns the access policy by resource identifier and request action from the map of policies
+     *
+     * @param resourceIdentifier the resource identifier
+     * @param action the request action
+     * @param policiesByResource the map from resource identifier to policies
+     * @return the access policy
+     */
+    public static AccessPolicy getAccessPolicy(
+            final String resourceIdentifier, final RequestAction action, final Map<String, Set<AccessPolicy>> policiesByResource) {
+        if (resourceIdentifier == null) {
+            throw new IllegalArgumentException("Resource Identifier cannot be null");
+        }
+
+        final Set<AccessPolicy> resourcePolicies = policiesByResource.get(resourceIdentifier);
+        if (resourcePolicies == null) {
+            return null;
+        }
+
+        for (AccessPolicy accessPolicy : resourcePolicies) {
+            if (accessPolicy.getAction() == action) {
+                return accessPolicy;
+            }
+        }
+
+        return null;
     }
 
     private AccessPolicyProviderUtils() {

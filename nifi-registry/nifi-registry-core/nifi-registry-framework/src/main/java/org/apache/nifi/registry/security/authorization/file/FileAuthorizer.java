@@ -253,7 +253,8 @@ public class FileAuthorizer extends AbstractPolicyBasedAuthorizer {
         return new UsersAndAccessPolicies() {
             @Override
             public AccessPolicy getAccessPolicy(String resourceIdentifier, RequestAction action) {
-                return authorizationsHolder.getAccessPolicy(resourceIdentifier, action);
+                return AccessPolicyProviderUtils.getAccessPolicy(
+                        resourceIdentifier, action, authorizationsHolder.getPoliciesByResource());
             }
 
             @Override

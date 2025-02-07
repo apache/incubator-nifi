@@ -18,8 +18,11 @@ package org.apache.nifi.registry.security.authorization.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.nifi.registry.security.authorization.AuthorizerConfigurationContext;
+import org.apache.nifi.registry.security.authorization.Group;
+import org.apache.nifi.registry.security.authorization.User;
 import org.apache.nifi.registry.security.identity.IdentityMapper;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -43,6 +46,74 @@ public final class UserGroupProviderUtils {
             }
         }
         return initialUserIdentities;
+    }
+
+    /**
+     * Creates a Map from user identifier to User.
+     *
+     * @param users the set of all users
+     * @return the Map from user identifier to User
+     */
+    public static Map<String, User> createUserByIdMap(final Set<User> users) {
+        Map<String, User> usersMap = new HashMap<>();
+        for (User user : users) {
+            usersMap.put(user.getIdentifier(), user);
+        }
+        return usersMap;
+    }
+
+    /**
+     * Creates a Map from user identity to User.
+     *
+     * @param users the set of all users
+     * @return the map from user identity to User
+     */
+    public static Map<String, User> createUserByIdentityMap(final Set<User> users) {
+        Map<String, User> usersMap = new HashMap<>();
+        for (User user : users) {
+            usersMap.put(user.getIdentity(), user);
+        }
+        return usersMap;
+    }
+
+    /**
+     * Creates a Map from group identifier to Group.
+     *
+     * @param groups the set of all groups
+     * @return the map from group identifier to Group
+     */
+    public static Map<String, Group> createGroupByIdMap(final Set<Group> groups) {
+        Map<String, Group> groupsMap = new HashMap<>();
+        for (Group group : groups) {
+            groupsMap.put(group.getIdentifier(), group);
+        }
+        return groupsMap;
+    }
+
+    /**
+     * Creates a Map from user identity to the set of Groups for that identity.
+     *
+     * @param groups all groups
+     * @param users all users
+     * @return a Map from User identity to the set of Groups for that identity
+     */
+    public static Map<String, Set<Group>> createGroupsByUserIdentityMap(final Set<Group> groups, final Set<User> users) {
+        Map<String, Set<Group>> groupsByUserIdentity = new HashMap<>();
+
+        for (User user : users) {
+            Set<Group> userGroups = new HashSet<>();
+            for (Group group : groups) {
+                for (String groupUser : group.getUsers()) {
+                    if (groupUser.equals(user.getIdentifier())) {
+                        userGroups.add(group);
+                    }
+                }
+            }
+
+            groupsByUserIdentity.put(user.getIdentity(), userGroups);
+        }
+
+        return groupsByUserIdentity;
     }
 
     private UserGroupProviderUtils() {
