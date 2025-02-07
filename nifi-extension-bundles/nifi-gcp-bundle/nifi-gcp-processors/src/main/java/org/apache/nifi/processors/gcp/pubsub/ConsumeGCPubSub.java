@@ -329,13 +329,13 @@ public class ConsumeGCPubSub extends AbstractGCPubSubWithProxyProcessor {
         switch (processingStrategy) {
         case RECORD -> processInputRecords(context, session, receivedMessages, subscriptionName, ackIds);
         case FLOW_FILE -> processInputFlowFile(session, receivedMessages, subscriptionName, ackIds);
-        case DEMARCATOR -> processInputDemarcator(context, session, receivedMessages, subscriptionName, ackIds);
+        case DEMARCATOR -> processInputDemarcator(session, receivedMessages, subscriptionName, ackIds);
         }
 
         session.commitAsync(() -> acknowledgeAcks(ackIds, subscriptionName));
     }
 
-    private void processInputDemarcator(final ProcessContext context, final ProcessSession session, final List<ReceivedMessage> receivedMessages, final String subscriptionName,
+    private void processInputDemarcator(final ProcessSession session, final List<ReceivedMessage> receivedMessages, final String subscriptionName,
             final List<String> ackIds) {
         final byte[] demarcator = demarcatorValue == null ? new byte[0] : demarcatorValue.getBytes(StandardCharsets.UTF_8);
         FlowFile flowFile = session.create();
