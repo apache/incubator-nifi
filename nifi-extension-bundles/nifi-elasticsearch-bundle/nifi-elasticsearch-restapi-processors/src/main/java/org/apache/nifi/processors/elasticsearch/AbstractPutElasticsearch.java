@@ -60,12 +60,12 @@ public abstract class AbstractPutElasticsearch extends AbstractProcessor impleme
             .description("All flowfiles that are sent to Elasticsearch without request failures go to this relationship.")
             .build();
 
-    static final Relationship REL_SUCCESSFUL = new Relationship.Builder()
+    public static final Relationship REL_SUCCESSFUL = new Relationship.Builder()
             .name("successful")
             .description("Record(s)/Flowfile(s) corresponding to Elasticsearch document(s) that did not result in an \"error\" (within Elasticsearch) will be routed here.")
             .build();
 
-    static final Relationship REL_ERRORS = new Relationship.Builder()
+    public static final Relationship REL_ERRORS = new Relationship.Builder()
             .name("errors")
             .description("Record(s)/Flowfile(s) corresponding to Elasticsearch document(s) that resulted in an \"error\" (within Elasticsearch) will be routed here.")
             .build();
@@ -96,7 +96,7 @@ public abstract class AbstractPutElasticsearch extends AbstractProcessor impleme
             .required(true)
             .build();
 
-    static final PropertyDescriptor INDEX_OP = new PropertyDescriptor.Builder()
+    public static final PropertyDescriptor INDEX_OP = new PropertyDescriptor.Builder()
             .name("put-es-record-index-op")
             .displayName("Index Operation")
             .description("The type of the operation used to index (create, delete, index, update, upsert)")

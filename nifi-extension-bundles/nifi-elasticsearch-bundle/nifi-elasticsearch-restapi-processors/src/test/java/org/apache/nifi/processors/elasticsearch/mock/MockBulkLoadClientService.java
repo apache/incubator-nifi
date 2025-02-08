@@ -30,7 +30,7 @@ public class MockBulkLoadClientService extends AbstractMockElasticsearchClient {
 
     @Override
     public IndexOperationResponse bulk(final List<IndexOperationRequest> items, final Map<String, String> requestParameters) {
-        if (isThrowRetriableError()) {
+        if (isThrowRetryableError()) {
             throw new MockElasticsearchException(true, false);
         } else if (isThrowFatalError()) {
             throw new MockElasticsearchException(false, false);

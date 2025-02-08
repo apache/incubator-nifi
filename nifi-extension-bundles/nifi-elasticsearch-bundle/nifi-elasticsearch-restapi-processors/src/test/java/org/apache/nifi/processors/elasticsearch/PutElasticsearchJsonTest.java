@@ -330,8 +330,8 @@ public class PutElasticsearchJsonTest extends AbstractPutElasticsearchTest {
     }
 
     @Test
-    void testRetriable() {
-        clientService.setThrowRetriableError(true);
+    void testRetryable() {
+        clientService.setThrowRetryableError(true);
         basicTest(0, 1, 0);
     }
 

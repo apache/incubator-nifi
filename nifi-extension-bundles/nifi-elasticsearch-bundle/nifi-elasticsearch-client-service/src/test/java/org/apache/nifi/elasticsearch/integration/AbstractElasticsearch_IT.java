@@ -65,6 +65,6 @@ abstract class AbstractElasticsearch_IT extends AbstractElasticsearchITBase {
     @AfterAll
     static void afterAll() {
         tearDownTestData(TEST_INDICES);
-        stopTestcontainer();
+        stopTestContainer();
     }
 }

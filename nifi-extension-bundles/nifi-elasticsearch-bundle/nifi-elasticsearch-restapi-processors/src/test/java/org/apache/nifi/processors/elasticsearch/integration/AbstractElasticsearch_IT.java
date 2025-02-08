@@ -60,7 +60,9 @@ abstract class AbstractElasticsearch_IT<P extends ElasticsearchRestProcessor> ex
 
         runner.setProperty(ElasticsearchRestProcessor.CLIENT_SERVICE, CLIENT_SERVICE_NAME);
         runner.setProperty(ElasticsearchRestProcessor.INDEX, INDEX);
-        runner.setProperty(ElasticsearchRestProcessor.TYPE, type);
+        if (!"".equals(type)) {
+            runner.setProperty(ElasticsearchRestProcessor.TYPE, type);
+        }
 
         service.refresh(null, null);
     }
@@ -73,7 +75,7 @@ abstract class AbstractElasticsearch_IT<P extends ElasticsearchRestProcessor> ex
     @AfterAll
     static void afterAll() {
         tearDownTestData(TEST_INDICES);
-        stopTestcontainer();
+        stopTestContainer();
     }
 
     @Test

@@ -95,6 +95,7 @@ public class StandardProcessorTestRunner implements TestRunner {
     private int numThreads = 1;
     private MockSessionFactory sessionFactory;
     private boolean allowSynchronousSessionCommits = false;
+    private boolean allowRecursiveReads = false;
     private long runSchedule = 0;
     private final AtomicInteger invocations = new AtomicInteger(0);
 
@@ -128,7 +129,7 @@ public class StandardProcessorTestRunner implements TestRunner {
         this.sharedState = new SharedSessionState(processor, idGenerator);
         this.flowFileQueue = sharedState.getFlowFileQueue();
         this.processorStateManager = new MockStateManager(processor);
-        this.sessionFactory = new MockSessionFactory(sharedState, processor, enforceReadStreamsClosed, processorStateManager, allowSynchronousSessionCommits);
+        this.sessionFactory = new MockSessionFactory(sharedState, processor, enforceReadStreamsClosed, processorStateManager, allowSynchronousSessionCommits, allowRecursiveReads);
 
         this.context = new MockProcessContext(processor, processorName, processorStateManager, environmentVariables);
         this.kerberosContext = kerberosContext;
@@ -149,7 +150,7 @@ public class StandardProcessorTestRunner implements TestRunner {
     @Override
     public void enforceReadStreamsClosed(final boolean enforce) {
         enforceReadStreamsClosed = enforce;
-        this.sessionFactory = new MockSessionFactory(sharedState, processor, enforceReadStreamsClosed, processorStateManager, allowSynchronousSessionCommits);
+        this.sessionFactory = new MockSessionFactory(sharedState, processor, enforceReadStreamsClosed, processorStateManager, allowSynchronousSessionCommits, allowRecursiveReads);
     }
 
     @Override
@@ -161,7 +162,13 @@ public class StandardProcessorTestRunner implements TestRunner {
     @Override
     public void setAllowSynchronousSessionCommits(final boolean allowSynchronousSessionCommits) {
         this.allowSynchronousSessionCommits = allowSynchronousSessionCommits;
-        this.sessionFactory = new MockSessionFactory(sharedState, processor, enforceReadStreamsClosed, processorStateManager, allowSynchronousSessionCommits);
+        this.sessionFactory = new MockSessionFactory(sharedState, processor, enforceReadStreamsClosed, processorStateManager, allowSynchronousSessionCommits, allowRecursiveReads);
+    }
+
+    @Override
+    public void setAllowRecursiveReads(final boolean allowRecursiveReads) {
+        this.allowRecursiveReads = allowRecursiveReads;
+        this.sessionFactory = new MockSessionFactory(sharedState, processor, enforceReadStreamsClosed, processorStateManager, allowSynchronousSessionCommits, allowRecursiveReads);
     }
 
     @Override
