@@ -20,19 +20,29 @@ import org.apache.nifi.util.MockFlowFile;
 import org.apache.nifi.util.TestRunner;
 import org.apache.nifi.util.TestRunners;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -183,6 +193,81 @@ public class TestSplitExcel {
                     assertTrue(formulaCell.getNumericCellValue() > 0.0, String.format("%s did not have expected numeric value greater than 0.0", messagePrefix));
                 }
             }
+        }
+    }
+
+    @Test
+    void testCopyDateTime() throws Exception {
+        LocalDateTime localDateTime = LocalDateTime.of(2023, 1, 1, 0, 0, 0);
+        LocalDateTime nonValidExcelDate = LocalDateTime.of(1899, 12, 31, 0, 0, 0);
+        final Object[][] data = {
+                {"transaction_id", "transaction_date", "transaction_time"},
+                {75, localDateTime, nonValidExcelDate.plusHours(9).plusMinutes(53).plusSeconds(44).toLocalTime()},
+                {78, localDateTime, nonValidExcelDate.plusHours(9).plusMinutes(55).plusSeconds(16).toLocalTime()}
+        };
+
+        final ByteArrayOutputStream workbookOutputStream = new ByteArrayOutputStream();
+        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+            final XSSFSheet sheet = workbook.createSheet("SomeSheetName");
+            populateSheet(sheet, data);
+            setCellStyles(sheet, workbook);
+            workbook.write(workbookOutputStream);
+        }
+
+        ByteArrayInputStream input = new ByteArrayInputStream(workbookOutputStream.toByteArray());
+        runner.enqueue(input);
+        runner.run();
+
+        runner.assertTransferCount(SplitExcel.REL_SPLIT, 1);
+        runner.assertTransferCount(SplitExcel.REL_ORIGINAL, 1);
+        runner.assertTransferCount(SplitExcel.REL_FAILURE, 0);
+
+        MockFlowFile flowFile = runner.getFlowFilesForRelationship(SplitExcel.REL_SPLIT).getFirst();
+        try (XSSFWorkbook workbook = new XSSFWorkbook(flowFile.getContentStream())) {
+            Sheet firstSheet = workbook.sheetIterator().next();
+
+            List<List<Cell>> dateCells = Stream.iterate(firstSheet.getFirstRowNum() + 1, rowIndex -> rowIndex + 1)
+                    .limit(firstSheet.getLastRowNum())
+                    .map(firstSheet::getRow)
+                    .filter(Objects::nonNull)
+                    .map(row -> List.of(row.getCell(1), row.getCell(2)))
+                    .toList();
+
+            dateCells.stream().flatMap(Collection::stream)
+                    .forEach(dateCell -> assertTrue(DateUtil.isCellDateFormatted(dateCell)));
+        }
+    }
+
+    private static void populateSheet(XSSFSheet sheet, Object[][] data) {
+        int rowCount = 0;
+        for (Object[] dataRow : data) {
+            Row row = sheet.createRow(rowCount++);
+            int columnCount = 0;
+
+            for (Object field : dataRow) {
+                Cell cell = row.createCell(columnCount++);
+                switch (field) {
+                    case String string -> cell.setCellValue(string);
+                    case Integer integer -> cell.setCellValue(integer.doubleValue());
+                    case Long l -> cell.setCellValue(l.doubleValue());
+                    case LocalDateTime localDateTime -> cell.setCellValue(localDateTime);
+                    case LocalTime localTime -> cell.setCellValue(DateUtil.convertTime(DateTimeFormatter.ISO_LOCAL_TIME.format(localTime)));
+                    default -> { }
+                }
+            }
+        }
+    }
+
+    void setCellStyles(XSSFSheet sheet, XSSFWorkbook workbook) {
+        CreationHelper creationHelper = workbook.getCreationHelper();
+        CellStyle dayMonthYearCellStyle = workbook.createCellStyle();
+        dayMonthYearCellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("dd/mm/yyyy"));
+        CellStyle hourMinuteSecond = workbook.createCellStyle();
+        hourMinuteSecond.setDataFormat((short) 21); // 21 represents format h:mm:ss
+        for (int rowNum = sheet.getFirstRowNum() + 1; rowNum < sheet.getLastRowNum() + 1; rowNum++) {
+            Row row = sheet.getRow(rowNum);
+            row.getCell(1).setCellStyle(dayMonthYearCellStyle);
+            row.getCell(2).setCellStyle(hourMinuteSecond);
         }
     }
 }
