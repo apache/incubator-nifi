@@ -674,18 +674,16 @@ public class ControllerServiceResource extends ApplicationResource {
     @Path("{id}/move-options")
     @Operation(
             summary = "Gets the move options for a controller service",
-            responses = @ApiResponse(content = @Content(schema = @Schema(implementation = ProcessGroupOptionEntity.class))),
-            security = {
-                    @SecurityRequirement(name = "Read - /flow")
-            }
-    )
-    @ApiResponses(
-            value = {
+            responses = {
+                    @ApiResponse(content = @Content(schema = @Schema(implementation = ProcessGroupOptionEntity.class))),
                     @ApiResponse(responseCode = "400", description = "NiFi was unable to complete the request because it was invalid. The request should not be retried without modification."),
                     @ApiResponse(responseCode = "401", description = "Client could not be authenticated."),
                     @ApiResponse(responseCode = "403", description = "Client is not authorized to make this request."),
                     @ApiResponse(responseCode = "404", description = "The specified resource could not be found."),
                     @ApiResponse(responseCode = "409", description = "The request was valid but NiFi was not in the appropriate state to process it.")
+            },
+            security = {
+                    @SecurityRequirement(name = "Read - /flow")
             }
     )
     public Response getProcessGroupOptions(
@@ -840,10 +838,6 @@ public class ControllerServiceResource extends ApplicationResource {
                     NiFiUser user = NiFiUserUtils.getNiFiUser();
                     // authorize the service
                     final ComponentAuthorizable authorizableControllerService = lookup.getControllerService(id);
-
-                    if (authorizableControllerService.getAuthorizable().isAuthorized(authorizer, RequestAction.WRITE, user)) {
-                        throw new IllegalStateException("You do not have permission to perform this action.");
-                    }
 
                     authorizableControllerService.getAuthorizable().authorize(authorizer, RequestAction.WRITE, user);
                     final ControllerServiceDTO requestControllerServiceDTO = serviceFacade.getControllerService(id, true).getComponent();
