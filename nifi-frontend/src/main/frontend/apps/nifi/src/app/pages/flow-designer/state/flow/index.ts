@@ -105,6 +105,10 @@ export interface CreateComponentRequest {
     revision: any;
 }
 
+export interface CreateLabelRequest extends CreateComponentRequest {
+    zIndex: number;
+}
+
 export interface CreateConnectionRequest {
     source: SelectedComponent;
     destination: SelectedComponent;
