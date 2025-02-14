@@ -37,6 +37,7 @@ import {
     openConfigureControllerServiceDialog,
     openDisableControllerServiceDialog,
     openEnableControllerServiceDialog,
+    openMoveControllerServiceDialog,
     openNewControllerServiceDialog,
     promptControllerServiceDeletion,
     resetControllerServicesState,
@@ -232,6 +233,17 @@ export class ControllerServices implements OnDestroy {
     enableControllerService(entity: ControllerServiceEntity): void {
         this.store.dispatch(
             openEnableControllerServiceDialog({
+                request: {
+                    id: entity.id,
+                    controllerService: entity
+                }
+            })
+        );
+    }
+
+    moveControllerService(entity: ControllerServiceEntity): void {
+        this.store.dispatch(
+            openMoveControllerServiceDialog({
                 request: {
                     id: entity.id,
                     controllerService: entity

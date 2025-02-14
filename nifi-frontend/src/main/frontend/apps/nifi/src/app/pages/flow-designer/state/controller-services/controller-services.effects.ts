@@ -43,6 +43,7 @@ import {
 } from './controller-services.selectors';
 import { ControllerServiceService } from '../../service/controller-service.service';
 import { EnableControllerService } from '../../../../ui/common/controller-service/enable-controller-service/enable-controller-service.component';
+import { MoveControllerService } from '../../ui/controller-service/move-controller-service/move-controller-service.component';
 import { DisableControllerService } from '../../../../ui/common/controller-service/disable-controller-service/disable-controller-service.component';
 import { PropertyTableHelperService } from '../../../../service/property-table-helper.service';
 import * as ErrorActions from '../../../../state/error/error.actions';
@@ -61,7 +62,7 @@ import {
 } from '../../../../state/property-verification/property-verification.selectors';
 import { VerifyPropertiesRequestContext } from '../../../../state/property-verification';
 import { BackNavigation } from '../../../../state/navigation';
-import { ComponentType, LARGE_DIALOG, SMALL_DIALOG, XL_DIALOG, NiFiCommon, Storage } from '@nifi/shared';
+import { ComponentType, LARGE_DIALOG, SMALL_DIALOG, XL_DIALOG, NiFiCommon, Storage, SelectOption } from '@nifi/shared';
 import { ErrorContextKey } from '../../../../state/error';
 import { ParameterContextService } from '../../../parameter-contexts/service/parameter-contexts.service';
 
@@ -653,6 +654,86 @@ export class ControllerServicesEffects {
                             );
                         }
                     });
+                })
+            ),
+        { dispatch: false }
+    );
+
+    openMoveControllerServiceDialog$ = createEffect(
+        () =>
+            this.actions$.pipe(
+                ofType(ControllerServicesActions.openMoveControllerServiceDialog),
+                map((action) => action.request),
+                switchMap((request) =>
+                    from(this.controllerServiceService.getMoveOptions(request.controllerService.id)).pipe(
+                        map((response: SelectOption[]) => {
+                            const moveDialogReference = this.dialog.open(MoveControllerService, {
+                                ...LARGE_DIALOG,
+                                data: {
+                                    controllerService: request.controllerService,
+                                    options: response
+                                }
+                            });
+
+                            moveDialogReference.componentInstance.goToReferencingComponent = (
+                                component: ControllerServiceReferencingComponent
+                            ) => {
+                                const route: string[] = this.getRouteForReference(component);
+                                this.router.navigate(route);
+                            };
+
+                            moveDialogReference.afterClosed().subscribe((response) => {
+                                if (response != 'ROUTED') {
+                                    this.store.dispatch(
+                                        ControllerServicesActions.loadControllerServices({
+                                            request: {
+                                                processGroupId: request.controllerService.parentGroupId!
+                                            }
+                                        })
+                                    );
+                                }
+                            });
+                        }),
+                        catchError((errorResponse: HttpErrorResponse) => {
+                            this.dialog.closeAll();
+                            return of(
+                                ErrorActions.snackBarError({ error: this.errorHelper.getErrorString(errorResponse) })
+                            );
+                        })
+                    )
+                )
+            ),
+        { dispatch: false }
+    );
+
+    moveControllerService$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(ControllerServicesActions.moveControllerService),
+            map((action) => action.request),
+            switchMap((request) =>
+                from(this.controllerServiceService.moveControllerService(request)).pipe(
+                    map((response) =>
+                        ControllerServicesActions.moveControllerServiceSuccess({
+                            response: {
+                                controllerService: response
+                            }
+                        })
+                    ),
+                    catchError((errorResponse: HttpErrorResponse) =>
+                        of(ErrorActions.snackBarError({ error: this.errorHelper.getErrorString(errorResponse) }))
+                    )
+                )
+            )
+        )
+    );
+
+    moveControllerServiceSuccess$ = createEffect(
+        () =>
+            this.actions$.pipe(
+                ofType(ControllerServicesActions.moveControllerServiceSuccess),
+                map((action) => action.response),
+                tap(() => {
+                    this.dialog.closeAll();
                 })
             ),
         { dispatch: false }

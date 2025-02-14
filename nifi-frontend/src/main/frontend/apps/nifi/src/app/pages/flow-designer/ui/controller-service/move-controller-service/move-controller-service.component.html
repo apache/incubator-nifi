@@ -1,0 +1,87 @@
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<h2 mat-dialog-title>Move Controller Service</h2>
+<form class="controller-service-move-form" [formGroup]="moveControllerServiceForm">
+    <mat-dialog-content>
+        <div class="py-4 flex gap-x-3">
+            <div class="flex basis-1/2 flex-col gap-y-4 pr-4 overflow-hidden">
+                <div>
+                    <div>Service</div>
+                    <div class="tertiary-color font-medium truncate" [title]="controllerService.component.name">
+                        {{ controllerService.component.name }}
+                    </div>
+                </div>
+                <div>
+                    <mat-form-field>
+                        <mat-label>Process Group</mat-label>
+                        <mat-select formControlName="processGroups">
+                            @for (option of processGroupOptions; track option) {
+                                <div
+                                    nifiTooltip
+                                    [tooltipDisabled]="!option.disabled"
+                                    [tooltipComponentType]="TextTip"
+                                    [tooltipInputData]="option.description"
+                                    [delayClose]="false">
+                                    <mat-option [value]="option.value" [disabled]="option.disabled">
+                                        <div
+                                            *ngIf="option.description != undefined; else valid"
+                                            class="pointer fa fa-warning has-errors caution-color"
+                                            style="padding: 3px"></div>
+                                        <ng-template #valid>
+                                            <div nifiTooltip [delayClose]="false"></div>
+                                        </ng-template>
+
+                                        {{ option.text }}
+                                    </mat-option>
+                                </div>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="flex basis-1/2 flex-col">
+                <div>
+                    Referencing Components
+                    <i
+                        class="fa fa-info-circle"
+                        nifiTooltip
+                        [tooltipComponentType]="TextTip"
+                        tooltipInputData="Other components referencing this controller service."></i>
+                </div>
+                <div class="relative h-full border" style="min-height: 320px">
+                    <div class="absolute inset-0 overflow-y-auto p-1">
+                        <controller-service-references
+                            [serviceReferences]="controllerService.component.referencingComponents"
+                            [goToReferencingComponent]="goToReferencingComponent"></controller-service-references>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+        <button mat-button mat-dialog-close>Cancel</button>
+        <button
+            type="button"
+            color="primary"
+            (click)="submitForm()"
+            [disabled]="moveControllerServiceForm.invalid"
+            mat-button>
+            Move
+        </button>
+    </mat-dialog-actions>
+</form>

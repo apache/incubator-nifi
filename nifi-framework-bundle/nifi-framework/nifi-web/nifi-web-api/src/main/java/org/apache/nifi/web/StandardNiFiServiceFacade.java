@@ -2968,6 +2968,41 @@ public class StandardNiFiServiceFacade implements NiFiServiceFacade {
     }
 
     @Override
+    public ControllerServiceEntity moveControllerService(final Revision revision, final ControllerServiceDTO controllerServiceDTO, final String newProcessGroupID) {
+        // get the component, ensure we have access to it, and perform the move request
+        final ControllerServiceNode controllerService = controllerServiceDAO.getControllerService(controllerServiceDTO.getId());
+        final RevisionUpdate<ControllerServiceDTO> snapshot = updateComponent(revision,
+                controllerService,
+                () -> {
+                    final ProcessGroup oldParentGroup = controllerService.getProcessGroup();
+                    controllerService.setMoving(true);
+                    oldParentGroup.removeControllerService(controllerService);
+                    if (!oldParentGroup.isRootGroup() && oldParentGroup.getParent().getIdentifier().equals(newProcessGroupID)) {
+                        // move to parent process group
+                        oldParentGroup.getParent().addControllerService(controllerService);
+                    } else {
+                        // move to child process group
+                        oldParentGroup.getProcessGroup(newProcessGroupID).addControllerService(controllerService);
+                    }
+                    return controllerService;
+                },
+                cs -> {
+                    final ControllerServiceDTO dto = dtoFactory.createControllerServiceDto(cs);
+                    final ControllerServiceReference ref = controllerService.getReferences();
+                    final ControllerServiceReferencingComponentsEntity referencingComponentsEntity = createControllerServiceReferencingComponentsEntity(ref);
+                    dto.setReferencingComponents(referencingComponentsEntity.getControllerServiceReferencingComponents());
+                    return dto;
+                });
+
+        final PermissionsDTO permissions = dtoFactory.createPermissionsDto(controllerService);
+        final PermissionsDTO operatePermissions = dtoFactory.createPermissionsDto(new OperationAuthorizable(controllerService));
+        final List<BulletinDTO> bulletins = dtoFactory.createBulletinDtos(bulletinRepository.findBulletinsForSource(controllerServiceDTO.getId()));
+        final List<BulletinEntity> bulletinEntities = bulletins.stream().map(bulletin -> entityFactory.createBulletinEntity(bulletin, permissions.getCanRead())).collect(Collectors.toList());
+        controllerService.performValidation();
+        return entityFactory.createControllerServiceEntity(snapshot.getComponent(), dtoFactory.createRevisionDTO(snapshot.getLastModification()), permissions, operatePermissions, bulletinEntities);
+    }
+
+    @Override
     public List<ConfigVerificationResultDTO> performControllerServiceConfigVerification(final String controllerServiceId, final Map<String, String> properties, final Map<String, String> variables) {
         return controllerServiceDAO.verifyConfiguration(controllerServiceId, properties, variables);
     }
