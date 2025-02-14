@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -212,6 +213,71 @@ public class TestExecuteSQL {
     }
 
     @Test
+    public void testDropTableWithOverwrite() throws SQLException, IOException {
+        // remove previous test database, if any
+        final File dbLocation = new File(DB_LOCATION);
+        dbLocation.delete();
+
+        // load test data to database
+        final Connection con = ((DBCPService) runner.getControllerService("dbcp")).getConnection();
+        Statement stmt = con.createStatement();
+
+        try {
+            stmt.execute("drop table TEST_DROP_TABLE");
+        } catch (final SQLException ignored) {
+        }
+
+        stmt.execute("create table TEST_DROP_TABLE (id integer not null, val1 integer, val2 integer)");
+
+        stmt.execute("insert into TEST_DROP_TABLE (id, val1, val2) VALUES (0, NULL, 1)");
+        stmt.execute("insert into TEST_DROP_TABLE (id, val1, val2) VALUES (1, 1, 1)");
+
+        runner.setIncomingConnection(true);
+        runner.setProperty(ExecuteSQL.SQL_SELECT_QUERY, "DROP TABLE TEST_DROP_TABLE");
+        runner.enqueue("some data");
+        runner.run();
+
+        runner.assertAllFlowFilesTransferred(ExecuteSQL.REL_SUCCESS, 1);
+
+        final List<MockFlowFile> flowfiles = runner.getFlowFilesForRelationship(ExecuteSQL.REL_SUCCESS);
+        final InputStream in = new ByteArrayInputStream(flowfiles.getFirst().toByteArray());
+        final DatumReader<GenericRecord> datumReader = new GenericDatumReader<>();
+        try (DataFileStream<GenericRecord> dataFileReader = new DataFileStream<>(in, datumReader)) {
+            assertFalse(dataFileReader.hasNext());
+        }
+    }
+
+    @Test
+    public void testDropTableNoOverwrite() throws SQLException, IOException {
+        // remove previous test database, if any
+        final File dbLocation = new File(DB_LOCATION);
+        dbLocation.delete();
+
+        // load test data to database
+        final Connection con = ((DBCPService) runner.getControllerService("dbcp")).getConnection();
+        Statement stmt = con.createStatement();
+
+        try {
+            stmt.execute("drop table TEST_TRUNCATE_TABLE");
+        } catch (final SQLException ignored) {
+        }
+
+        stmt.execute("create table TEST_TRUNCATE_TABLE (id integer not null, val1 integer, val2 integer)");
+
+        stmt.execute("insert into TEST_TRUNCATE_TABLE (id, val1, val2) VALUES (0, NULL, 1)");
+        stmt.execute("insert into TEST_TRUNCATE_TABLE (id, val1, val2) VALUES (1, 1, 1)");
+
+        runner.setIncomingConnection(true);
+        runner.setProperty(ExecuteSQL.OVERWRITE_FLOW_FILE_CONTENT, "false");
+        runner.setProperty(ExecuteSQL.SQL_SELECT_QUERY, "TRUNCATE TABLE TEST_TRUNCATE_TABLE");
+        runner.enqueue("some data");
+        runner.run();
+
+        runner.assertAllFlowFilesTransferred(ExecuteSQL.REL_SUCCESS, 1);
+        runner.assertContents(ExecuteSQL.REL_SUCCESS, List.of("some data"));
+    }
+
+    @Test
     public void testCompression() throws SQLException, IOException {
         // remove previous test database, if any
         final File dbLocation = new File(DB_LOCATION);
@@ -311,7 +377,6 @@ public class TestExecuteSQL {
             stmt.execute("insert into TEST_NULL_INT (id, val1, val2) VALUES (" + i + ", 1, 1)");
         }
 
-
         Map<String, String> attrMap = new HashMap<>();
         String testAttrName = "attr1";
         String testAttrValue = "value1";
@@ -342,8 +407,6 @@ public class TestExecuteSQL {
         lastFlowFile.assertAttributeEquals(FragmentAttributes.FRAGMENT_INDEX.key(), "199");
         lastFlowFile.assertAttributeEquals(testAttrName, testAttrValue);
         lastFlowFile.assertAttributeEquals(AbstractExecuteSQL.INPUT_FLOWFILE_UUID, inputFlowFile.getAttribute(CoreAttributes.UUID.key()));
-
-
     }
 
     @Test

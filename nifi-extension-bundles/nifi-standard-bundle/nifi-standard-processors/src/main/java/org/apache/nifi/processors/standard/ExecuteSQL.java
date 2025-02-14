@@ -36,12 +36,12 @@ import org.apache.nifi.processor.ProcessSession;
 import org.apache.nifi.processor.util.StandardValidators;
 import org.apache.nifi.processors.standard.sql.DefaultAvroSqlWriter;
 import org.apache.nifi.processors.standard.sql.SqlWriter;
+import org.apache.nifi.util.db.AvroUtil.CodecType;
 import org.apache.nifi.util.db.JdbcCommon;
 
 import java.util.List;
 import java.util.Set;
 
-import static org.apache.nifi.util.db.AvroUtil.CodecType;
 import static org.apache.nifi.util.db.JdbcProperties.DEFAULT_PRECISION;
 import static org.apache.nifi.util.db.JdbcProperties.DEFAULT_SCALE;
 import static org.apache.nifi.util.db.JdbcProperties.NORMALIZE_NAMES_FOR_AVRO;
@@ -161,7 +161,8 @@ public class ExecuteSQL extends AbstractExecuteSQL {
                 MAX_ROWS_PER_FLOW_FILE,
                 OUTPUT_BATCH_SIZE,
                 FETCH_SIZE,
-                AUTO_COMMIT
+                AUTO_COMMIT,
+                OVERWRITE_FLOW_FILE_CONTENT
         );
     }
 

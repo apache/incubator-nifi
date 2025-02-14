@@ -103,7 +103,8 @@ public abstract class AbstractExecuteSQL extends AbstractProcessor {
 
     public static final PropertyDescriptor SQL_SELECT_QUERY = new PropertyDescriptor.Builder()
             .name("SQL select query")
-            .description("The SQL select query to execute. The query can be empty, a constant value, or built from attributes "
+            .displayName("SQL Query")
+            .description("The SQL query to execute. The query can be empty, a constant value, or built from attributes "
                     + "using Expression Language. If this property is specified, it will be used regardless of the content of "
                     + "incoming flowfiles. If this property is empty, the content of the incoming flow file is expected "
                     + "to contain a valid SQL select query, to be issued by the processor to the database. Note that Expression "
@@ -183,6 +184,17 @@ public abstract class AbstractExecuteSQL extends AbstractProcessor {
                     "When auto commit is enabled, postgreSQL driver loads whole result set to memory at once. " +
                     "This could lead for a large amount of memory usage when executing queries which fetch large data sets. " +
                     "More Details of this behaviour in PostgreSQL driver can be found in https://jdbc.postgresql.org//documentation/head/query.html. ")
+            .allowableValues("true", "false")
+            .defaultValue("true")
+            .required(true)
+            .build();
+
+    public static final PropertyDescriptor OVERWRITE_FLOW_FILE_CONTENT = new PropertyDescriptor.Builder()
+            .name("Overwrite FlowFile Content")
+            .description("""
+                    If the query didn't return any result, this property specifies if the processor should overwrite the
+                    FlowFile's content (when the processor is triggered by an incoming FlowFile).
+                    """)
             .allowableValues("true", "false")
             .defaultValue("true")
             .required(true)
@@ -456,7 +468,11 @@ public abstract class AbstractExecuteSQL extends AbstractProcessor {
                         session.remove(fileToProcess);
                     } else {
                         // If we had no results then transfer the original flow file downstream to trigger processors
-                        session.transfer(setFlowFileEmptyResults(session, fileToProcess, sqlWriter), REL_SUCCESS);
+                        if (context.getProperty(OVERWRITE_FLOW_FILE_CONTENT).asBoolean() == null || context.getProperty(OVERWRITE_FLOW_FILE_CONTENT).asBoolean()) {
+                            session.transfer(setFlowFileEmptyResults(session, fileToProcess, sqlWriter), REL_SUCCESS);
+                        } else {
+                            session.transfer(fileToProcess, REL_SUCCESS);
+                        }
                     }
                 } else if (resultCount == 0) {
                     // If we had no inbound FlowFile, no exceptions, and the SQL generated no result sets (Insert/Update/Delete statements only)
