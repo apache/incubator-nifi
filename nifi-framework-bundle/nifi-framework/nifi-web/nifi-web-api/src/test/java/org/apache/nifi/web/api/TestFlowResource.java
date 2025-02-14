@@ -26,6 +26,8 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import io.prometheus.client.Collector.MetricFamilySamples.Sample;
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.exporter.common.TextFormat;
+import org.apache.nifi.controller.status.ProcessGroupStatus;
+import org.apache.nifi.controller.status.ProcessingPerformanceStatus;
 import org.apache.nifi.metrics.jvm.JmxJvmMetrics;
 import org.apache.nifi.prometheusutil.BulletinMetricsRegistry;
 import org.apache.nifi.prometheusutil.ClusterMetricsRegistry;
@@ -40,6 +42,7 @@ import org.apache.nifi.web.api.dto.ComponentDifferenceDTO;
 import org.apache.nifi.web.api.dto.DifferenceDTO;
 import org.apache.nifi.web.api.entity.FlowComparisonEntity;
 import org.apache.nifi.web.api.request.FlowMetricsProducer;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -61,6 +64,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -83,6 +87,7 @@ public class TestFlowResource {
     private static final String HEAP_USAGE_NAME = "nifi_jvm_heap_usage";
     private static final String HEAP_USED_NAME = "nifi_jvm_heap_used";
     private static final String HEAP_STARTS_WITH_PATTERN = "nifi_jvm_heap.*";
+    private static final String PROCESSING_STARTS_WITH_PATTERN = "^nifi_processing_.*";
     private static final String THREAD_COUNT_LABEL = String.format("nifi_jvm_thread_count{instance=\"%s\"", LABEL_VALUE);
     private static final String THREAD_COUNT_OTHER_LABEL = String.format("nifi_jvm_thread_count{instance=\"%s\"", OTHER_LABEL_VALUE);
     private static final String ROOT_FIELD_NAME = "beans";
@@ -114,7 +119,7 @@ public class TestFlowResource {
 
     @Test
     public void testGetFlowMetricsPrometheus() throws IOException {
-        final List<CollectorRegistry> registries = getCollectorRegistries();
+        final List<CollectorRegistry> registries = getCollectorRegistries(false);
         when(serviceFacade.generateFlowMetrics(anySet())).thenReturn(registries);
 
         final Response response = resource.getFlowMetrics(FlowMetricsProducer.PROMETHEUS.getProducer(), Collections.emptySet(), null, null, null);
@@ -126,11 +131,29 @@ public class TestFlowResource {
 
         assertTrue(output.contains(THREAD_COUNT_NAME), "Thread Count name not found");
         assertTrue(output.contains(HEAP_USAGE_NAME), "Heap Usage name not found");
+        assertEquals(0, Pattern.compile(PROCESSING_STARTS_WITH_PATTERN, Pattern.MULTILINE).matcher(output).results().count());
+    }
+
+    @Test
+    public void testGetFlowMetricsPrometheusWithPerformanceStatus() throws IOException {
+        final List<CollectorRegistry> registries = getCollectorRegistries(true);
+        when(serviceFacade.generateFlowMetrics(anySet())).thenReturn(registries);
+
+        final Response response = resource.getFlowMetrics(FlowMetricsProducer.PROMETHEUS.getProducer(), Collections.emptySet(), null, null, null);
+
+        assertNotNull(response);
+        assertEquals(MediaType.valueOf(TextFormat.CONTENT_TYPE_004), response.getMediaType());
+
+        final String output = getResponseOutput(response);
+
+        assertTrue(output.contains(THREAD_COUNT_NAME), "Thread Count name not found");
+        assertTrue(output.contains(HEAP_USAGE_NAME), "Heap Usage name not found");
+        assertEquals(5, Pattern.compile(PROCESSING_STARTS_WITH_PATTERN, Pattern.MULTILINE).matcher(output).results().count());
     }
 
     @Test
     public void testGetFlowMetricsPrometheusSampleName() throws IOException {
-        final List<CollectorRegistry> registries = getCollectorRegistries();
+        final List<CollectorRegistry> registries = getCollectorRegistries(false);
         when(serviceFacade.generateFlowMetrics(anySet())).thenReturn(registries);
 
         final Response response = resource.getFlowMetrics(FlowMetricsProducer.PROMETHEUS.getProducer(), Collections.emptySet(), THREAD_COUNT_NAME, null, null);
@@ -146,7 +169,7 @@ public class TestFlowResource {
 
     @Test
     public void testGetFlowMetricsPrometheusSampleNameStartsWithPattern() throws IOException {
-        final List<CollectorRegistry> registries = getCollectorRegistries();
+        final List<CollectorRegistry> registries = getCollectorRegistries(false);
         when(serviceFacade.generateFlowMetrics(anySet())).thenReturn(registries);
 
         final Response response = resource.getFlowMetrics(FlowMetricsProducer.PROMETHEUS.getProducer(), Collections.emptySet(), HEAP_STARTS_WITH_PATTERN, null, null);
@@ -163,7 +186,7 @@ public class TestFlowResource {
 
     @Test
     public void testGetFlowMetricsPrometheusSampleLabelValue() throws IOException {
-        final List<CollectorRegistry> registries = getCollectorRegistries();
+        final List<CollectorRegistry> registries = getCollectorRegistries(false);
         when(serviceFacade.generateFlowMetrics(anySet())).thenReturn(registries);
 
         final Response response = resource.getFlowMetrics(FlowMetricsProducer.PROMETHEUS.getProducer(), Collections.emptySet(), null, LABEL_VALUE, null);
@@ -179,7 +202,7 @@ public class TestFlowResource {
 
     @Test
     public void testGetFlowMetricsPrometheusSampleNameAndSampleLabelValue() throws IOException {
-        final List<CollectorRegistry> registries = getCollectorRegistries();
+        final List<CollectorRegistry> registries = getCollectorRegistries(false);
         when(serviceFacade.generateFlowMetrics(anySet())).thenReturn(registries);
 
         final Response response = resource.getFlowMetrics(FlowMetricsProducer.PROMETHEUS.getProducer(), Collections.emptySet(), THREAD_COUNT_NAME, LABEL_VALUE, null);
@@ -392,6 +415,11 @@ public class TestFlowResource {
         assertEquals(createDifference("Position Changed", "Position was changed"), differences.get(0));
     }
 
+    @Test
+    public void testWithProcessorPerformanceStatus() {
+
+    }
+
     private void setUpGetVersionDifference() {
         doReturn(getDifferences()).when(serviceFacade).getVersionDifference(anyString(), any(FlowVersionLocation.class), any(FlowVersionLocation.class));
     }
@@ -445,11 +473,51 @@ public class TestFlowResource {
         return new String(outputBytes, StandardCharsets.UTF_8);
     }
 
-    private List<CollectorRegistry> getCollectorRegistries() {
+    private List<CollectorRegistry> getCollectorRegistries(boolean includeProcessorPerfStatus) {
         final JvmMetricsRegistry jvmMetricsRegistry = new JvmMetricsRegistry();
         final CollectorRegistry jvmCollectorRegistry = PrometheusMetricsUtil.createJvmMetrics(jvmMetricsRegistry, JmxJvmMetrics.getInstance(), LABEL_VALUE);
         final CollectorRegistry otherJvmCollectorRegistry = PrometheusMetricsUtil.createJvmMetrics(jvmMetricsRegistry, JmxJvmMetrics.getInstance(), OTHER_LABEL_VALUE);
-        return Arrays.asList(jvmCollectorRegistry, otherJvmCollectorRegistry);
+        final NiFiMetricsRegistry niFiMetricsRegistry = new NiFiMetricsRegistry();
+        final ProcessGroupStatus processGroupStatus;
+        if (includeProcessorPerfStatus) {
+            processGroupStatus = makeTestProcessGroupStatusWithPerformance();
+        } else {
+            processGroupStatus = makeTestProcessGroupStatus();
+        }
+        final CollectorRegistry nifiCollectionRegistry = PrometheusMetricsUtil.createNifiMetrics(niFiMetricsRegistry, processGroupStatus, "", "", "", "");
+        return Arrays.asList(jvmCollectorRegistry, otherJvmCollectorRegistry, nifiCollectionRegistry);
+    }
+
+    private static @NotNull ProcessGroupStatus makeTestProcessGroupStatus() {
+        final ProcessGroupStatus processGroupStatus = new ProcessGroupStatus();
+        processGroupStatus.setId("1234");
+        processGroupStatus.setFlowFilesReceived(5);
+        processGroupStatus.setBytesReceived(10000);
+        processGroupStatus.setFlowFilesSent(10);
+        processGroupStatus.setBytesSent(20000);
+        processGroupStatus.setQueuedCount(100);
+        processGroupStatus.setQueuedContentSize(1024L);
+        processGroupStatus.setBytesRead(60000L);
+        processGroupStatus.setBytesWritten(80000L);
+        processGroupStatus.setActiveThreadCount(5);
+        processGroupStatus.setOutputContentSize(1000L);
+        processGroupStatus.setInputContentSize(1000L);
+        processGroupStatus.setInputCount(1);
+        processGroupStatus.setOutputCount(1);
+        return processGroupStatus;
+    }
+
+    private static @NotNull ProcessGroupStatus makeTestProcessGroupStatusWithPerformance() {
+        ProcessGroupStatus status = makeTestProcessGroupStatus();
+        ProcessingPerformanceStatus performanceStatus = new ProcessingPerformanceStatus();
+        performanceStatus.setContentReadDuration(1L);
+        performanceStatus.setContentWriteDuration(1L);
+        performanceStatus.setIdentifier("");
+        performanceStatus.setSessionCommitDuration(1L);
+        performanceStatus.setGarbageCollectionDuration(1L);
+        performanceStatus.setCpuDuration(1L);
+        status.setProcessingPerformanceStatus(performanceStatus);
+        return status;
     }
 
     private Map<String, List<Sample>> convertJsonResponseToMap(final Response response) throws IOException {

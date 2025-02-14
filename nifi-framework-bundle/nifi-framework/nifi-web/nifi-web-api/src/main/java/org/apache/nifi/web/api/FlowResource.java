@@ -555,11 +555,15 @@ public class FlowResource extends ApplicationResource {
     public Response getFlowMetrics(
             @Parameter(
                     description = "The producer for flow file metrics. Each producer may have its own output format.",
-                    required = true
+                    required = true,
+                    schema = @Schema(allowableValues = {"prometheus", "json"})
             )
             @PathParam("producer") final String producer,
             @Parameter(
-                    description = "Set of included metrics registries"
+                    description = "Set of included metrics registries. Duplicate the parameter to include multiple registries. " +
+                            "All registries are included by default.",
+
+                    schema = @Schema(allowableValues = {"NIFI", "JVM", "BULLETIN", "CONNECTION", "CLUSTER"})
             )
             @QueryParam("includedRegistries") final Set<FlowMetricsRegistry> includedRegistries,
             @Parameter(

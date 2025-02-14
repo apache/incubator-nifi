@@ -23,6 +23,7 @@ import org.apache.nifi.controller.status.ConnectionStatus;
 import org.apache.nifi.controller.status.PortStatus;
 import org.apache.nifi.controller.status.ProcessGroupStatus;
 import org.apache.nifi.controller.status.ProcessorStatus;
+import org.apache.nifi.controller.status.ProcessingPerformanceStatus;
 import org.apache.nifi.controller.status.RemoteProcessGroupStatus;
 import org.apache.nifi.controller.status.TransmissionStatus;
 import org.apache.nifi.controller.status.analytics.StatusAnalytics;
@@ -80,6 +81,12 @@ public class PrometheusMetricsUtil {
         nifiMetricsRegistry.setDataPoint(status.getTerminatedThreadCount() == null ? 0 : status.getTerminatedThreadCount(), "AMOUNT_THREADS_TOTAL_TERMINATED",
                 instanceId, componentType, componentName, componentId, parentPGId);
 
+        addProcessingPerformanceMetrics(nifiMetricsRegistry, status.getProcessingPerformanceStatus(),
+                instanceId, componentType, componentName, componentId, parentPGId);
+
+        nifiMetricsRegistry.setDataPoint(status.getProcessingNanos(), "TOTAL_TASK_DURATION",
+                instanceId, componentType, componentName, componentId, parentPGId);
+
         // Report metrics for child process groups if specified
         if (METRICS_STRATEGY_PG.getValue().equals(metricsStrategy) || METRICS_STRATEGY_COMPONENTS.getValue().equals(metricsStrategy)) {
             status.getProcessGroupStatus().forEach((childGroupStatus) -> createNifiMetrics(nifiMetricsRegistry, childGroupStatus, instanceId, componentId, "ProcessGroup", metricsStrategy));
@@ -127,6 +134,9 @@ public class PrometheusMetricsUtil {
                 nifiMetricsRegistry.setDataPoint(status.getActiveThreadCount() == null ? 0 : status.getActiveThreadCount(), "AMOUNT_THREADS_TOTAL_ACTIVE",
                         instanceId, procComponentType, procComponentName, procComponentId, parentId);
                 nifiMetricsRegistry.setDataPoint(status.getTerminatedThreadCount() == null ? 0 : status.getTerminatedThreadCount(), "AMOUNT_THREADS_TOTAL_TERMINATED",
+                        instanceId, procComponentType, procComponentName, procComponentId, parentId);
+
+                addProcessingPerformanceMetrics(nifiMetricsRegistry, processorStatus.getProcessingPerformanceStatus(),
                         instanceId, procComponentType, procComponentName, procComponentId, parentId);
 
             }
@@ -507,5 +517,26 @@ public class PrometheusMetricsUtil {
                 instanceId, componentType, componentName, componentId, parentId, storageUsage.getIdentifier());
         nifiMetricsRegistry.setDataPoint(storageUsage.getUsedSpace(), usedSpaceLabel,
                 instanceId, componentType, componentName, componentId, parentId, storageUsage.getIdentifier());
+    }
+
+    private static void addProcessingPerformanceMetrics(final NiFiMetricsRegistry niFiMetricsRegistry, final ProcessingPerformanceStatus perfStatus, final String instanceId,
+                                                        final String componentType, final String componentName, final String componentId, final String parentId) {
+        if (perfStatus != null) {
+            niFiMetricsRegistry.setDataPoint(perfStatus.getCpuDuration() / 1000.0, "PROCESSING_PERF_CPU_MILLIS",
+                    instanceId, componentType, componentName, componentId, parentId, perfStatus.getIdentifier());
+
+            // Base metric already in milliseconds
+            niFiMetricsRegistry.setDataPoint(perfStatus.getGarbageCollectionDuration(), "PROCESSING_PERF_GC_MILLIS",
+                    instanceId, componentType, componentName, componentId, parentId, perfStatus.getIdentifier());
+
+            niFiMetricsRegistry.setDataPoint(perfStatus.getContentReadDuration() / 1000.0, "PROCESSING_PERF_READ_MILLIS",
+                    instanceId, componentType, componentName, componentId, parentId, perfStatus.getIdentifier());
+
+            niFiMetricsRegistry.setDataPoint(perfStatus.getContentWriteDuration() / 1000.0, "PROCESSING_PERF_WRITE_MILLIS",
+                    instanceId, componentType, componentName, componentId, parentId, perfStatus.getIdentifier());
+
+            niFiMetricsRegistry.setDataPoint(perfStatus.getSessionCommitDuration() / 1000.0, "PROCESSING_PERF_COMMIT_MILLIS",
+                    instanceId, componentType, componentName, componentId, parentId, perfStatus.getIdentifier());
+        }
     }
 }
