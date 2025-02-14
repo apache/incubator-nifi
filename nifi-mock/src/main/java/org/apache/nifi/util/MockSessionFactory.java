@@ -33,19 +33,21 @@ public class MockSessionFactory implements ProcessSessionFactory {
     private final boolean enforceReadStreamsClosed;
     private final StateManager stateManager;
     private final boolean allowSynchronousSessionCommits;
+    private final boolean allowRecursiveReads;
 
     MockSessionFactory(final SharedSessionState sharedState, final Processor processor, final boolean enforceReadStreamsClosed, final StateManager stateManager,
-                       final boolean allowSynchronousSessionCommits) {
+                       final boolean allowSynchronousSessionCommits, final boolean allowRecursiveReads) {
         this.sharedState = sharedState;
         this.processor = processor;
         this.enforceReadStreamsClosed = enforceReadStreamsClosed;
         this.stateManager = stateManager;
         this.allowSynchronousSessionCommits = allowSynchronousSessionCommits;
+        this.allowRecursiveReads = allowRecursiveReads;
     }
 
     @Override
     public ProcessSession createSession() {
-        final MockProcessSession session = new MockProcessSession(sharedState, processor, enforceReadStreamsClosed, stateManager, allowSynchronousSessionCommits);
+        final MockProcessSession session = new MockProcessSession(sharedState, processor, enforceReadStreamsClosed, stateManager, allowSynchronousSessionCommits, allowRecursiveReads);
         createdSessions.add(session);
         return session;
     }

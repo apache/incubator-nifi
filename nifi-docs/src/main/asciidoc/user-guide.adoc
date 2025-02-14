@@ -695,9 +695,9 @@ In order for a Processor to be considered valid and able to run, each Relationsh
 
 ===== Automatically Retry
 Users can also configure whether or not FlowFiles routed to a given Relationship should be retried. If a FlowFile is routed to any Relationship that is configured to be retried,
-the FlowFile will be re-queued and the Processor will attempt to process it again. If the Processor routes the FlowFile to a retriable Relationship again (either the same Relationship
+the FlowFile will be re-queued and the Processor will attempt to process it again. If the Processor routes the FlowFile to a retryable Relationship again (either the same Relationship
 or another that is configured to be retried), it will be re-queued again, up to the number of
-times specified by the user. If the Processor routes the FlowFile to a retriable Relationship after the specified number of retries, the FlowFile will be transferred to
+times specified by the user. If the Processor routes the FlowFile to a retryable Relationship after the specified number of retries, the FlowFile will be transferred to
 the Connection(s) that include that Relationship - or auto-terminated, as configured.
 If the Processor routes the FlowFile to any Relationship that is not configured to be retried, it will be routed to that Relationship immediately.
 
@@ -705,7 +705,7 @@ For example, consider a Processor with two relationships: `success` and `failure
 A user configures the `failure` Relationship to retry 10 times and also be configured to auto-terminate. In this
 case, if an incoming FlowFile is routed to the `failure` Relationship,
 it will be retried up to 10 times. After 10 attempts, if it is routed to `failure` again, it will be auto-terminated. However, if at any point it is
-routed to `success`, it will immediatley be transferred to the Connection(s) that include the `success` Relationship and not retried any further.
+routed to `success`, it will immediately be transferred to the Connection(s) that include the `success` Relationship and not retried any further.
 
 ====== Number of Retry Attempts
 For relationships set to retry, this number indicates how many times a FlowFile will attempt to reprocess before it is routed elsewhere.

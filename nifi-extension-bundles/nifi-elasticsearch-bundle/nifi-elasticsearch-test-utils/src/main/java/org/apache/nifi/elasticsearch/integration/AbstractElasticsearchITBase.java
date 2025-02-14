@@ -52,7 +52,7 @@ import static org.apache.http.auth.AuthScope.ANY;
 public abstract class AbstractElasticsearchITBase {
     // default Elasticsearch version should (ideally) match that in the nifi-elasticsearch-bundle#pom.xml for the integration-tests profile
     protected static final DockerImageName IMAGE = DockerImageName
-            .parse(System.getProperty("elasticsearch.docker.image", "docker.elastic.co/elasticsearch/elasticsearch:8.17.0"));
+            .parse(System.getProperty("elasticsearch.docker.image", "docker.elastic.co/elasticsearch/elasticsearch:8.17.1"));
     protected static final String ELASTIC_USER_PASSWORD = System.getProperty("elasticsearch.elastic_user.password", RandomStringUtils.randomAlphanumeric(10, 20));
     private static final int PORT = 9200;
     protected static final ElasticsearchContainer ELASTICSEARCH_CONTAINER = new ElasticsearchContainer(IMAGE)
@@ -79,7 +79,7 @@ public abstract class AbstractElasticsearchITBase {
 
     protected static final boolean ENABLE_TEST_CONTAINERS = "true".equalsIgnoreCase(System.getProperty("elasticsearch.testcontainers.enabled"));
     protected static String elasticsearchHost;
-    protected static void startTestcontainer() {
+    protected static void startTestContainer() {
         if (ENABLE_TEST_CONTAINERS) {
             if (getElasticMajorVersion() == 6) {
                 // disable system call filter check to allow Elasticsearch 6 to run on aarch64 machines (e.g. Mac M1/2)
@@ -99,7 +99,7 @@ public abstract class AbstractElasticsearchITBase {
 
     static RestClient testDataManagementClient;
 
-    protected static void stopTestcontainer() {
+    protected static void stopTestContainer() {
         if (ENABLE_TEST_CONTAINERS) {
             ELASTICSEARCH_CONTAINER.stop();
         }
@@ -107,7 +107,7 @@ public abstract class AbstractElasticsearchITBase {
 
     @BeforeAll
     static void beforeAll() throws IOException {
-        startTestcontainer();
+        startTestContainer();
         type = getElasticMajorVersion() == 6 ? "_doc" : "";
         System.out.printf("%n%n%n%n%n%n%n%n%n%n%n%n%n%n%nTYPE: %s%nIMAGE: %s:%s%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n",
                 type, IMAGE.getRepository(), IMAGE.getVersionPart());
@@ -201,23 +201,13 @@ public abstract class AbstractElasticsearchITBase {
         return actions;
     }
 
-    private static final class SetupAction {
-        private final String verb;
-        private final String path;
-        private final String json;
-
-        public SetupAction(final String verb, final String path, final String json) {
-            this.verb = verb;
-            this.path = path;
-            this.json = json;
-        }
-
+    private record SetupAction(String verb, String path, String json) {
         @Override
-        public String toString() {
-            return "SetupAction{" +
-                    "verb='" + verb + '\'' +
-                    ", path='" + path + '\'' +
-                    '}';
+            public String toString() {
+                return "SetupAction{" +
+                        "verb='" + verb + '\'' +
+                        ", path='" + path + '\'' +
+                        '}';
+            }
         }
-    }
 }

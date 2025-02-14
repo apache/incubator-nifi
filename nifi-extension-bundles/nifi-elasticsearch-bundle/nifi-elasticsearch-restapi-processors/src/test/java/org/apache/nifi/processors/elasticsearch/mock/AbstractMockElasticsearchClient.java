@@ -121,12 +121,12 @@ public class AbstractMockElasticsearchClient extends AbstractControllerService i
         return String.format("http://localhost:9200/%s/%s", index, StringUtils.isNotBlank(type) ? type : "");
     }
 
-    public boolean isThrowRetriableError() {
-        return throwRetriableError;
+    public boolean isThrowRetryableError() {
+        return throwRetryableError;
     }
 
-    public void setThrowRetriableError(final boolean throwRetriableError) {
-        this.throwRetriableError = throwRetriableError;
+    public void setThrowRetryableError(final boolean throwRetryableError) {
+        this.throwRetryableError = throwRetryableError;
     }
 
     public boolean isThrowFatalError() {
@@ -137,6 +137,6 @@ public class AbstractMockElasticsearchClient extends AbstractControllerService i
         this.throwFatalError = throwFatalError;
     }
 
-    private boolean throwRetriableError;
+    private boolean throwRetryableError;
     private boolean throwFatalError;
 }
