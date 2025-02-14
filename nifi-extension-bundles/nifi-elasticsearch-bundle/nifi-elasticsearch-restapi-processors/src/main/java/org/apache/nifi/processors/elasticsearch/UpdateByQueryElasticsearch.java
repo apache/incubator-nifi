@@ -17,6 +17,7 @@
 
 package org.apache.nifi.processors.elasticsearch;
 
+import org.apache.nifi.annotation.behavior.DynamicProperties;
 import org.apache.nifi.annotation.behavior.DynamicProperty;
 import org.apache.nifi.annotation.behavior.InputRequirement;
 import org.apache.nifi.annotation.behavior.WritesAttribute;
@@ -24,10 +25,9 @@ import org.apache.nifi.annotation.behavior.WritesAttributes;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.elasticsearch.ElasticSearchClientService;
+import org.apache.nifi.elasticsearch.ElasticsearchRequestOptions;
 import org.apache.nifi.elasticsearch.OperationResponse;
 import org.apache.nifi.expression.ExpressionLanguageScope;
-
-import java.util.Map;
 
 @WritesAttributes({
         @WritesAttribute(attribute = "elasticsearch.update.took", description = "The amount of time that it took to complete the update operation in ms."),
@@ -38,12 +38,21 @@ import java.util.Map;
 @CapabilityDescription("Update documents in an Elasticsearch index using a query. The query can be loaded from a flowfile body " +
         "or from the Query parameter. The loaded Query can contain any JSON accepted by Elasticsearch's _update_by_query API, " +
         "for example a \"query\" object to identify what documents are to be updated, plus a \"script\" to define the updates to perform.")
-@DynamicProperty(
-        name = "The name of a URL query parameter to add",
-        value = "The value of the URL query parameter",
-        expressionLanguageScope = ExpressionLanguageScope.FLOWFILE_ATTRIBUTES,
-        description = "Adds the specified property name/value as a query parameter in the Elasticsearch URL used for processing. " +
-                "These parameters will override any matching parameters in the query request body")
+@DynamicProperties({
+        @DynamicProperty(
+                name = "The name of the HTTP request header",
+                value = "A Record Path expression to retrieve the HTTP request header value",
+                expressionLanguageScope = ExpressionLanguageScope.FLOWFILE_ATTRIBUTES,
+                description = "Prefix: " + ElasticsearchRestProcessor.DYNAMIC_PROPERTY_PREFIX_REQUEST_HEADER +
+                        " - adds the specified property name/value as a HTTP request header in the Elasticsearch request. " +
+                        "If the Record Path expression results in a null or blank value, the HTTP request header will be omitted."),
+        @DynamicProperty(
+                name = "The name of a URL query parameter to add",
+                value = "The value of the URL query parameter",
+                expressionLanguageScope = ExpressionLanguageScope.FLOWFILE_ATTRIBUTES,
+                description = "Adds the specified property name/value as a query parameter in the Elasticsearch URL used for processing. " +
+                        "These parameters will override any matching parameters in the query request body")
+})
 public class UpdateByQueryElasticsearch extends AbstractByQueryElasticsearch {
     static final String TOOK_ATTRIBUTE = "elasticsearch.update.took";
     static final String ERROR_ATTRIBUTE = "elasticsearch.update.error";
@@ -60,7 +69,7 @@ public class UpdateByQueryElasticsearch extends AbstractByQueryElasticsearch {
 
     @Override
     OperationResponse performOperation(final ElasticSearchClientService clientService, final String query,
-                                       final String index, final String type, final Map<String, String> requestParameters) {
-        return clientService.updateByQuery(query, index, type, requestParameters);
+                                       final String index, final String type, final ElasticsearchRequestOptions elasticsearchRequestOptions) {
+        return clientService.updateByQuery(query, index, type, elasticsearchRequestOptions);
     }
 }

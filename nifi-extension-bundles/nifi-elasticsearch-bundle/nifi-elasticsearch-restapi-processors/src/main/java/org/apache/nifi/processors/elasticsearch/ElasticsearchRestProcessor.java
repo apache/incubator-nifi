@@ -28,6 +28,7 @@ import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.Validator;
 import org.apache.nifi.elasticsearch.ElasticSearchClientService;
 import org.apache.nifi.elasticsearch.ElasticsearchException;
+import org.apache.nifi.elasticsearch.ElasticsearchRequestOptions;
 import org.apache.nifi.elasticsearch.SearchResponse;
 import org.apache.nifi.expression.ExpressionLanguageScope;
 import org.apache.nifi.flowfile.FlowFile;
@@ -50,6 +51,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public interface ElasticsearchRestProcessor extends Processor, VerifiableProcessor {
@@ -58,6 +60,9 @@ public interface ElasticsearchRestProcessor extends Processor, VerifiableProcess
     String VERIFICATION_STEP_QUERY_JSON_VALID = "Elasticsearch Query JSON Valid";
     String VERIFICATION_STEP_QUERY_VALID = "Elasticsearch Query Valid";
     String DEFAULT_MAX_STRING_LENGTH = "20 MB";
+    String DYNAMIC_PROPERTY_PREFIX_REQUEST_HEADER = "HEADER:";
+    Predicate<Map.Entry<PropertyDescriptor, String>> REQUEST_HEADER_FILTER = entry ->
+            StringUtils.startsWith(entry.getKey().getName(), DYNAMIC_PROPERTY_PREFIX_REQUEST_HEADER);
 
     PropertyDescriptor INDEX = new PropertyDescriptor.Builder()
             .name("el-rest-fetch-index")
@@ -321,17 +326,33 @@ public interface ElasticsearchRestProcessor extends Processor, VerifiableProcess
         }
     }
 
-    default Map<String, String> getDynamicProperties(final ProcessContext context, final FlowFile flowFile) {
-        return getDynamicProperties(context, flowFile != null ? flowFile.getAttributes() : null);
+    default Map<String, String> getRequestParametersFromDynamicProperties(final ProcessContext context, final FlowFile flowFile) {
+        return getRequestParametersFromDynamicProperties(context, flowFile != null ? flowFile.getAttributes() : null);
     }
 
-    default Map<String, String> getDynamicProperties(final ProcessContext context, final Map<String, String> attributes) {
+    default Map<String, String> getRequestParametersFromDynamicProperties(final ProcessContext context, final Map<String, String> attributes) {
+        return getDynamicProperties(context, attributes, Predicate.not(REQUEST_HEADER_FILTER));
+    }
+
+    default Map<String, String> getRequestHeadersFromDynamicProperties(final ProcessContext context, final FlowFile flowFile) {
+        return getRequestHeadersFromDynamicProperties(context, flowFile != null ? flowFile.getAttributes() : null);
+    }
+
+    default Map<String, String> getRequestHeadersFromDynamicProperties(final ProcessContext context, final Map<String, String> attributes) {
+        final Map<String, String> dynamicProperties = getDynamicProperties(context, attributes, REQUEST_HEADER_FILTER);
+        return dynamicProperties.entrySet().stream().collect(Collectors.toMap(
+                e -> e.getKey().replaceFirst("^" + DYNAMIC_PROPERTY_PREFIX_REQUEST_HEADER, ""),
+                Map.Entry::getValue));
+    }
+
+    default Map<String, String> getDynamicProperties(final ProcessContext context, final Map<String, String> attributes, final Predicate<Map.Entry<PropertyDescriptor, String>> predicate) {
         return context.getProperties().entrySet().stream()
                 // filter non-blank dynamic properties
                 .filter(e -> e.getKey().isDynamic()
                         && StringUtils.isNotBlank(e.getValue())
                         && StringUtils.isNotBlank(context.getProperty(e.getKey()).evaluateAttributeExpressions(attributes).getValue())
                 )
+                .filter(predicate)
                 // convert to Map keys and evaluated property values
                 .collect(Collectors.toMap(
                         e -> e.getKey().getName(),
@@ -353,7 +374,8 @@ public interface ElasticsearchRestProcessor extends Processor, VerifiableProcess
             if (context.getProperty(INDEX).isSet()) {
                 index = context.getProperty(INDEX).evaluateAttributeExpressions(attributes).getValue();
                 try {
-                    if (verifyClientService.exists(index, getDynamicProperties(context, attributes))) {
+                    if (verifyClientService.exists(index, new ElasticsearchRequestOptions(getRequestParametersFromDynamicProperties(context, attributes),
+                            getRequestHeadersFromDynamicProperties(context, attributes)))) {
                         indexExistsResult.outcome(ConfigVerificationResult.Outcome.SUCCESSFUL)
                                 .explanation(String.format("Index [%s] exists", index));
                         indexExists = true;
@@ -408,10 +430,11 @@ public interface ElasticsearchRestProcessor extends Processor, VerifiableProcess
                     queryJson.remove("script");
                 }
                 final String type = context.getProperty(TYPE).evaluateAttributeExpressions(attributes).getValue();
-                final Map<String, String> requestParameters = new HashMap<>(getDynamicProperties(context, attributes));
+                final Map<String, String> requestParameters = new HashMap<>(getRequestParametersFromDynamicProperties(context, attributes));
                 requestParameters.putIfAbsent("_source", "false");
 
-                final SearchResponse response = verifyClientService.search(mapper.writeValueAsString(queryJson), index, type, requestParameters);
+                final SearchResponse response = verifyClientService.search(
+                        mapper.writeValueAsString(queryJson), index, type, new ElasticsearchRequestOptions(requestParameters, getRequestHeadersFromDynamicProperties(context, attributes)));
                 queryValidResult.outcome(ConfigVerificationResult.Outcome.SUCCESSFUL)
                         .explanation(String.format("Query found %d hits and %d aggregations in %d milliseconds, timed out: %s",
                                 response.getNumberOfHits(), response.getAggregations() == null ? 0 : response.getAggregations().size(), response.getTook(), response.isTimedOut()));

@@ -18,6 +18,7 @@
 package org.apache.nifi.processors.elasticsearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.nifi.annotation.behavior.DynamicProperties;
 import org.apache.nifi.annotation.behavior.DynamicProperty;
 import org.apache.nifi.annotation.behavior.InputRequirement;
 import org.apache.nifi.annotation.behavior.WritesAttribute;
@@ -32,6 +33,7 @@ import org.apache.nifi.components.ConfigVerificationResult;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.elasticsearch.ElasticSearchClientService;
 import org.apache.nifi.elasticsearch.ElasticsearchException;
+import org.apache.nifi.elasticsearch.ElasticsearchRequestOptions;
 import org.apache.nifi.expression.ExpressionLanguageScope;
 import org.apache.nifi.flowfile.FlowFile;
 import org.apache.nifi.logging.ComponentLog;
@@ -64,11 +66,20 @@ import java.util.concurrent.atomic.AtomicReference;
         @WritesAttribute(attribute = "elasticsearch.get.error", description = "The error message provided by Elasticsearch if there is an error fetching the document.")
 })
 @SeeAlso(JsonQueryElasticsearch.class)
-@DynamicProperty(
-        name = "The name of a URL query parameter to add",
-        value = "The value of the URL query parameter",
-        expressionLanguageScope = ExpressionLanguageScope.FLOWFILE_ATTRIBUTES,
-        description = "Adds the specified property name/value as a query parameter in the Elasticsearch URL used for processing.")
+@DynamicProperties({
+        @DynamicProperty(
+                name = "The name of the HTTP request header",
+                value = "A Record Path expression to retrieve the HTTP request header value",
+                expressionLanguageScope = ExpressionLanguageScope.FLOWFILE_ATTRIBUTES,
+                description = "Prefix: " + ElasticsearchRestProcessor.DYNAMIC_PROPERTY_PREFIX_REQUEST_HEADER +
+                        " - adds the specified property name/value as a HTTP request header in the Elasticsearch request. " +
+                        "If the Record Path expression results in a null or blank value, the HTTP request header will be omitted."),
+        @DynamicProperty(
+                name = "The name of a URL query parameter to add",
+                value = "The value of the URL query parameter",
+                expressionLanguageScope = ExpressionLanguageScope.FLOWFILE_ATTRIBUTES,
+                description = "Adds the specified property name/value as a query parameter in the Elasticsearch URL used for processing.")
+})
 public class GetElasticsearch extends AbstractProcessor implements ElasticsearchRestProcessor {
     static final AllowableValue FLOWFILE_CONTENT = new AllowableValue(
             "flowfile-content",
@@ -184,9 +195,10 @@ public class GetElasticsearch extends AbstractProcessor implements Elasticsearch
             final String type = context.getProperty(TYPE).evaluateAttributeExpressions(attributes).getValue();
             final String id = context.getProperty(ID).evaluateAttributeExpressions(attributes).getValue();
             try {
-                final Map<String, String> requestParameters = new HashMap<>(getDynamicProperties(context, attributes));
+                final Map<String, String> requestParameters = new HashMap<>(getRequestParametersFromDynamicProperties(context, attributes));
                 requestParameters.putIfAbsent("_source", "false");
-                if (verifyClientService.documentExists(index, type, id, requestParameters)) {
+                if (verifyClientService.documentExists(index, type, id, new ElasticsearchRequestOptions(requestParameters,
+                        getRequestHeadersFromDynamicProperties(context, attributes)))) {
                     documentExistsResult.outcome(ConfigVerificationResult.Outcome.SUCCESSFUL)
                             .explanation(String.format("Document [%s] exists in index [%s]", id, index));
                 } else {
@@ -234,7 +246,8 @@ public class GetElasticsearch extends AbstractProcessor implements Elasticsearch
             }
 
             final StopWatch stopWatch = new StopWatch(true);
-            final Map<String, Object> doc = clientService.get().get(index, type, id, getDynamicProperties(context, input));
+            final Map<String, Object> doc = clientService.get().get(index, type, id,
+                    new ElasticsearchRequestOptions(getRequestParametersFromDynamicProperties(context, input), getRequestHeadersFromDynamicProperties(context, input)));
 
             final Map<String, String> attributes = new HashMap<>(4, 1);
             attributes.put("filename", id);

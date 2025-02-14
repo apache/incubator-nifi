@@ -292,19 +292,19 @@ public interface ElasticSearchClientService extends ControllerService, Verifiabl
      * Index a document.
      *
      * @param operation A document to index.
-     * @param requestParameters A collection of URL request parameters. Optional.
+     * @param elasticsearchRequestOptions A collection of request options (parameters and header). Optional.
      * @return IndexOperationResponse if successful
      */
-    IndexOperationResponse add(IndexOperationRequest operation, Map<String, String> requestParameters);
+    IndexOperationResponse add(IndexOperationRequest operation, ElasticsearchRequestOptions elasticsearchRequestOptions);
 
     /**
      * Bulk process multiple documents.
      *
      * @param operations A list of index operations.
-     * @param requestParameters A collection of URL request parameters. Optional.
+     * @param elasticsearchRequestOptions A collection of request options (parameters and header). Optional.
      * @return IndexOperationResponse if successful.
      */
-    IndexOperationResponse bulk(List<IndexOperationRequest> operations, Map<String, String> requestParameters);
+    IndexOperationResponse bulk(List<IndexOperationRequest> operations, ElasticsearchRequestOptions elasticsearchRequestOptions);
 
     /**
      * Count the documents that match the criteria.
@@ -312,10 +312,10 @@ public interface ElasticSearchClientService extends ControllerService, Verifiabl
      * @param query A query in the JSON DSL syntax
      * @param index The index to target.
      * @param type The type to target. Will not be used in future versions of Elasticsearch.
-     * @param requestParameters A collection of URL request parameters. Optional.
+     * @param elasticsearchRequestOptions A collection of request options (parameters and header). Optional.
      * @return number of documents matching the query
      */
-    Long count(String query, String index, String type, Map<String, String> requestParameters);
+    Long count(String query, String index, String type, ElasticsearchRequestOptions elasticsearchRequestOptions);
 
     /**
      * Delete a document by its ID from an index.
@@ -323,10 +323,10 @@ public interface ElasticSearchClientService extends ControllerService, Verifiabl
      * @param index The index to target.
      * @param type The type to target. Optional. Will not be used in future versions of Elasticsearch.
      * @param id The document ID to remove from the selected index.
-     * @param requestParameters A collection of URL request parameters. Optional.
+     * @param elasticsearchRequestOptions A collection of request options (parameters and header). Optional.
      * @return A DeleteOperationResponse object if successful.
      */
-    DeleteOperationResponse deleteById(String index, String type, String id, Map<String, String> requestParameters);
+    DeleteOperationResponse deleteById(String index, String type, String id, ElasticsearchRequestOptions elasticsearchRequestOptions);
 
 
     /**
@@ -334,10 +334,10 @@ public interface ElasticSearchClientService extends ControllerService, Verifiabl
      * @param index The index to target.
      * @param type The type to target. Optional. Will not be used in future versions of Elasticsearch.
      * @param ids A list of document IDs to remove from the selected index.
-     * @param requestParameters A collection of URL request parameters. Optional.
+     * @param elasticsearchRequestOptions A collection of request options (parameters and header). Optional.
      * @return A DeleteOperationResponse object if successful.
      */
-    DeleteOperationResponse deleteById(String index, String type, List<String> ids, Map<String, String> requestParameters);
+    DeleteOperationResponse deleteById(String index, String type, List<String> ids, ElasticsearchRequestOptions elasticsearchRequestOptions);
 
     /**
      * Delete documents by query.
@@ -345,10 +345,10 @@ public interface ElasticSearchClientService extends ControllerService, Verifiabl
      * @param query A valid JSON query to be used for finding documents to delete.
      * @param index The index to target.
      * @param type The type to target within the index. Optional. Will not be used in future versions of Elasticsearch.
-     * @param requestParameters A collection of URL request parameters. Optional.
+     * @param elasticsearchRequestOptions A collection of request options (parameters and header). Optional.
      * @return A DeleteOperationResponse object if successful.
      */
-    DeleteOperationResponse deleteByQuery(String query, String index, String type, Map<String, String> requestParameters);
+    DeleteOperationResponse deleteByQuery(String query, String index, String type, ElasticsearchRequestOptions elasticsearchRequestOptions);
 
     /**
      * Update documents by query.
@@ -356,26 +356,27 @@ public interface ElasticSearchClientService extends ControllerService, Verifiabl
      * @param query A valid JSON query to be used for finding documents to update.
      * @param index The index to target.
      * @param type The type to target within the index. Optional. Will not be used in future versions of Elasticsearch.
-     * @param requestParameters A collection of URL request parameters. Optional.
+     * @param elasticsearchRequestOptions A collection of request options (parameters and header). Optional.
      * @return An UpdateOperationResponse object if successful.
      */
-    UpdateOperationResponse updateByQuery(String query, String index, String type, Map<String, String> requestParameters);
+    UpdateOperationResponse updateByQuery(String query, String index, String type, ElasticsearchRequestOptions elasticsearchRequestOptions);
 
     /**
      * Refresh index/indices.
      *
      * @param index The index to target, if omitted then all indices will be updated.
-     * @param requestParameters A collection of URL request parameters. Optional.
+     * @param elasticsearchRequestOptions A collection of request options (parameters and header). Optional.
      */
-    void refresh(final String index, final Map<String, String> requestParameters);
+    void refresh(String index, ElasticsearchRequestOptions elasticsearchRequestOptions);
 
     /**
      * Check whether an index exists.
      *
      * @param index The index to check.
-     * @param requestParameters A collection of URL request parameters. Optional.
+     * @param elasticsearchRequestOptions A collection of request options (parameters and header). Optional.
+     * @return true if index exists, false otherwise
      */
-    boolean exists(final String index, final Map<String, String> requestParameters);
+    boolean exists(String index, ElasticsearchRequestOptions elasticsearchRequestOptions);
 
     /**
      * Check whether a document exists.
@@ -383,9 +384,10 @@ public interface ElasticSearchClientService extends ControllerService, Verifiabl
      * @param index The index that holds the document.
      * @param type The document type. Optional. Will not be used in future versions of Elasticsearch.
      * @param id The document ID
-     * @param requestParameters A collection of URL request parameters. Optional.
+     * @param elasticsearchRequestOptions A collection of request options (parameters and header). Optional.
+     * @return true if doc exists in index, false otherwise
      */
-    boolean documentExists(final String index, final String type, final String id, final Map<String, String> requestParameters);
+    boolean documentExists(String index, String type, String id, ElasticsearchRequestOptions elasticsearchRequestOptions);
 
     /**
      * Get a document by ID.
@@ -393,10 +395,10 @@ public interface ElasticSearchClientService extends ControllerService, Verifiabl
      * @param index The index that holds the document.
      * @param type The document type. Optional. Will not be used in future versions of Elasticsearch.
      * @param id The document ID
-     * @param requestParameters A collection of URL request parameters. Optional.
+     * @param elasticsearchRequestOptions A collection of request options (parameters and header). Optional.
      * @return Map if successful, null if not found.
      */
-    Map<String, Object> get(String index, String type, String id, Map<String, String> requestParameters);
+    Map<String, Object> get(String index, String type, String id, ElasticsearchRequestOptions elasticsearchRequestOptions);
 
     /**
      * Perform a search using the JSON DSL.
@@ -404,18 +406,20 @@ public interface ElasticSearchClientService extends ControllerService, Verifiabl
      * @param query A JSON string representing the query.
      * @param index The index to target. Optional.
      * @param type The type to target. Optional. Will not be used in future versions of Elasticsearch.
-     * @param requestParameters A collection of URL request parameters. Optional.
+     * @param elasticsearchRequestOptions A collection of request options (parameters and header). Optional.
      * @return A SearchResponse object if successful.
      */
-    SearchResponse search(String query, String index, String type, Map<String, String> requestParameters);
+    SearchResponse search(String query, String index, String type, ElasticsearchRequestOptions elasticsearchRequestOptions);
 
     /**
      * Retrieve next page of results from a Scroll.
      *
      * @param scroll A JSON string containing scrollId and optional scroll (keep alive) retention period.
+     * @param elasticsearchRequestOptions A collection of request options (parameters and header). Optional.
+     *                                    Request Parameters will be ignored from the Request Options as unusable for this API.
      * @return A SearchResponse object if successful.
      */
-    SearchResponse scroll(String scroll);
+    SearchResponse scroll(String scroll, ElasticsearchRequestOptions elasticsearchRequestOptions);
 
     /**
      * Initialise a Point in Time for paginated queries.
@@ -423,26 +427,32 @@ public interface ElasticSearchClientService extends ControllerService, Verifiabl
      *
      * @param index Index targeted.
      * @param keepAlive Point in Time's retention period (maximum time Elasticsearch will retain the PiT between requests). Optional.
+     * @param elasticsearchRequestOptions A collection of request options (parameters and header). Optional.
+     *                                    Request Parameters will be ignored from the Request Options as unusable for this API.
      * @return the Point in Time Id (pit_id)
      */
-    String initialisePointInTime(String index, String keepAlive);
+    String initialisePointInTime(String index, String keepAlive, ElasticsearchRequestOptions elasticsearchRequestOptions);
 
     /**
      * Delete a Point in Time.
      * Requires Elasticsearch 7.10+ and XPack features.
      *
      * @param pitId Point in Time Id to be deleted.
+     * @param elasticsearchRequestOptions A collection of request options (parameters and header). Optional.
+     *                                    Request Parameters will be ignored from the Request Options as unusable for this API.
      * @return A DeleteOperationResponse object if successful.
      */
-    DeleteOperationResponse deletePointInTime(String pitId);
+    DeleteOperationResponse deletePointInTime(String pitId, ElasticsearchRequestOptions elasticsearchRequestOptions);
 
     /**
      * Delete a Scroll.
      *
      * @param scrollId Scroll Id to be deleted.
+     * @param elasticsearchRequestOptions A collection of request options (parameters and header). Optional.
+     *                                    Request Parameters will be ignored from the Request Options as unusable for this API.
      * @return A DeleteOperationResponse object if successful.
      */
-    DeleteOperationResponse deleteScroll(String scrollId);
+    DeleteOperationResponse deleteScroll(String scrollId, ElasticsearchRequestOptions elasticsearchRequestOptions);
 
     /**
      * Build a transit URL to use with the provenance reporter.

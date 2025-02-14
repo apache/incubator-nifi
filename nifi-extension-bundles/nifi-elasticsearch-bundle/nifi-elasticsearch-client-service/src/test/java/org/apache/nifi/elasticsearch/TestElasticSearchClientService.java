@@ -44,61 +44,62 @@ public class TestElasticSearchClientService extends AbstractControllerService im
     }
 
     @Override
-    public IndexOperationResponse add(IndexOperationRequest operation, Map<String, String> requestParameters) {
+    public IndexOperationResponse add(IndexOperationRequest operation, ElasticsearchRequestOptions elasticsearchRequestOptions) {
         return null;
     }
 
     @Override
-    public IndexOperationResponse bulk(List<IndexOperationRequest> operations, Map<String, String> requestParameters) {
+    public IndexOperationResponse bulk(List<IndexOperationRequest> operations, ElasticsearchRequestOptions elasticsearchRequestOptions) {
         return null;
     }
 
     @Override
-    public Long count(String query, String index, String type, Map<String, String> requestParameters) {
+    public Long count(String query, String index, String type, ElasticsearchRequestOptions elasticsearchRequestOptions) {
         return null;
     }
 
     @Override
-    public DeleteOperationResponse deleteById(String index, String type, String id, Map<String, String> requestParameters) {
+    public DeleteOperationResponse deleteById(String index, String type, String id, ElasticsearchRequestOptions elasticsearchRequestOptions) {
         return null;
     }
 
     @Override
-    public DeleteOperationResponse deleteById(String index, String type, List<String> ids, Map<String, String> requestParameters) {
+    public DeleteOperationResponse deleteById(String index, String type, List<String> ids, ElasticsearchRequestOptions elasticsearchRequestOptions) {
         return null;
     }
 
     @Override
-    public DeleteOperationResponse deleteByQuery(String query, String index, String type, Map<String, String> requestParameters) {
+    public DeleteOperationResponse deleteByQuery(String query, String index, String type, ElasticsearchRequestOptions elasticsearchRequestOptions) {
         return null;
     }
 
     @Override
-    public UpdateOperationResponse updateByQuery(String query, String index, String type, Map<String, String> requestParameters) {
+    public UpdateOperationResponse updateByQuery(String query, String index, String type, ElasticsearchRequestOptions elasticsearchRequestOptions) {
         return null;
     }
 
     @Override
-    public void refresh(final String index, final Map<String, String> requestParameters) {
+    public void refresh(final String index, final ElasticsearchRequestOptions elasticsearchRequestOptions) {
+        // intentionally blank
     }
 
     @Override
-    public boolean exists(final String index, final Map<String, String> requestParameters) {
+    public boolean exists(final String index, final ElasticsearchRequestOptions elasticsearchRequestOptions) {
         return true;
     }
 
     @Override
-    public boolean documentExists(String index, String type, String id, Map<String, String> requestParameters) {
+    public boolean documentExists(String index, String type, String id, ElasticsearchRequestOptions elasticsearchRequestOptions) {
         return true;
     }
 
     @Override
-    public Map<String, Object> get(String index, String type, String id, Map<String, String> requestParameters) {
+    public Map<String, Object> get(String index, String type, String id, ElasticsearchRequestOptions elasticsearchRequestOptions) {
         return data;
     }
 
     @Override
-    public SearchResponse search(String query, String index, String type, Map<String, String> requestParameters) {
+    public SearchResponse search(String query, String index, String type, ElasticsearchRequestOptions elasticsearchRequestOptions) {
         List<Map<String, Object>> hits = new ArrayList<>();
         Map<String, Object> source = new HashMap<>();
         source.put("_source", data);
@@ -108,22 +109,22 @@ public class TestElasticSearchClientService extends AbstractControllerService im
     }
 
     @Override
-    public SearchResponse scroll(String scroll) {
-        return search(null, null, null, null);
+    public SearchResponse scroll(String scroll, ElasticsearchRequestOptions elasticsearchRequestOptions) {
+        return search(null, null, null, elasticsearchRequestOptions);
     }
 
     @Override
-    public String initialisePointInTime(String index, String keepAlive) {
+    public String initialisePointInTime(String index, String keepAlive, ElasticsearchRequestOptions elasticsearchRequestOptions) {
         return null;
     }
 
     @Override
-    public DeleteOperationResponse deletePointInTime(String pitId) {
+    public DeleteOperationResponse deletePointInTime(String pitId, ElasticsearchRequestOptions elasticsearchRequestOptions) {
         return null;
     }
 
     @Override
-    public DeleteOperationResponse deleteScroll(String scrollId) {
+    public DeleteOperationResponse deleteScroll(String scrollId, ElasticsearchRequestOptions elasticsearchRequestOptions) {
         return null;
     }
 

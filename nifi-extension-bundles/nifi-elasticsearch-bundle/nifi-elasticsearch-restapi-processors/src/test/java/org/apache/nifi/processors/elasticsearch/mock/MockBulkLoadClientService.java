@@ -16,6 +16,7 @@
  */
 package org.apache.nifi.processors.elasticsearch.mock;
 
+import org.apache.nifi.elasticsearch.ElasticsearchRequestOptions;
 import org.apache.nifi.elasticsearch.IndexOperationRequest;
 import org.apache.nifi.elasticsearch.IndexOperationResponse;
 
@@ -27,9 +28,10 @@ public class MockBulkLoadClientService extends AbstractMockElasticsearchClient {
     private IndexOperationResponse response;
     private Consumer<List<IndexOperationRequest>> evalConsumer;
     private Consumer<Map<String, String>> evalParametersConsumer;
+    private Consumer<Map<String, String>> evalHeadersConsumer;
 
     @Override
-    public IndexOperationResponse bulk(final List<IndexOperationRequest> items, final Map<String, String> requestParameters) {
+    public IndexOperationResponse bulk(final List<IndexOperationRequest> items, final ElasticsearchRequestOptions elasticsearchRequestOptions) {
         if (isThrowRetriableError()) {
             throw new MockElasticsearchException(true, false);
         } else if (isThrowFatalError()) {
@@ -41,7 +43,11 @@ public class MockBulkLoadClientService extends AbstractMockElasticsearchClient {
         }
 
         if (evalParametersConsumer != null) {
-            evalParametersConsumer.accept(requestParameters);
+            evalParametersConsumer.accept(elasticsearchRequestOptions.getRequestParameters());
+        }
+
+        if (evalHeadersConsumer != null) {
+            evalHeadersConsumer.accept(elasticsearchRequestOptions.getRequestHeaders());
         }
 
         return response;
@@ -57,5 +63,9 @@ public class MockBulkLoadClientService extends AbstractMockElasticsearchClient {
 
     public void setEvalParametersConsumer(final Consumer<Map<String, String>> evalParametersConsumer) {
         this.evalParametersConsumer = evalParametersConsumer;
+    }
+
+    public void setEvalHeadersConsumer(final Consumer<Map<String, String>> evalHeadersConsumer) {
+        this.evalHeadersConsumer = evalHeadersConsumer;
     }
 }

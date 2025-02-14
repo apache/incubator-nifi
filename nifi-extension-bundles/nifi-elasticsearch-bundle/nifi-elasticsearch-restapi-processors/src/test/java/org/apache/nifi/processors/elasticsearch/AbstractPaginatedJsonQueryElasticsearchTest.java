@@ -61,10 +61,12 @@ public abstract class AbstractPaginatedJsonQueryElasticsearchTest extends Abstra
         runner.setProperty(AbstractPaginatedJsonQueryElasticsearch.PAGINATION_TYPE, "not-enum");
 
         final AssertionError assertionError = assertThrows(AssertionError.class, runner::run);
-        final String expected = String.format("Processor has 2 validation failures:\n" +
-                        "'%s' validated against 'not-enum' is invalid because Given value not found in allowed set '%s'\n" +
-                        "'%s' validated against 'not-a-period' is invalid because Must be of format <duration> <TimeUnit> where <duration> " +
-                        "is a non-negative integer and TimeUnit is a supported Time Unit, such as: nanos, millis, secs, mins, hrs, days\n",
+        final String expected = String.format("""
+                        Processor has 2 validation failures:
+                        '%s' validated against 'not-enum' is invalid because Given value not found in allowed set '%s'
+                        '%s' validated against 'not-a-period' is invalid because Must be of format <duration> <TimeUnit> where <duration> \
+                        is a non-negative integer and TimeUnit is a supported Time Unit, such as: nanos, millis, secs, mins, hrs, days
+                        """,
                 AbstractPaginatedJsonQueryElasticsearch.PAGINATION_TYPE.getName(),
                 Stream.of(PaginationType.values()).map(PaginationType::getValue).collect(Collectors.joining(", ")),
                 AbstractPaginatedJsonQueryElasticsearch.PAGINATION_KEEP_ALIVE.getName());
