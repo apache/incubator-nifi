@@ -25,6 +25,7 @@ import { initialState } from '../../state/manage-remote-ports/manage-remote-port
 import { MockComponent } from 'ng-mocks';
 import { Navigation } from '../../../../ui/common/navigation/navigation.component';
 import { remotePortsFeatureKey } from '../../state/manage-remote-ports';
+import { NgxSkeletonLoaderComponent } from 'ngx-skeleton-loader';
 
 describe('ManageRemotePorts', () => {
     let component: ManageRemotePorts;
@@ -33,7 +34,12 @@ describe('ManageRemotePorts', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             declarations: [ManageRemotePorts],
-            imports: [RouterTestingModule, MockComponent(Navigation), HttpClientTestingModule],
+            imports: [
+                RouterTestingModule,
+                MockComponent(Navigation),
+                HttpClientTestingModule,
+                MockComponent(NgxSkeletonLoaderComponent)
+            ],
             providers: [
                 provideMockStore({
                     initialState: {

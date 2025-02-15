@@ -26,6 +26,7 @@ import { MockComponent } from 'ng-mocks';
 import { Navigation } from '../../../ui/common/navigation/navigation.component';
 import { usersFeatureKey } from '../state';
 import { BannerText } from '../../../ui/common/banner-text/banner-text.component';
+import { NgxSkeletonLoaderComponent } from 'ngx-skeleton-loader';
 
 describe('Users', () => {
     let component: Users;
@@ -34,7 +35,13 @@ describe('Users', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             declarations: [Users, UserListing],
-            imports: [RouterModule, RouterTestingModule, MockComponent(BannerText), MockComponent(Navigation)],
+            imports: [
+                RouterModule,
+                RouterTestingModule,
+                MockComponent(BannerText),
+                MockComponent(Navigation),
+                MockComponent(NgxSkeletonLoaderComponent)
+            ],
             providers: [
                 provideMockStore({
                     initialState: {
