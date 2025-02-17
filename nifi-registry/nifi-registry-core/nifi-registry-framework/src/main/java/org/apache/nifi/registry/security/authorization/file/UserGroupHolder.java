@@ -22,9 +22,9 @@ import org.apache.nifi.registry.security.authorization.file.tenants.generated.Te
 import org.apache.nifi.registry.security.authorization.file.tenants.generated.Users;
 import org.apache.nifi.registry.security.authorization.Group;
 import org.apache.nifi.registry.security.authorization.User;
+import org.apache.nifi.registry.security.authorization.util.UserGroupProviderUtils;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -61,16 +61,20 @@ public class UserGroupHolder {
         final Set<Group> allGroups = Collections.unmodifiableSet(createGroups(groups, users));
 
         // create a convenience map to retrieve a user by id
-        final Map<String, User> userByIdMap = Collections.unmodifiableMap(createUserByIdMap(allUsers));
+        final Map<String, User> userByIdMap = Collections.unmodifiableMap(
+                UserGroupProviderUtils.createUserByIdMap(allUsers));
 
         // create a convenience map to retrieve a user by identity
-        final Map<String, User> userByIdentityMap = Collections.unmodifiableMap(createUserByIdentityMap(allUsers));
+        final Map<String, User> userByIdentityMap = Collections.unmodifiableMap(
+                UserGroupProviderUtils.createUserByIdentityMap(allUsers));
 
         // create a convenience map to retrieve a group by id
-        final Map<String, Group> groupByIdMap = Collections.unmodifiableMap(createGroupByIdMap(allGroups));
+        final Map<String, Group> groupByIdMap = Collections.unmodifiableMap(
+                UserGroupProviderUtils.createGroupByIdMap(allGroups));
 
         // create a convenience map to retrieve the groups for a user identity
-        final Map<String, Set<Group>> groupsByUserIdentityMap = Collections.unmodifiableMap(createGroupsByUserIdentityMap(allGroups, allUsers));
+        final Map<String, Set<Group>> groupsByUserIdentityMap = Collections.unmodifiableMap(
+                UserGroupProviderUtils.createGroupsByUserIdentityMap(allGroups, allUsers));
 
         // set all the holders
         this.allUsers = allUsers;
@@ -130,74 +134,6 @@ public class UserGroupHolder {
         }
 
         return allGroups;
-    }
-
-    /**
-     * Creates a Map from user identifier to User.
-     *
-     * @param users the set of all users
-     * @return the Map from user identifier to User
-     */
-    private Map<String, User> createUserByIdMap(final Set<User> users) {
-        Map<String, User> usersMap = new HashMap<>();
-        for (User user : users) {
-            usersMap.put(user.getIdentifier(), user);
-        }
-        return usersMap;
-    }
-
-    /**
-     * Creates a Map from user identity to User.
-     *
-     * @param users the set of all users
-     * @return the Map from user identity to User
-     */
-    private Map<String, User> createUserByIdentityMap(final Set<User> users) {
-        Map<String, User> usersMap = new HashMap<>();
-        for (User user : users) {
-            usersMap.put(user.getIdentity(), user);
-        }
-        return usersMap;
-    }
-
-    /**
-     * Creates a Map from group identifier to Group.
-     *
-     * @param groups the set of all groups
-     * @return the Map from group identifier to Group
-     */
-    private Map<String, Group> createGroupByIdMap(final Set<Group> groups) {
-        Map<String, Group> groupsMap = new HashMap<>();
-        for (Group group : groups) {
-            groupsMap.put(group.getIdentifier(), group);
-        }
-        return groupsMap;
-    }
-
-    /**
-     * Creates a Map from user identity to the set of Groups for that identity.
-     *
-     * @param groups all groups
-     * @param users all users
-     * @return a Map from User identity to the set of Groups for that identity
-     */
-    private Map<String, Set<Group>> createGroupsByUserIdentityMap(final Set<Group> groups, final Set<User> users) {
-        Map<String, Set<Group>> groupsByUserIdentity = new HashMap<>();
-
-        for (User user : users) {
-            Set<Group> userGroups = new HashSet<>();
-            for (Group group : groups) {
-                for (String groupUser : group.getUsers()) {
-                    if (groupUser.equals(user.getIdentifier())) {
-                        userGroups.add(group);
-                    }
-                }
-            }
-
-            groupsByUserIdentity.put(user.getIdentity(), userGroups);
-        }
-
-        return groupsByUserIdentity;
     }
 
     public Tenants getTenants() {

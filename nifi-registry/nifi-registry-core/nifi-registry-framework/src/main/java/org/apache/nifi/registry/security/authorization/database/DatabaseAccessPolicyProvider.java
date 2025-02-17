@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Implementation of {@link org.apache.nifi.registry.security.authorization.ConfigurableAccessPolicyProvider} backed by a relational database.
@@ -62,6 +63,8 @@ public class DatabaseAccessPolicyProvider extends AbstractConfigurableAccessPoli
     private IdentityMapper identityMapper;
 
     private JdbcTemplate jdbcTemplate;
+
+    private final AtomicReference<DatabaseAccessPolicyHolder> accessPoliciesHolder = new AtomicReference<>();
 
     @AuthorizerContext
     public void setDataSource(final DataSource dataSource) {
@@ -81,6 +84,8 @@ public class DatabaseAccessPolicyProvider extends AbstractConfigurableAccessPoli
 
     @Override
     public void doOnConfigured(final AuthorizerConfigurationContext configurationContext) throws SecurityProviderCreationException {
+        refreshAccessPolicyHolder();
+
         final String initialAdminIdentity = AccessPolicyProviderUtils.getInitialAdminIdentity(configurationContext, identityMapper);
         final Set<String> nifiIdentities = AccessPolicyProviderUtils.getNiFiIdentities(configurationContext, identityMapper);
         final String nifiGroupName = AccessPolicyProviderUtils.getNiFiGroupName(configurationContext, identityMapper);
@@ -158,7 +163,7 @@ public class DatabaseAccessPolicyProvider extends AbstractConfigurableAccessPoli
     // ---- access policy methods
 
     @Override
-    public AccessPolicy addAccessPolicy(final AccessPolicy accessPolicy) throws AuthorizationAccessException {
+    public synchronized AccessPolicy addAccessPolicy(final AccessPolicy accessPolicy) throws AuthorizationAccessException {
         Objects.requireNonNull(accessPolicy);
 
         // insert to the policy table
@@ -168,11 +173,13 @@ public class DatabaseAccessPolicyProvider extends AbstractConfigurableAccessPoli
         // insert to the policy-user and policy groups table
         createPolicyUserAndGroups(accessPolicy);
 
+        refreshAccessPolicyHolder();
+
         return accessPolicy;
     }
 
     @Override
-    public AccessPolicy updateAccessPolicy(final AccessPolicy accessPolicy) throws AuthorizationAccessException {
+    public synchronized AccessPolicy updateAccessPolicy(final AccessPolicy accessPolicy) throws AuthorizationAccessException {
         Objects.requireNonNull(accessPolicy);
 
         // determine if policy exists
@@ -193,11 +200,17 @@ public class DatabaseAccessPolicyProvider extends AbstractConfigurableAccessPoli
         // re-create the associations
         createPolicyUserAndGroups(accessPolicy);
 
+        refreshAccessPolicyHolder();
+
         return accessPolicy;
     }
 
     @Override
     public Set<AccessPolicy> getAccessPolicies() throws AuthorizationAccessException {
+        return accessPoliciesHolder.get().getAllPolicies();
+    }
+
+    private Set<AccessPolicy> getDatabaseAccessPolicies() throws AuthorizationAccessException {
         // retrieve all the policies
         final String sql = "SELECT * FROM APP_POLICY";
         final List<DatabaseAccessPolicy> databasePolicies = jdbcTemplate.query(sql, new DatabaseAccessPolicyRowMapper());
@@ -237,36 +250,18 @@ public class DatabaseAccessPolicyProvider extends AbstractConfigurableAccessPoli
     @Override
     public AccessPolicy getAccessPolicy(final String identifier) throws AuthorizationAccessException {
         Validate.notBlank(identifier);
-
-        final DatabaseAccessPolicy databaseAccessPolicy = getDatabaseAcessPolicy(identifier);
-        if (databaseAccessPolicy == null) {
-            return null;
-        }
-
-        final Set<String> userIdentifiers = getPolicyUsers(identifier);
-        final Set<String> groupIdentifiers = getPolicyGroups(identifier);
-        return mapTopAccessPolicy(databaseAccessPolicy, userIdentifiers, groupIdentifiers);
+        return accessPoliciesHolder.get().getPoliciesById().get(identifier);
     }
 
     @Override
     public AccessPolicy getAccessPolicy(final String resourceIdentifier, RequestAction action) throws AuthorizationAccessException {
         Validate.notBlank(resourceIdentifier);
         Objects.requireNonNull(action);
-
-        final String policySql = "SELECT * FROM APP_POLICY WHERE RESOURCE = ? AND ACTION = ?";
-        final Object[] args = new Object[]{resourceIdentifier, action.toString()};
-        final DatabaseAccessPolicy databaseAccessPolicy = queryForObject(policySql, new DatabaseAccessPolicyRowMapper(), args);
-        if (databaseAccessPolicy == null) {
-            return null;
-        }
-
-        final Set<String> userIdentifiers = getPolicyUsers(databaseAccessPolicy.getIdentifier());
-        final Set<String> groupIdentifiers = getPolicyGroups(databaseAccessPolicy.getIdentifier());
-        return mapTopAccessPolicy(databaseAccessPolicy, userIdentifiers, groupIdentifiers);
+        return AccessPolicyProviderUtils.getAccessPolicy(resourceIdentifier, action, accessPoliciesHolder.get().getPoliciesByResource());
     }
 
     @Override
-    public AccessPolicy deleteAccessPolicy(final AccessPolicy accessPolicy) throws AuthorizationAccessException {
+    public synchronized AccessPolicy deleteAccessPolicy(final AccessPolicy accessPolicy) throws AuthorizationAccessException {
         Objects.requireNonNull(accessPolicy);
 
         final String sql = "DELETE FROM APP_POLICY WHERE IDENTIFIER = ?";
@@ -274,6 +269,8 @@ public class DatabaseAccessPolicyProvider extends AbstractConfigurableAccessPoli
         if (rowsUpdated <= 0) {
             return null;
         }
+
+        refreshAccessPolicyHolder();
 
         return accessPolicy;
     }
@@ -295,36 +292,18 @@ public class DatabaseAccessPolicyProvider extends AbstractConfigurableAccessPoli
     protected void insertPolicyGroup(final String policyIdentifier, final String groupIdentifier) {
         final String policyGroupSql = "INSERT INTO APP_POLICY_GROUP(POLICY_IDENTIFIER, GROUP_IDENTIFIER) VALUES (?, ?)";
         jdbcTemplate.update(policyGroupSql, policyIdentifier, groupIdentifier);
+        refreshAccessPolicyHolder();
     }
 
     protected void insertPolicyUser(final String policyIdentifier, final String userIdentifier) {
         final String policyUserSql = "INSERT INTO APP_POLICY_USER(POLICY_IDENTIFIER, USER_IDENTIFIER) VALUES (?, ?)";
         jdbcTemplate.update(policyUserSql, policyIdentifier, userIdentifier);
+        refreshAccessPolicyHolder();
     }
 
     protected DatabaseAccessPolicy getDatabaseAcessPolicy(final String policyIdentifier) {
         final String sql = "SELECT * FROM APP_POLICY WHERE IDENTIFIER = ?";
         return queryForObject(sql, new DatabaseAccessPolicyRowMapper(), policyIdentifier);
-    }
-
-    protected Set<String> getPolicyUsers(final String policyIdentifier) {
-        final String sql = "SELECT * FROM APP_POLICY_USER WHERE POLICY_IDENTIFIER = ?";
-
-        final Set<String> userIdentifiers = new HashSet<>();
-        jdbcTemplate.query(sql, (rs) -> {
-            userIdentifiers.add(rs.getString("USER_IDENTIFIER"));
-        }, policyIdentifier);
-        return userIdentifiers;
-    }
-
-    protected Set<String> getPolicyGroups(final String policyIdentifier) {
-        final String sql = "SELECT * FROM APP_POLICY_GROUP WHERE POLICY_IDENTIFIER = ?";
-
-        final Set<String> groupIdentifiers = new HashSet<>();
-        jdbcTemplate.query(sql, (rs) -> {
-            groupIdentifiers.add(rs.getString("GROUP_IDENTIFIER"));
-        }, policyIdentifier);
-        return groupIdentifiers;
     }
 
     protected AccessPolicy mapTopAccessPolicy(final DatabaseAccessPolicy databaseAccessPolicy, final Set<String> userIdentifiers, final Set<String> groupIdentifiers) {
@@ -385,6 +364,11 @@ public class DatabaseAccessPolicyProvider extends AbstractConfigurableAccessPoli
             // a policy already exists for the given resource and action, so just associate the group with that policy
             insertPolicyGroup(existingPolicy.getIdentifier(), initialGroup.getIdentifier());
         }
+    }
+
+    private synchronized void refreshAccessPolicyHolder() {
+        final Set<AccessPolicy> allPolicies = getDatabaseAccessPolicies();
+        this.accessPoliciesHolder.set(new DatabaseAccessPolicyHolder(allPolicies));
     }
 
     //-- util methods

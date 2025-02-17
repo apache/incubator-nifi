@@ -33,6 +33,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -55,8 +57,10 @@ public class TestDatabaseUserGroupProvider extends DatabaseBaseTest {
 
     private ConfigurableUserGroupProvider userGroupProvider;
 
+    private Method refreshUserGroupHolderMethod;
+
     @BeforeEach
-    public void setup() {
+    public void setup() throws NoSuchMethodException {
         properties = new NiFiRegistryProperties();
         identityMapper = new DefaultIdentityMapper(properties);
 
@@ -68,6 +72,9 @@ public class TestDatabaseUserGroupProvider extends DatabaseBaseTest {
         databaseUserGroupProvider.initialize(initializationContext);
 
         userGroupProvider = databaseUserGroupProvider;
+
+        refreshUserGroupHolderMethod = DatabaseUserGroupProvider.class.getDeclaredMethod("refreshUserGroupHolder");
+        refreshUserGroupHolderMethod.setAccessible(true);
     }
 
     /**
@@ -100,6 +107,7 @@ public class TestDatabaseUserGroupProvider extends DatabaseBaseTest {
         final String sql = "INSERT INTO UGP_USER(IDENTIFIER, IDENTITY) VALUES (?, ?)";
         final int updatedRows1 = jdbcTemplate.update(sql, userIdentifier, userIdentity);
         assertEquals(1, updatedRows1);
+        invokeRefreshUserGroupHolder();
     }
 
     /**
@@ -113,6 +121,7 @@ public class TestDatabaseUserGroupProvider extends DatabaseBaseTest {
         final String sql = "INSERT INTO UGP_GROUP(IDENTIFIER, IDENTITY) VALUES (?, ?)";
         final int updatedRows1 = jdbcTemplate.update(sql, groupIdentifier, groupIdentity);
         assertEquals(1, updatedRows1);
+        invokeRefreshUserGroupHolder();
     }
 
     /**
@@ -126,6 +135,18 @@ public class TestDatabaseUserGroupProvider extends DatabaseBaseTest {
         final String sql = "INSERT INTO UGP_USER_GROUP(USER_IDENTIFIER, GROUP_IDENTIFIER) VALUES (?, ?)";
         final int updatedRows1 = jdbcTemplate.update(sql, userIdentifier, groupIdentifier);
         assertEquals(1, updatedRows1);
+        invokeRefreshUserGroupHolder();
+    }
+
+    /**
+     * Helper method to refresh the provider cache.
+     */
+    private void invokeRefreshUserGroupHolder() {
+        try {
+            refreshUserGroupHolderMethod.invoke(userGroupProvider);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new AssertionError(e);
+        }
     }
 
     // -- Test onConfigured

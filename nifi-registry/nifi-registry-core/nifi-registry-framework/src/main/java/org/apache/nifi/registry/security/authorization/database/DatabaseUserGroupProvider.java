@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Implementation of {@link org.apache.nifi.registry.security.authorization.ConfigurableUserGroupProvider} backed by a relational database.
@@ -60,6 +61,8 @@ public class DatabaseUserGroupProvider implements ConfigurableUserGroupProvider 
     private IdentityMapper identityMapper;
 
     private JdbcTemplate jdbcTemplate;
+
+    private final AtomicReference<DatabaseUserGroupHolder> userGroupHolder = new AtomicReference<>();
 
     @AuthorizerContext
     public void setDataSource(final DataSource dataSource) {
@@ -78,6 +81,8 @@ public class DatabaseUserGroupProvider implements ConfigurableUserGroupProvider 
 
     @Override
     public void onConfigured(final AuthorizerConfigurationContext configurationContext) throws SecurityProviderCreationException {
+        refreshUserGroupHolder();
+
         final Set<String> initialUserIdentities = UserGroupProviderUtils.getInitialUserIdentities(configurationContext, identityMapper);
 
         for (final String initialUserIdentity : initialUserIdentities) {
@@ -120,15 +125,18 @@ public class DatabaseUserGroupProvider implements ConfigurableUserGroupProvider 
     //-- User CRUD
 
     @Override
-    public User addUser(final User user) throws AuthorizationAccessException {
+    public synchronized User addUser(final User user) throws AuthorizationAccessException {
         Objects.requireNonNull(user);
         final String sql = "INSERT INTO UGP_USER(IDENTIFIER, IDENTITY) VALUES (?, ?)";
         jdbcTemplate.update(sql, user.getIdentifier(), user.getIdentity());
+
+        refreshUserGroupHolder();
+
         return user;
     }
 
     @Override
-    public User updateUser(final User user) throws AuthorizationAccessException {
+    public synchronized User updateUser(final User user) throws AuthorizationAccessException {
         Objects.requireNonNull(user);
 
         // update the user identity
@@ -140,11 +148,17 @@ public class DatabaseUserGroupProvider implements ConfigurableUserGroupProvider 
             return null;
         }
 
+        refreshUserGroupHolder();
+
         return user;
     }
 
     @Override
     public Set<User> getUsers() throws AuthorizationAccessException {
+        return userGroupHolder.get().getAllUsers();
+    }
+
+    private Set<User> getDatabaseUsers() throws AuthorizationAccessException {
         final String sql = "SELECT * FROM UGP_USER";
         final List<DatabaseUser> databaseUsers = jdbcTemplate.query(sql, new DatabaseUserRowMapper());
 
@@ -158,59 +172,21 @@ public class DatabaseUserGroupProvider implements ConfigurableUserGroupProvider 
     @Override
     public User getUser(final String identifier) throws AuthorizationAccessException {
         Validate.notBlank(identifier);
-
-        final DatabaseUser databaseUser = getDatabaseUser(identifier);
-        if (databaseUser == null) {
-            return null;
-        }
-
-        return mapToUser(databaseUser);
+        return userGroupHolder.get().getUsersById().get(identifier);
     }
 
     @Override
     public User getUserByIdentity(final String identity) throws AuthorizationAccessException {
         Validate.notBlank(identity);
-
-        final String sql = "SELECT * FROM UGP_USER WHERE IDENTITY = ?";
-        final DatabaseUser databaseUser = queryForObject(sql, new DatabaseUserRowMapper(), identity);
-        if (databaseUser == null) {
-            return null;
-        }
-
-        return mapToUser(databaseUser);
+        return userGroupHolder.get().getUsersByIdentity().get(identity);
     }
 
     @Override
     public UserAndGroups getUserAndGroups(final String userIdentity) throws AuthorizationAccessException {
         Validate.notBlank(userIdentity);
 
-        // retrieve the user
-        final User user = getUserByIdentity(userIdentity);
-
-        // if the user exists, then retrieve the groups for the user
-        final Set<Group> groups;
-        if (user == null) {
-            groups = null;
-        } else {
-            final String userGroupSql =
-                    "SELECT " +
-                            "G.IDENTIFIER AS IDENTIFIER, " +
-                            "G.IDENTITY AS IDENTITY " +
-                    "FROM " +
-                            "UGP_GROUP AS G, " +
-                            "UGP_USER_GROUP AS UG " +
-                    "WHERE " +
-                            "G.IDENTIFIER = UG.GROUP_IDENTIFIER AND " +
-                            "UG.USER_IDENTIFIER = ?";
-
-            final List<DatabaseGroup> databaseGroups = jdbcTemplate.query(userGroupSql, new DatabaseGroupRowMapper(), user.getIdentifier());
-
-            groups = new HashSet<>();
-            databaseGroups.forEach(g -> {
-                final Set<String> userIdentifiers = getUserIdentifiers(g.getIdentifier());
-                groups.add(mapToGroup(g, userIdentifiers));
-            });
-        }
+        final User user = userGroupHolder.get().getUser(userIdentity);
+        final Set<Group> groups = userGroupHolder.get().getGroups(userIdentity);
 
         return new UserAndGroups() {
             @Override
@@ -226,7 +202,7 @@ public class DatabaseUserGroupProvider implements ConfigurableUserGroupProvider 
     }
 
     @Override
-    public User deleteUser(final User user) throws AuthorizationAccessException {
+    public synchronized User deleteUser(final User user) throws AuthorizationAccessException {
         Objects.requireNonNull(user);
 
         final String deleteFromUserGroupSql = "DELETE FROM UGP_USER_GROUP WHERE USER_IDENTIFIER = ?";
@@ -238,12 +214,9 @@ public class DatabaseUserGroupProvider implements ConfigurableUserGroupProvider 
             return null;
         }
 
-        return user;
-    }
+        refreshUserGroupHolder();
 
-    private DatabaseUser getDatabaseUser(final String userIdentifier) {
-        final String sql = "SELECT * FROM UGP_USER WHERE IDENTIFIER = ?";
-        return queryForObject(sql, new DatabaseUserRowMapper(), userIdentifier);
+        return user;
     }
 
     private User mapToUser(final DatabaseUser databaseUser) {
@@ -256,7 +229,7 @@ public class DatabaseUserGroupProvider implements ConfigurableUserGroupProvider 
     //-- Group CRUD
 
     @Override
-    public Group addGroup(final Group group) throws AuthorizationAccessException {
+    public synchronized Group addGroup(final Group group) throws AuthorizationAccessException {
         Objects.requireNonNull(group);
 
         // insert to the group table...
@@ -266,11 +239,13 @@ public class DatabaseUserGroupProvider implements ConfigurableUserGroupProvider 
         // insert to the user-group table...
         createUserGroups(group);
 
+        refreshUserGroupHolder();
+
         return group;
     }
 
     @Override
-    public Group updateGroup(final Group group) throws AuthorizationAccessException {
+    public synchronized Group updateGroup(final Group group) throws AuthorizationAccessException {
         Objects.requireNonNull(group);
 
         // update the group identity
@@ -289,11 +264,17 @@ public class DatabaseUserGroupProvider implements ConfigurableUserGroupProvider 
         // re-create any user-group associations
         createUserGroups(group);
 
+        refreshUserGroupHolder();
+
         return group;
     }
 
     @Override
     public Set<Group> getGroups() throws AuthorizationAccessException {
+        return userGroupHolder.get().getAllGroups();
+    }
+
+    private Set<Group> getDatabaseGroups() throws AuthorizationAccessException {
         // retrieve all the groups
         final String sql = "SELECT * FROM UGP_GROUP";
         final List<DatabaseGroup> databaseGroups = jdbcTemplate.query(sql, new DatabaseGroupRowMapper());
@@ -319,18 +300,11 @@ public class DatabaseUserGroupProvider implements ConfigurableUserGroupProvider 
     @Override
     public Group getGroup(final String groupIdentifier) throws AuthorizationAccessException {
         Validate.notBlank(groupIdentifier);
-
-        final DatabaseGroup databaseGroup = getDatabaseGroup(groupIdentifier);
-        if (databaseGroup == null) {
-            return null;
-        }
-
-        final Set<String> userIdentifiers = getUserIdentifiers(groupIdentifier);
-        return mapToGroup(databaseGroup, userIdentifiers);
+        return userGroupHolder.get().getGroupsById().get(groupIdentifier);
     }
 
     @Override
-    public Group deleteGroup(final Group group) throws AuthorizationAccessException {
+    public synchronized Group deleteGroup(final Group group) throws AuthorizationAccessException {
         Objects.requireNonNull(group);
 
         final String sql = "DELETE FROM UGP_GROUP WHERE IDENTIFIER = ?";
@@ -338,6 +312,8 @@ public class DatabaseUserGroupProvider implements ConfigurableUserGroupProvider 
         if (rowsUpdated <= 0) {
             return null;
         }
+
+        refreshUserGroupHolder();
 
         return group;
     }
@@ -351,28 +327,18 @@ public class DatabaseUserGroupProvider implements ConfigurableUserGroupProvider 
         }
     }
 
-    private DatabaseGroup getDatabaseGroup(final String groupIdentifier) {
-        final String sql = "SELECT * FROM UGP_GROUP WHERE IDENTIFIER = ?";
-        return queryForObject(sql, new DatabaseGroupRowMapper(), groupIdentifier);
-    }
-
-    private Set<String> getUserIdentifiers(final String groupIdentifier) {
-        final String sql = "SELECT * FROM UGP_USER_GROUP WHERE GROUP_IDENTIFIER = ?";
-
-        final Set<String> userIdentifiers = new HashSet<>();
-        jdbcTemplate.query(sql, (rs) -> {
-            userIdentifiers.add(rs.getString("USER_IDENTIFIER"));
-        }, groupIdentifier);
-
-        return userIdentifiers;
-    }
-
     private Group mapToGroup(final DatabaseGroup databaseGroup, final Set<String> userIdentifiers) {
         return new Group.Builder()
                 .identifier(databaseGroup.getIdentifier())
                 .name(databaseGroup.getIdentity())
                 .addUsers(userIdentifiers == null ? Collections.emptySet() : userIdentifiers)
                 .build();
+    }
+
+    private synchronized void refreshUserGroupHolder() {
+        final Set<User> allUsers = getDatabaseUsers();
+        final Set<Group> allGroups = getDatabaseGroups();
+        this.userGroupHolder.set(new DatabaseUserGroupHolder(allUsers, allGroups));
     }
 
     //-- util methods
