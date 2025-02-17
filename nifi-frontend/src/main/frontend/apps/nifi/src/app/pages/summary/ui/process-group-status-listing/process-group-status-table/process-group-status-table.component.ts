@@ -19,8 +19,10 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
-import { SummaryTableFilterModule } from '../../common/summary-table-filter/summary-table-filter.module';
-import { SummaryTableFilterColumn } from '../../common/summary-table-filter/summary-table-filter.component';
+import {
+    SummaryTableFilter,
+    SummaryTableFilterColumn
+} from '../../common/summary-table-filter/summary-table-filter.component';
 import { NiFiCommon } from '@nifi/shared';
 import { RouterLink } from '@angular/router';
 import { MatPaginatorModule } from '@angular/material/paginator';
@@ -47,7 +49,7 @@ export type SupportedColumns =
         CommonModule,
         MatSortModule,
         MatTableModule,
-        SummaryTableFilterModule,
+        SummaryTableFilter,
         RouterLink,
         MatPaginatorModule,
         MatButtonModule,

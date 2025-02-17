@@ -27,7 +27,7 @@ describe('ParameterContextListing', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [ProvenanceEventListing],
+            imports: [ProvenanceEventListing],
             providers: [provideMockStore({ initialState })]
         });
         fixture = TestBed.createComponent(ProvenanceEventListing);

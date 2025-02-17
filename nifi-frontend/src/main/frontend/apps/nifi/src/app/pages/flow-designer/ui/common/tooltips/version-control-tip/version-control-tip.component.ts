@@ -22,8 +22,7 @@ import { RegistryClientEntity } from '../../../../../../state/shared';
 @Component({
     selector: 'version-control-tip',
     templateUrl: './version-control-tip.component.html',
-    styleUrls: ['./version-control-tip.component.scss'],
-    standalone: false
+    styleUrls: ['./version-control-tip.component.scss']
 })
 export class VersionControlTip {
     @Input() left = 0;

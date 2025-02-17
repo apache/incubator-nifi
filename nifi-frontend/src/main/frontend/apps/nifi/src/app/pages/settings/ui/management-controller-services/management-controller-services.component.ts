@@ -49,12 +49,16 @@ import { CurrentUser } from '../../../../state/current-user';
 import { getComponentStateAndOpenDialog } from '../../../../state/component-state/component-state.actions';
 import { navigateToComponentDocumentation } from '../../../../state/documentation/documentation.actions';
 import { ComponentType } from '@nifi/shared';
+import { AsyncPipe } from '@angular/common';
+import { NgxSkeletonLoaderComponent } from 'ngx-skeleton-loader';
+import { MatIconButton } from '@angular/material/button';
+import { ControllerServiceTable } from '../../../../ui/common/controller-service/controller-service-table/controller-service-table.component';
 
 @Component({
     selector: 'management-controller-services',
     templateUrl: './management-controller-services.component.html',
-    styleUrls: ['./management-controller-services.component.scss'],
-    standalone: false
+    imports: [AsyncPipe, NgxSkeletonLoaderComponent, MatIconButton, ControllerServiceTable],
+    styleUrls: ['./management-controller-services.component.scss']
 })
 export class ManagementControllerServices implements OnInit, OnDestroy {
     serviceState$ = this.store.select(selectManagementControllerServicesState);

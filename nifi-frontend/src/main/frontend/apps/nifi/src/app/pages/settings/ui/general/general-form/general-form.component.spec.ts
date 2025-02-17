@@ -20,9 +20,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { GeneralForm } from './general-form.component';
 import { provideMockStore } from '@ngrx/store/testing';
 import { initialState } from '../../../state/general/general.reducer';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatInputModule } from '@angular/material/input';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ClusterConnectionService } from '../../../../../service/cluster-connection.service';
 
@@ -32,8 +29,7 @@ describe('GeneralForm', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [GeneralForm],
-            imports: [NoopAnimationsModule, MatFormFieldModule, MatInputModule, FormsModule, ReactiveFormsModule],
+            imports: [GeneralForm, NoopAnimationsModule],
             providers: [
                 provideMockStore({
                     initialState

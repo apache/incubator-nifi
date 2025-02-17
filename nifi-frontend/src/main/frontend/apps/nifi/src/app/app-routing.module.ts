@@ -21,6 +21,8 @@ import { authenticationGuard } from './service/guard/authentication.guard';
 import { RouteNotFound } from './pages/route-not-found/feature/route-not-found.component';
 import { checkLoginConfiguration } from './service/guard/login-configuration.guard';
 import { LoginConfiguration } from './state/login-configuration';
+import { Error } from './pages/error/feature/error.component';
+import { Logout } from './pages/logout/feature/logout.component';
 
 const routes: Routes = [
     {
@@ -32,17 +34,15 @@ const routes: Routes = [
     },
     {
         path: 'logout-complete',
-        loadChildren: () => import('./pages/logout/feature/logout.module').then((m) => m.LogoutModule)
+        loadComponent: () => Logout
     },
     {
         path: 'error',
-        loadChildren: () => import('./pages/error/feature/error.module').then((m) => m.ErrorModule)
+        loadComponent: () => Error
     },
     {
         path: '404',
-        component: RouteNotFound,
-        loadChildren: () =>
-            import('./pages/route-not-found/feature/route-not-found.module').then((m) => m.RouteNotFoundModule)
+        component: RouteNotFound
     },
     {
         path: 'documentation',
@@ -126,9 +126,7 @@ const routes: Routes = [
     },
     {
         path: '**',
-        component: RouteNotFound,
-        loadChildren: () =>
-            import('./pages/route-not-found/feature/route-not-found.module').then((m) => m.RouteNotFoundModule)
+        component: RouteNotFound
     }
 ];
 

@@ -18,8 +18,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { RemoteProcessGroupStatusListing } from './remote-process-group-status-listing.component';
-import { RemoteProcessGroupStatusTable } from './remote-process-group-status-table/remote-process-group-status-table.component';
-import { SummaryTableFilterModule } from '../common/summary-table-filter/summary-table-filter.module';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { provideMockStore } from '@ngrx/store/testing';
 import { initialState } from '../../state/summary-listing/summary-listing.reducer';
@@ -30,8 +28,7 @@ describe('RemoteProcessGroupStatusListing', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [RemoteProcessGroupStatusListing],
-            imports: [RemoteProcessGroupStatusTable, SummaryTableFilterModule, NoopAnimationsModule],
+            imports: [RemoteProcessGroupStatusListing, NoopAnimationsModule],
             providers: [provideMockStore({ initialState })]
         });
         fixture = TestBed.createComponent(RemoteProcessGroupStatusListing);

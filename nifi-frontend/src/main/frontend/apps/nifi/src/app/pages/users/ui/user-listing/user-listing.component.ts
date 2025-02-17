@@ -43,12 +43,16 @@ import { filter, switchMap, take } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UserEntity, UserGroupEntity } from '../../../../state/shared';
 import { selectFlowConfiguration } from '../../../../state/flow-configuration/flow-configuration.selectors';
+import { AsyncPipe } from '@angular/common';
+import { NgxSkeletonLoaderComponent } from 'ngx-skeleton-loader';
+import { UserTable } from './user-table/user-table.component';
+import { MatIconButton } from '@angular/material/button';
 
 @Component({
     selector: 'user-listing',
     templateUrl: './user-listing.component.html',
-    styleUrls: ['./user-listing.component.scss'],
-    standalone: false
+    imports: [AsyncPipe, NgxSkeletonLoaderComponent, UserTable, MatIconButton],
+    styleUrls: ['./user-listing.component.scss']
 })
 export class UserListing implements OnInit {
     flowConfiguration$ = this.store.select(selectFlowConfiguration);

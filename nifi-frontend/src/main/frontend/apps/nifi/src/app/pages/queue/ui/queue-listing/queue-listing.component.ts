@@ -42,12 +42,16 @@ import { About } from '../../../../state/about';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { selectClusterSummary } from '../../../../state/cluster-summary/cluster-summary.selectors';
 import { loadClusterSummary } from '../../../../state/cluster-summary/cluster-summary.actions';
+import { AsyncPipe } from '@angular/common';
+import { FlowFileTable } from './flowfile-table/flowfile-table.component';
+import { NgxSkeletonLoaderComponent } from 'ngx-skeleton-loader';
+import { MatIconButton } from '@angular/material/button';
 
 @Component({
     selector: 'queue-listing',
     templateUrl: './queue-listing.component.html',
-    styleUrls: ['./queue-listing.component.scss'],
-    standalone: false
+    imports: [AsyncPipe, FlowFileTable, NgxSkeletonLoaderComponent, MatIconButton],
+    styleUrls: ['./queue-listing.component.scss']
 })
 export class QueueListing implements OnInit, OnDestroy {
     status$ = this.store.select(selectStatus);

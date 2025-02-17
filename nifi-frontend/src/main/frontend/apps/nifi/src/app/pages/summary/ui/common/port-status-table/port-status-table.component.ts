@@ -19,8 +19,7 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
-import { SummaryTableFilterModule } from '../summary-table-filter/summary-table-filter.module';
-import { SummaryTableFilterColumn } from '../summary-table-filter/summary-table-filter.component';
+import { SummaryTableFilter, SummaryTableFilterColumn } from '../summary-table-filter/summary-table-filter.component';
 import { RouterLink } from '@angular/router';
 import { ComponentType, NiFiCommon } from '@nifi/shared';
 import { MatPaginatorModule } from '@angular/material/paginator';
@@ -35,7 +34,7 @@ export type SupportedColumns = 'name' | 'runStatus' | 'in' | 'out';
     selector: 'port-status-table',
     imports: [
         CommonModule,
-        SummaryTableFilterModule,
+        SummaryTableFilter,
         MatSortModule,
         MatTableModule,
         RouterLink,

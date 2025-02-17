@@ -39,12 +39,16 @@ import { NiFiState } from '../../../../state';
 import { filter, switchMap, take } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RegistryClientEntity } from '../../../../state/shared';
+import { AsyncPipe } from '@angular/common';
+import { NgxSkeletonLoaderComponent } from 'ngx-skeleton-loader';
+import { MatIconButton } from '@angular/material/button';
+import { RegistryClientTable } from './registry-client-table/registry-client-table.component';
 
 @Component({
     selector: 'registry-clients',
     templateUrl: './registry-clients.component.html',
-    styleUrls: ['./registry-clients.component.scss'],
-    standalone: false
+    imports: [AsyncPipe, NgxSkeletonLoaderComponent, MatIconButton, RegistryClientTable],
+    styleUrls: ['./registry-clients.component.scss']
 })
 export class RegistryClients implements OnInit, OnDestroy {
     registryClientsState$ = this.store.select(selectRegistryClientsState);

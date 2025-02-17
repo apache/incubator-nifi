@@ -18,8 +18,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PortStatusTable } from './port-status-table.component';
-import { SummaryTableFilterModule } from '../summary-table-filter/summary-table-filter.module';
-import { MatSortModule } from '@angular/material/sort';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('PortStatusTable', () => {
@@ -28,7 +26,7 @@ describe('PortStatusTable', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [PortStatusTable, SummaryTableFilterModule, MatSortModule, NoopAnimationsModule]
+            imports: [PortStatusTable, NoopAnimationsModule]
         });
         fixture = TestBed.createComponent(PortStatusTable);
         component = fixture.componentInstance;

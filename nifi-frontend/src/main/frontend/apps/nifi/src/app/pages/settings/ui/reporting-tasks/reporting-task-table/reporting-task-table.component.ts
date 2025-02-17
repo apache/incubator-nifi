@@ -16,21 +16,33 @@
  */
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-import { Sort } from '@angular/material/sort';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatSortModule, Sort } from '@angular/material/sort';
 import { ReportingTaskEntity } from '../../../state/reporting-tasks';
-import { TextTip, NiFiCommon } from '@nifi/shared';
+import { TextTip, NiFiCommon, NifiTooltipDirective } from '@nifi/shared';
 import { BulletinsTip } from '../../../../../ui/common/tooltips/bulletins-tip/bulletins-tip.component';
 import { ValidationErrorsTip } from '../../../../../ui/common/tooltips/validation-errors-tip/validation-errors-tip.component';
 import { BulletinsTipInput, ValidationErrorsTipInput } from '../../../../../state/shared';
 import { FlowConfiguration } from '../../../../../state/flow-configuration';
 import { CurrentUser } from '../../../../../state/current-user';
+import { NgClass } from '@angular/common';
+import { MatIconButton } from '@angular/material/button';
+import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 
 @Component({
     selector: 'reporting-task-table',
     templateUrl: './reporting-task-table.component.html',
     styleUrls: ['./reporting-task-table.component.scss'],
-    standalone: false
+    imports: [
+        MatTableModule,
+        MatSortModule,
+        NifiTooltipDirective,
+        NgClass,
+        MatIconButton,
+        MatMenuTrigger,
+        MatMenu,
+        MatMenuItem
+    ]
 })
 export class ReportingTaskTable {
     @Input() initialSortColumn: 'name' | 'type' | 'bundle' | 'state' = 'name';

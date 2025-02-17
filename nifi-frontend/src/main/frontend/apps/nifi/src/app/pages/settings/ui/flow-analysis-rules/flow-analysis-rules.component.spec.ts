@@ -27,7 +27,7 @@ describe('FlowAnalysisRules', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [FlowAnalysisRules],
+            imports: [FlowAnalysisRules],
             providers: [
                 provideMockStore({
                     initialState

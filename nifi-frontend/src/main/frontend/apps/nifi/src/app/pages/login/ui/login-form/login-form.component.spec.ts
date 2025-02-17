@@ -35,8 +35,8 @@ describe('LoginForm', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [LoginForm],
             imports: [
+                LoginForm,
                 HttpClientTestingModule,
                 NoopAnimationsModule,
                 MatFormFieldModule,

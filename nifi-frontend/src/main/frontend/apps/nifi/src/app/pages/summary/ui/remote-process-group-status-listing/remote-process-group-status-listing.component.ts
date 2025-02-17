@@ -42,12 +42,15 @@ import {
 } from '../../../../state/cluster-summary/cluster-summary.selectors';
 import * as ClusterStatusActions from '../../state/component-cluster-status/component-cluster-status.actions';
 import { NodeSearchResult } from '../../../../state/cluster-summary';
+import { AsyncPipe } from '@angular/common';
+import { NgxSkeletonLoaderComponent } from 'ngx-skeleton-loader';
+import { RemoteProcessGroupStatusTable } from './remote-process-group-status-table/remote-process-group-status-table.component';
 
 @Component({
     selector: 'remote-process-group-status-listing',
     templateUrl: './remote-process-group-status-listing.component.html',
-    styleUrls: ['./remote-process-group-status-listing.component.scss'],
-    standalone: false
+    imports: [AsyncPipe, NgxSkeletonLoaderComponent, RemoteProcessGroupStatusTable],
+    styleUrls: ['./remote-process-group-status-listing.component.scss']
 })
 export class RemoteProcessGroupStatusListing {
     loadedTimestamp$ = this.store.select(selectSummaryListingLoadedTimestamp);

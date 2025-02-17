@@ -16,19 +16,21 @@
  */
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-import { Sort } from '@angular/material/sort';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatSortModule, Sort } from '@angular/material/sort';
 import { ReportingTaskEntity } from '../../../state/reporting-tasks';
-import { TextTip, NiFiCommon } from '@nifi/shared';
+import { TextTip, NiFiCommon, NifiTooltipDirective } from '@nifi/shared';
 import { BulletinsTip } from '../../../../../ui/common/tooltips/bulletins-tip/bulletins-tip.component';
 import { ValidationErrorsTip } from '../../../../../ui/common/tooltips/validation-errors-tip/validation-errors-tip.component';
 import { BulletinsTipInput, RegistryClientEntity, ValidationErrorsTipInput } from '../../../../../state/shared';
+import { MatIconButton } from '@angular/material/button';
+import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 
 @Component({
     selector: 'registry-client-table',
     templateUrl: './registry-client-table.component.html',
     styleUrls: ['./registry-client-table.component.scss'],
-    standalone: false
+    imports: [MatTableModule, MatSortModule, NifiTooltipDirective, MatIconButton, MatMenuTrigger, MatMenu, MatMenuItem]
 })
 export class RegistryClientTable {
     @Input() set registryClients(registryClientEntities: RegistryClientEntity[]) {

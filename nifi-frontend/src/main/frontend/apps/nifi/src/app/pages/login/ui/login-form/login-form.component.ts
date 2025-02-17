@@ -16,7 +16,7 @@
  */
 
 import { Component } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { login } from '../../state/access/access.actions';
 import { selectLoginFailure } from '../../state/access/access.selectors';
@@ -25,12 +25,16 @@ import { selectLogoutSupported } from '../../../../state/current-user/current-us
 import { NiFiState } from '../../../../state';
 import { setRoutedToFullScreenError } from '../../../../state/error/error.actions';
 import { logout } from '../../../../state/current-user/current-user.actions';
+import { RouterLink } from '@angular/router';
+import { MatFormField } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { MatLabel } from '@angular/material/select';
 
 @Component({
     selector: 'login-form',
     templateUrl: './login-form.component.html',
-    styleUrls: ['./login-form.component.scss'],
-    standalone: false
+    imports: [RouterLink, ReactiveFormsModule, MatFormField, MatInput, MatLabel],
+    styleUrls: ['./login-form.component.scss']
 })
 export class LoginForm {
     logoutSupported = this.store.selectSignal(selectLogoutSupported);

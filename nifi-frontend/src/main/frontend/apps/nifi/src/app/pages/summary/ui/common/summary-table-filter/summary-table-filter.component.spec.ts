@@ -18,7 +18,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SummaryTableFilter } from './summary-table-filter.component';
-import { SummaryTableFilterModule } from './summary-table-filter.module';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('SummaryTableFilter', () => {
@@ -27,8 +26,7 @@ describe('SummaryTableFilter', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [SummaryTableFilter],
-            imports: [SummaryTableFilterModule, NoopAnimationsModule]
+            imports: [SummaryTableFilter, NoopAnimationsModule]
         });
         fixture = TestBed.createComponent(SummaryTableFilter);
         component = fixture.componentInstance;

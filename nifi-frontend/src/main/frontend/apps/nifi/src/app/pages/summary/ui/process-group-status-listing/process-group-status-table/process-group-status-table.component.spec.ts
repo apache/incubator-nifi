@@ -18,8 +18,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ProcessGroupStatusTable } from './process-group-status-table.component';
-import { SummaryTableFilterModule } from '../../common/summary-table-filter/summary-table-filter.module';
-import { MatSortModule } from '@angular/material/sort';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('ProcessGroupStatusTable', () => {
@@ -28,7 +26,7 @@ describe('ProcessGroupStatusTable', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [ProcessGroupStatusTable, SummaryTableFilterModule, MatSortModule, NoopAnimationsModule]
+            imports: [ProcessGroupStatusTable, NoopAnimationsModule]
         });
         fixture = TestBed.createComponent(ProcessGroupStatusTable);
         component = fixture.componentInstance;

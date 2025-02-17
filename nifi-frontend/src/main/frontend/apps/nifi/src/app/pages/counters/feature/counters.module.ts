@@ -23,10 +23,10 @@ import { StoreModule } from '@ngrx/store';
 import { countersFeatureKey, reducers } from '../state';
 import { EffectsModule } from '@ngrx/effects';
 import { CounterListingEffects } from '../state/counter-listing/counter-listing.effects';
-import { CounterListingModule } from '../ui/counter-listing/counter-listing.module';
 import { MatDialogModule } from '@angular/material/dialog';
 import { Navigation } from '../../../ui/common/navigation/navigation.component';
 import { BannerText } from '../../../ui/common/banner-text/banner-text.component';
+import { CounterListing } from '../ui/counter-listing/counter-listing.component';
 
 @NgModule({
     declarations: [Counters],
@@ -36,7 +36,7 @@ import { BannerText } from '../../../ui/common/banner-text/banner-text.component
         CountersRoutingModule,
         StoreModule.forFeature(countersFeatureKey, reducers),
         EffectsModule.forFeature(CounterListingEffects),
-        CounterListingModule,
+        CounterListing,
         MatDialogModule,
         Navigation,
         BannerText

@@ -27,7 +27,7 @@ describe('ParameterProviders', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [ParameterProviders],
+            imports: [ParameterProviders],
             providers: [
                 provideMockStore({
                     initialState: initialParameterProvidersState

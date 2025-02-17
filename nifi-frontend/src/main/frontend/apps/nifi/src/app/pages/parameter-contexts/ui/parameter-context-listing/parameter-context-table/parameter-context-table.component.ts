@@ -16,18 +16,22 @@
  */
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-import { Sort } from '@angular/material/sort';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatSortModule, Sort } from '@angular/material/sort';
 import { NiFiCommon } from '@nifi/shared';
 import { FlowConfiguration } from '../../../../../state/flow-configuration';
 import { CurrentUser } from '../../../../../state/current-user';
 import { ParameterContextEntity } from '../../../../../state/shared';
+import { MatIconButton } from '@angular/material/button';
+import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
+import { RouterLink } from '@angular/router';
+import { NgClass } from '@angular/common';
 
 @Component({
     selector: 'parameter-context-table',
     templateUrl: './parameter-context-table.component.html',
     styleUrls: ['./parameter-context-table.component.scss'],
-    standalone: false
+    imports: [MatTableModule, MatSortModule, MatIconButton, MatMenuTrigger, MatMenu, MatMenuItem, RouterLink, NgClass]
 })
 export class ParameterContextTable {
     @Input() initialSortColumn: 'name' | 'provider' | 'description' = 'name';

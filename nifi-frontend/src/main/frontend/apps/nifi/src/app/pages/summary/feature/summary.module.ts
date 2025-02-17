@@ -23,12 +23,6 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { StoreModule } from '@ngrx/store';
 import { reducers, summaryFeatureKey } from '../state';
 import { EffectsModule } from '@ngrx/effects';
-import { ProcessorStatusListingModule } from '../ui/processor-status-listing/processor-status-listing.module';
-import { ProcessGroupStatusListingModule } from '../ui/process-group-status-listing/process-group-status-listing.module';
-import { ConnectionStatusListingModule } from '../ui/connection-status-listing/connection-status-listing.module';
-import { RemoteProcessGroupStatusListingModule } from '../ui/remote-process-group-status-listing/remote-process-group-status-listing.module';
-import { OutputPortStatusListingModule } from '../ui/output-port-status-listing/output-port-status-listing.module';
-import { InputPortStatusListingModule } from '../ui/input-port-status-listing/input-port-status-listing.module';
 import { SummaryListingEffects } from '../state/summary-listing/summary-listing.effects';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { Navigation } from '../../../ui/common/navigation/navigation.component';
@@ -42,13 +36,6 @@ import { BannerText } from '../../../ui/common/banner-text/banner-text.component
         CommonModule,
         SummaryRoutingModule,
         MatTabsModule,
-        ProcessorStatusListingModule,
-        ProcessGroupStatusListingModule,
-        ConnectionStatusListingModule,
-        RemoteProcessGroupStatusListingModule,
-        ConnectionStatusListingModule,
-        OutputPortStatusListingModule,
-        InputPortStatusListingModule,
         StoreModule.forFeature(summaryFeatureKey, reducers),
         EffectsModule.forFeature(SummaryListingEffects, ComponentClusterStatusEffects),
         NgxSkeletonLoaderModule,

@@ -27,7 +27,7 @@ describe('RegistryClients', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [RegistryClients],
+            imports: [RegistryClients],
             providers: [provideMockStore({ initialState })]
         });
         fixture = TestBed.createComponent(RegistryClients);

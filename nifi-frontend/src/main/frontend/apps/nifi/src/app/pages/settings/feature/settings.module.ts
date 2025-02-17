@@ -24,12 +24,6 @@ import { reducers, settingsFeatureKey } from '../state';
 import { SettingsRoutingModule } from './settings-routing.module';
 import { GeneralEffects } from '../state/general/general.effects';
 import { ManagementControllerServicesEffects } from '../state/management-controller-services/management-controller-services.effects';
-import { GeneralModule } from '../ui/general/general.module';
-import { ManagementControllerServicesModule } from '../ui/management-controller-services/management-controller-services.module';
-import { FlowAnalysisRulesModule } from '../ui/flow-analysis-rules/flow-analysis-rules.module';
-import { ParameterProvidersModule } from '../ui/parameter-providers/parameter-providers.module';
-import { RegistryClientsModule } from '../ui/registry-clients/registry-clients.module';
-import { ReportingTasksModule } from '../ui/reporting-tasks/reporting-tasks.module';
 import { MatTabsModule } from '@angular/material/tabs';
 import { ReportingTasksEffects } from '../state/reporting-tasks/reporting-tasks.effects';
 import { RegistryClientsEffects } from '../state/registry-clients/registry-clients.effects';
@@ -43,12 +37,6 @@ import { BannerText } from '../../../ui/common/banner-text/banner-text.component
     exports: [Settings],
     imports: [
         CommonModule,
-        GeneralModule,
-        ManagementControllerServicesModule,
-        FlowAnalysisRulesModule,
-        ParameterProvidersModule,
-        RegistryClientsModule,
-        ReportingTasksModule,
         SettingsRoutingModule,
         StoreModule.forFeature(settingsFeatureKey, reducers),
         EffectsModule.forFeature(

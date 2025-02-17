@@ -18,8 +18,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { RemoteProcessGroupStatusTable } from './remote-process-group-status-table.component';
-import { SummaryTableFilterModule } from '../../common/summary-table-filter/summary-table-filter.module';
-import { MatSortModule } from '@angular/material/sort';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('RemoteProcessGroupStatusTableComponent', () => {
@@ -28,7 +26,7 @@ describe('RemoteProcessGroupStatusTableComponent', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [RemoteProcessGroupStatusTable, SummaryTableFilterModule, MatSortModule, NoopAnimationsModule]
+            imports: [RemoteProcessGroupStatusTable, NoopAnimationsModule]
         });
         fixture = TestBed.createComponent(RemoteProcessGroupStatusTable);
         component = fixture.componentInstance;

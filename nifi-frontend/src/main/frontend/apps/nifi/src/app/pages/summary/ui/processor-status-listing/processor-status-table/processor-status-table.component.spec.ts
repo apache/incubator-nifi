@@ -18,12 +18,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ProcessorStatusTable } from './processor-status-table.component';
-import { SummaryTableFilterModule } from '../../common/summary-table-filter/summary-table-filter.module';
-import { MatTableModule } from '@angular/material/table';
-import { MatSortModule } from '@angular/material/sort';
-import { MatInputModule } from '@angular/material/input';
-import { ReactiveFormsModule } from '@angular/forms';
-import { MatSelectModule } from '@angular/material/select';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('ProcessorStatusTable', () => {
@@ -32,15 +26,7 @@ describe('ProcessorStatusTable', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [
-                SummaryTableFilterModule,
-                MatTableModule,
-                MatSortModule,
-                MatInputModule,
-                ReactiveFormsModule,
-                MatSelectModule,
-                NoopAnimationsModule
-            ]
+            imports: [ProcessorStatusTable, NoopAnimationsModule]
         });
         fixture = TestBed.createComponent(ProcessorStatusTable);
         component = fixture.componentInstance;

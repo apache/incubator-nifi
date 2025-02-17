@@ -18,8 +18,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ConnectionStatusListing } from './connection-status-listing.component';
-import { ConnectionStatusTable } from './connection-status-table/connection-status-table.component';
-import { SummaryTableFilterModule } from '../common/summary-table-filter/summary-table-filter.module';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { provideMockStore } from '@ngrx/store/testing';
 import { initialState } from '../../state/summary-listing/summary-listing.reducer';
@@ -30,8 +28,7 @@ describe('ConnectionStatusListing', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [ConnectionStatusListing],
-            imports: [ConnectionStatusTable, SummaryTableFilterModule, NoopAnimationsModule],
+            imports: [ConnectionStatusListing, NoopAnimationsModule],
             providers: [provideMockStore({ initialState })]
         });
         fixture = TestBed.createComponent(ConnectionStatusListing);

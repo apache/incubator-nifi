@@ -18,8 +18,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ParameterContextTable } from './parameter-context-table.component';
-import { MatTableModule } from '@angular/material/table';
-import { MatSortModule } from '@angular/material/sort';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('ParameterContextTable', () => {
@@ -28,8 +26,7 @@ describe('ParameterContextTable', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [ParameterContextTable],
-            imports: [MatTableModule, MatSortModule, NoopAnimationsModule]
+            imports: [ParameterContextTable, NoopAnimationsModule]
         });
         fixture = TestBed.createComponent(ParameterContextTable);
         component = fixture.componentInstance;

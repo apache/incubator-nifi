@@ -18,8 +18,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ConnectionStatusTable } from './connection-status-table.component';
-import { SummaryTableFilterModule } from '../../common/summary-table-filter/summary-table-filter.module';
-import { MatSortModule } from '@angular/material/sort';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('ConnectionStatusTable', () => {
@@ -28,7 +26,7 @@ describe('ConnectionStatusTable', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [ConnectionStatusTable, SummaryTableFilterModule, MatSortModule, NoopAnimationsModule]
+            imports: [ConnectionStatusTable, NoopAnimationsModule]
         });
         fixture = TestBed.createComponent(ConnectionStatusTable);
         component = fixture.componentInstance;

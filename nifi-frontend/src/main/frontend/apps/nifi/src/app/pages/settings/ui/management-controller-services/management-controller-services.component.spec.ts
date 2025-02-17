@@ -27,7 +27,7 @@ describe('ManagementControllerServices', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [ManagementControllerServices],
+            imports: [ManagementControllerServices],
             providers: [
                 provideMockStore({
                     initialState

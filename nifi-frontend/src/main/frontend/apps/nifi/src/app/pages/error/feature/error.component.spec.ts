@@ -30,8 +30,7 @@ describe('Error', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [Error],
-            imports: [MockComponent(PageContent)],
+            imports: [Error, MockComponent(PageContent)],
             providers: [
                 provideMockStore({
                     initialState: {

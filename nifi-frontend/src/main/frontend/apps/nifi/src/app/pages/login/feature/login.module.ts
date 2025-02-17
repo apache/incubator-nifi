@@ -33,7 +33,7 @@ import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @NgModule({
-    declarations: [Login, LoginForm],
+    declarations: [Login],
     exports: [Login],
     imports: [
         CommonModule,
@@ -47,7 +47,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
         MatButtonModule,
         NgxSkeletonLoaderModule,
         MatProgressSpinnerModule,
-        PageContent
+        PageContent,
+        LoginForm
     ]
 })
 export class LoginModule {}

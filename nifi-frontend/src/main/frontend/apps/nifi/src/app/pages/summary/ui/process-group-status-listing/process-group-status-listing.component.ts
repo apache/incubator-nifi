@@ -43,12 +43,15 @@ import {
     selectClusterSearchResults,
     selectClusterSummary
 } from '../../../../state/cluster-summary/cluster-summary.selectors';
+import { AsyncPipe } from '@angular/common';
+import { NgxSkeletonLoaderComponent } from 'ngx-skeleton-loader';
+import { ProcessGroupStatusTable } from './process-group-status-table/process-group-status-table.component';
 
 @Component({
     selector: 'process-group-status-listing',
     templateUrl: './process-group-status-listing.component.html',
-    styleUrls: ['./process-group-status-listing.component.scss'],
-    standalone: false
+    imports: [AsyncPipe, NgxSkeletonLoaderComponent, ProcessGroupStatusTable],
+    styleUrls: ['./process-group-status-listing.component.scss']
 })
 export class ProcessGroupStatusListing {
     processGroupStatusSnapshots$ = this.store.select(selectProcessGroupStatusSnapshots);

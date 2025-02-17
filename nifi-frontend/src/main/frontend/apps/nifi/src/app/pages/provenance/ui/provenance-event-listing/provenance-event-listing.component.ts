@@ -51,12 +51,15 @@ import { clearBannerErrors } from '../../../../state/error/error.actions';
 import { selectClusterSummary } from '../../../../state/cluster-summary/cluster-summary.selectors';
 import { loadClusterSummary } from '../../../../state/cluster-summary/cluster-summary.actions';
 import { ErrorContextKey } from '../../../../state/error';
+import { AsyncPipe } from '@angular/common';
+import { ProvenanceEventTable } from './provenance-event-table/provenance-event-table.component';
+import { NgxSkeletonLoaderComponent } from 'ngx-skeleton-loader';
 
 @Component({
     selector: 'provenance-event-listing',
     templateUrl: './provenance-event-listing.component.html',
-    styleUrls: ['./provenance-event-listing.component.scss'],
-    standalone: false
+    imports: [AsyncPipe, ProvenanceEventTable, NgxSkeletonLoaderComponent],
+    styleUrls: ['./provenance-event-listing.component.scss']
 })
 export class ProvenanceEventListing implements OnInit, OnDestroy {
     status$ = this.store.select(selectStatus);

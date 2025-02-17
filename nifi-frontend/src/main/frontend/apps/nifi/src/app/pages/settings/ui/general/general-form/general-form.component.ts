@@ -16,7 +16,7 @@
  */
 
 import { Component, Input } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ControllerEntity, GeneralState, UpdateControllerConfigRequest } from '../../../state/general';
 import { Store } from '@ngrx/store';
 import { updateControllerConfig } from '../../../state/general/general.actions';
@@ -24,13 +24,18 @@ import { Client } from '../../../../../service/client.service';
 import { selectCurrentUser } from '../../../../../state/current-user/current-user.selectors';
 import { selectSaving } from '../../../state/general/general.selectors';
 import { ClusterConnectionService } from '../../../../../service/cluster-connection.service';
-import { TextTip } from '@nifi/shared';
+import { NifiTooltipDirective, TextTip } from '@nifi/shared';
+import { AsyncPipe } from '@angular/common';
+import { MatFormField } from '@angular/material/form-field';
+import { MatLabel } from '@angular/material/select';
+import { MatInput } from '@angular/material/input';
+import { MatButton } from '@angular/material/button';
 
 @Component({
     selector: 'general-form',
     templateUrl: './general-form.component.html',
-    styleUrls: ['./general-form.component.scss'],
-    standalone: false
+    imports: [AsyncPipe, ReactiveFormsModule, MatFormField, MatLabel, NifiTooltipDirective, MatInput, MatButton],
+    styleUrls: ['./general-form.component.scss']
 })
 export class GeneralForm {
     private _controller!: ControllerEntity;

@@ -26,7 +26,7 @@ describe('UserListing', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [UserListing],
+            imports: [UserListing],
             providers: [provideMockStore({ initialState })]
         });
         fixture = TestBed.createComponent(UserListing);

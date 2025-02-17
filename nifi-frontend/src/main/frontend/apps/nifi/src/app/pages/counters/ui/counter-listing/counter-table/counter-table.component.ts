@@ -17,18 +17,30 @@
 
 import { AfterViewInit, Component, DestroyRef, EventEmitter, inject, Input, Output } from '@angular/core';
 import { CounterEntity } from '../../../state/counter-listing';
-import { MatTableDataSource } from '@angular/material/table';
-import { Sort } from '@angular/material/sort';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatSortModule, Sort } from '@angular/material/sort';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime } from 'rxjs';
 import { NiFiCommon } from '@nifi/shared';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { MatFormField } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { MatLabel, MatOption, MatSelect } from '@angular/material/select';
 
 @Component({
     selector: 'counter-table',
     templateUrl: './counter-table.component.html',
-    styleUrls: ['./counter-table.component.scss'],
-    standalone: false
+    imports: [
+        ReactiveFormsModule,
+        MatFormField,
+        MatInput,
+        MatSelect,
+        MatOption,
+        MatLabel,
+        MatTableModule,
+        MatSortModule
+    ],
+    styleUrls: ['./counter-table.component.scss']
 })
 export class CounterTable implements AfterViewInit {
     private _canModifyCounters = false;

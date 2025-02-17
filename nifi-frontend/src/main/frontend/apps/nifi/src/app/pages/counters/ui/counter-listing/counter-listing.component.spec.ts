@@ -26,7 +26,7 @@ describe('CounterListing', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [CounterListing],
+            imports: [CounterListing],
             providers: [provideMockStore({ initialState })]
         });
         fixture = TestBed.createComponent(CounterListing);

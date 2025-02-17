@@ -27,7 +27,7 @@ describe('General', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [General],
+            imports: [General],
             providers: [
                 provideMockStore({
                     initialState

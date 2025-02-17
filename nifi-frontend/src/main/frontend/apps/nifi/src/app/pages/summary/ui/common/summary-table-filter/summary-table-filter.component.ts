@@ -16,10 +16,14 @@
  */
 
 import { AfterViewInit, Component, DestroyRef, EventEmitter, inject, Input, Output } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NodeSearchResult } from '../../../../../state/cluster-summary';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { MatOption, MatSelect } from '@angular/material/select';
+import { MatCheckbox } from '@angular/material/checkbox';
 
 export interface SummaryTableFilterColumn {
     key: string;
@@ -42,8 +46,8 @@ export interface SummaryTableFilterContext extends SummaryTableFilterArgs {
 @Component({
     selector: 'summary-table-filter',
     templateUrl: './summary-table-filter.component.html',
-    styleUrls: ['./summary-table-filter.component.scss'],
-    standalone: false
+    imports: [ReactiveFormsModule, MatLabel, MatFormField, MatInput, MatSelect, MatOption, MatCheckbox],
+    styleUrls: ['./summary-table-filter.component.scss']
 })
 export class SummaryTableFilter implements AfterViewInit {
     filterForm: FormGroup;

@@ -17,9 +17,11 @@
 
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SummaryTableFilterModule } from '../../common/summary-table-filter/summary-table-filter.module';
 import { MatSortModule, Sort } from '@angular/material/sort';
-import { SummaryTableFilterColumn } from '../../common/summary-table-filter/summary-table-filter.component';
+import {
+    SummaryTableFilter,
+    SummaryTableFilterColumn
+} from '../../common/summary-table-filter/summary-table-filter.component';
 import { MatTableModule } from '@angular/material/table';
 import { ComponentType, NiFiCommon } from '@nifi/shared';
 import { RouterLink } from '@angular/router';
@@ -35,7 +37,7 @@ export type SupportedColumns = 'name' | 'uri' | 'transmitting' | 'sent' | 'recei
     selector: 'remote-process-group-status-table',
     imports: [
         CommonModule,
-        SummaryTableFilterModule,
+        SummaryTableFilter,
         MatSortModule,
         MatTableModule,
         RouterLink,

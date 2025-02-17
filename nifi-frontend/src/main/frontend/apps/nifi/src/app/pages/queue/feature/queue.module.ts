@@ -22,10 +22,22 @@ import { QueueRoutingModule } from './queue-routing.module';
 import { MatDialogModule } from '@angular/material/dialog';
 import { Navigation } from '../../../ui/common/navigation/navigation.component';
 import { BannerText } from '../../../ui/common/banner-text/banner-text.component';
+import { StoreModule } from '@ngrx/store';
+import { queueFeatureKey, reducers } from '../state';
+import { EffectsModule } from '@ngrx/effects';
+import { QueueListingEffects } from '../state/queue-listing/queue-listing.effects';
 
 @NgModule({
     declarations: [Queue],
     exports: [Queue],
-    imports: [CommonModule, MatDialogModule, QueueRoutingModule, Navigation, BannerText]
+    imports: [
+        CommonModule,
+        MatDialogModule,
+        QueueRoutingModule,
+        Navigation,
+        BannerText,
+        StoreModule.forFeature(queueFeatureKey, reducers),
+        EffectsModule.forFeature(QueueListingEffects)
+    ]
 })
 export class QueueModule {}

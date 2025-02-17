@@ -44,12 +44,16 @@ import { FlowAnalysisRuleEntity, FlowAnalysisRulesState } from '../../state/flow
 import { getComponentStateAndOpenDialog } from '../../../../state/component-state/component-state.actions';
 import { navigateToComponentDocumentation } from '../../../../state/documentation/documentation.actions';
 import { ComponentType } from '@nifi/shared';
+import { AsyncPipe } from '@angular/common';
+import { NgxSkeletonLoaderComponent } from 'ngx-skeleton-loader';
+import { MatIconButton } from '@angular/material/button';
+import { FlowAnalysisRuleTable } from './flow-analysis-rule-table/flow-analysis-rule-table.component';
 
 @Component({
     selector: 'flow-analysis-rules',
     templateUrl: './flow-analysis-rules.component.html',
-    styleUrls: ['./flow-analysis-rules.component.scss'],
-    standalone: false
+    imports: [AsyncPipe, NgxSkeletonLoaderComponent, MatIconButton, FlowAnalysisRuleTable],
+    styleUrls: ['./flow-analysis-rules.component.scss']
 })
 export class FlowAnalysisRules implements OnInit, OnDestroy {
     flowAnalysisRuleState$ = this.store.select(selectFlowAnalysisRulesState);

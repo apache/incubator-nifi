@@ -18,8 +18,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { InputPortStatusListing } from './input-port-status-listing.component';
-import { SummaryTableFilterModule } from '../common/summary-table-filter/summary-table-filter.module';
-import { PortStatusTable } from '../common/port-status-table/port-status-table.component';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { provideMockStore } from '@ngrx/store/testing';
 import { initialState } from '../../state/summary-listing/summary-listing.reducer';
@@ -30,8 +28,7 @@ describe('InputPortStatusListing', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [InputPortStatusListing],
-            imports: [PortStatusTable, SummaryTableFilterModule, NoopAnimationsModule],
+            imports: [InputPortStatusListing, NoopAnimationsModule],
             providers: [provideMockStore({ initialState })]
         });
         fixture = TestBed.createComponent(InputPortStatusListing);

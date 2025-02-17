@@ -23,7 +23,6 @@ import { bulletinsFeatureKey, reducers } from '../state';
 import { EffectsModule } from '@ngrx/effects';
 import { BulletinBoardEffects } from '../state/bulletin-board/bulletin-board.effects';
 import { BulletinsRoutingModule } from './bulletins-routing.module';
-import { CounterListingModule } from '../../counters/ui/counter-listing/counter-listing.module';
 import { BulletinBoard } from '../ui/bulletin-board/bulletin-board.component';
 import { Navigation } from '../../../ui/common/navigation/navigation.component';
 import { BannerText } from '../../../ui/common/banner-text/banner-text.component';
@@ -36,7 +35,6 @@ import { BannerText } from '../../../ui/common/banner-text/banner-text.component
         BulletinsRoutingModule,
         StoreModule.forFeature(bulletinsFeatureKey, reducers),
         EffectsModule.forFeature(BulletinBoardEffects),
-        CounterListingModule,
         BulletinBoard,
         Navigation,
         BannerText

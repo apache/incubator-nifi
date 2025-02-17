@@ -44,12 +44,14 @@ import {
 import { loadClusterSummary } from '../../../../state/cluster-summary/cluster-summary.actions';
 import { ProcessorStatusSnapshotEntity } from '../../state';
 import { NodeSearchResult } from '../../../../state/cluster-summary';
+import { AsyncPipe } from '@angular/common';
+import { NgxSkeletonLoaderComponent } from 'ngx-skeleton-loader';
 
 @Component({
     selector: 'processor-status-listing',
     templateUrl: './processor-status-listing.component.html',
-    styleUrls: ['./processor-status-listing.component.scss'],
-    standalone: false
+    imports: [AsyncPipe, NgxSkeletonLoaderComponent, ProcessorStatusTable],
+    styleUrls: ['./processor-status-listing.component.scss']
 })
 export class ProcessorStatusListing implements AfterViewInit, OnDestroy {
     private destroyRef = inject(DestroyRef);

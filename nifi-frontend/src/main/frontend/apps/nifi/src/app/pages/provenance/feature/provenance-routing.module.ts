@@ -18,6 +18,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { Provenance } from './provenance.component';
+import { ProvenanceEventListing } from '../ui/provenance-event-listing/provenance-event-listing.component';
 
 const routes: Routes = [
     {
@@ -26,10 +27,7 @@ const routes: Routes = [
         children: [
             {
                 path: '',
-                loadChildren: () =>
-                    import('../ui/provenance-event-listing/provenance-event-listing.module').then(
-                        (m) => m.ProvenanceEventListingModule
-                    )
+                loadComponent: () => ProvenanceEventListing
             }
         ]
     }

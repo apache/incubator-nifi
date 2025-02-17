@@ -27,7 +27,7 @@ describe('QueueListing', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [QueueListing],
+            imports: [QueueListing],
             providers: [provideMockStore({ initialState })]
         });
         fixture = TestBed.createComponent(QueueListing);

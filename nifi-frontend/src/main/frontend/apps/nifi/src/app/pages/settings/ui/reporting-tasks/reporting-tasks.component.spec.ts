@@ -27,7 +27,7 @@ describe('ReportingTasks', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [ReportingTasks],
+            imports: [ReportingTasks],
             providers: [
                 provideMockStore({
                     initialState

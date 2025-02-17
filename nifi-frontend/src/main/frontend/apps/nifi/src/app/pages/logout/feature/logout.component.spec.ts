@@ -28,8 +28,7 @@ describe('Login', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [Logout],
-            imports: [MatProgressSpinner, MockComponent(PageContent)]
+            imports: [Logout, MatProgressSpinner, MockComponent(PageContent)]
         });
         fixture = TestBed.createComponent(Logout);
         component = fixture.componentInstance;

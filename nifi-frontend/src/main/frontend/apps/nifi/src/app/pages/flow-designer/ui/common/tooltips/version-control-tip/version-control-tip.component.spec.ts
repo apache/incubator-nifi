@@ -25,7 +25,7 @@ describe('VersionControlTip', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [VersionControlTip]
+            imports: [VersionControlTip]
         });
         fixture = TestBed.createComponent(VersionControlTip);
         component = fixture.componentInstance;

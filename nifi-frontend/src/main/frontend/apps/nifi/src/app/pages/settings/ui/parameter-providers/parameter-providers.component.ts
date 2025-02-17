@@ -34,12 +34,16 @@ import { switchMap, take } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ComponentType, isDefinedAndNotNull } from '@nifi/shared';
 import { navigateToComponentDocumentation } from '../../../../state/documentation/documentation.actions';
+import { AsyncPipe } from '@angular/common';
+import { NgxSkeletonLoaderComponent } from 'ngx-skeleton-loader';
+import { MatIconButton } from '@angular/material/button';
+import { ParameterProvidersTable } from './parameter-providers-table/parameter-providers-table.component';
 
 @Component({
     selector: 'parameter-providers',
     templateUrl: './parameter-providers.component.html',
-    styleUrls: ['./parameter-providers.component.scss'],
-    standalone: false
+    imports: [AsyncPipe, NgxSkeletonLoaderComponent, MatIconButton, ParameterProvidersTable],
+    styleUrls: ['./parameter-providers.component.scss']
 })
 export class ParameterProviders implements OnInit, OnDestroy {
     currentUser$ = this.store.select(selectCurrentUser);

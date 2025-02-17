@@ -47,12 +47,16 @@ import { selectFlowConfiguration } from '../../../../state/flow-configuration/fl
 import { getComponentStateAndOpenDialog } from '../../../../state/component-state/component-state.actions';
 import { navigateToComponentDocumentation } from '../../../../state/documentation/documentation.actions';
 import { ComponentType } from '@nifi/shared';
+import { AsyncPipe } from '@angular/common';
+import { NgxSkeletonLoaderComponent } from 'ngx-skeleton-loader';
+import { MatIconButton } from '@angular/material/button';
+import { ReportingTaskTable } from './reporting-task-table/reporting-task-table.component';
 
 @Component({
     selector: 'reporting-tasks',
     templateUrl: './reporting-tasks.component.html',
-    styleUrls: ['./reporting-tasks.component.scss'],
-    standalone: false
+    imports: [AsyncPipe, NgxSkeletonLoaderComponent, MatIconButton, ReportingTaskTable],
+    styleUrls: ['./reporting-tasks.component.scss']
 })
 export class ReportingTasks implements OnInit, OnDestroy {
     reportingTaskState$ = this.store.select(selectReportingTasksState);

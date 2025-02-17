@@ -24,9 +24,9 @@ import { usersFeatureKey, reducers } from '../state';
 import { EffectsModule } from '@ngrx/effects';
 import { MatDialogModule } from '@angular/material/dialog';
 import { UserListingEffects } from '../state/user-listing/user-listing.effects';
-import { UserListingModule } from '../ui/user-listing/user-listing.module';
 import { Navigation } from '../../../ui/common/navigation/navigation.component';
 import { BannerText } from '../../../ui/common/banner-text/banner-text.component';
+import { UserListing } from '../ui/user-listing/user-listing.component';
 
 @NgModule({
     declarations: [Users],
@@ -37,7 +37,7 @@ import { BannerText } from '../../../ui/common/banner-text/banner-text.component
         StoreModule.forFeature(usersFeatureKey, reducers),
         EffectsModule.forFeature(UserListingEffects),
         MatDialogModule,
-        UserListingModule,
+        UserListing,
         Navigation,
         BannerText
     ]

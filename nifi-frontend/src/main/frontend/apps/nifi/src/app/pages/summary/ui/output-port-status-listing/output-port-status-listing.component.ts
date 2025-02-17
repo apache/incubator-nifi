@@ -38,12 +38,15 @@ import { ComponentType, isDefinedAndNotNull } from '@nifi/shared';
 import { map } from 'rxjs';
 import { NodeSearchResult } from '../../../../state/cluster-summary';
 import * as ClusterStatusActions from '../../state/component-cluster-status/component-cluster-status.actions';
+import { AsyncPipe } from '@angular/common';
+import { NgxSkeletonLoaderComponent } from 'ngx-skeleton-loader';
+import { PortStatusTable } from '../common/port-status-table/port-status-table.component';
 
 @Component({
     selector: 'output-port-status-listing',
     templateUrl: './output-port-status-listing.component.html',
-    styleUrls: ['./output-port-status-listing.component.scss'],
-    standalone: false
+    imports: [AsyncPipe, NgxSkeletonLoaderComponent, PortStatusTable],
+    styleUrls: ['./output-port-status-listing.component.scss']
 })
 export class OutputPortStatusListing {
     portStatusSnapshots$ = this.store.select(selectOutputPortStatusSnapshots);

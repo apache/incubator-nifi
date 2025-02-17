@@ -18,6 +18,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { Queue } from './queue.component';
+import { QueueListing } from '../ui/queue-listing/queue-listing.component';
 
 const routes: Routes = [
     {
@@ -25,8 +26,8 @@ const routes: Routes = [
         component: Queue,
         children: [
             {
-                path: '',
-                loadChildren: () => import('../ui/queue-listing/queue-listing.module').then((m) => m.QueueListingModule)
+                path: ':connectionId',
+                loadComponent: () => QueueListing
             }
         ]
     }
