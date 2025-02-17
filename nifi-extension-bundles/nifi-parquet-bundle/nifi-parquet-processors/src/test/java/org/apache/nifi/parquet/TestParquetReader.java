@@ -18,6 +18,7 @@ package org.apache.nifi.parquet;
 
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toMap;
+import static org.apache.nifi.parquet.utils.ParquetUtils.AVRO_ADD_LIST_ELEMENT_RECORDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.ByteArrayInputStream;
@@ -172,6 +173,44 @@ public class TestParquetReader {
         runner.getFlowFilesForRelationship(TestParquetProcessor.SUCCESS).get(0).assertContentEquals(
                 "MapRecord[{name=Bob6, favorite_number=6, favorite_color=blue6}]\n" +
                 "MapRecord[{name=Bob7, favorite_number=7, favorite_color=blue7}]");
+    }
+
+    @Test
+    public void testReaderWithAddListElementRecordsEnabled() throws IOException, InitializationException {
+        final TestRunner runner = TestRunners.newTestRunner(TestParquetProcessor.class);
+        final ParquetReader parquetReader = new ParquetReader();
+
+        runner.addControllerService("reader", parquetReader);
+        runner.setProperty(parquetReader, AVRO_ADD_LIST_ELEMENT_RECORDS, "true");
+        runner.enableControllerService(parquetReader);
+
+        runner.enqueue(Paths.get("src/test/resources/TestParquetReaderWithArray.parquet"));
+
+        runner.setProperty(TestParquetProcessor.READER, "reader");
+
+        runner.run();
+        runner.assertAllFlowFilesTransferred(TestParquetProcessor.SUCCESS, 1);
+        runner.getFlowFilesForRelationship(TestParquetProcessor.SUCCESS).getFirst().assertContentEquals(
+                "MapRecord[{name=Bob, favorite_number=1, favorite_colors=[MapRecord[{element=blue}], MapRecord[{element=red}], MapRecord[{element=yellow}]]}]");
+    }
+
+    @Test
+    public void testReaderWithAddListElementRecordsDisabled() throws IOException, InitializationException {
+        final TestRunner runner = TestRunners.newTestRunner(TestParquetProcessor.class);
+        final ParquetReader parquetReader = new ParquetReader();
+
+        runner.addControllerService("reader", parquetReader);
+        runner.setProperty(parquetReader, AVRO_ADD_LIST_ELEMENT_RECORDS, "false");
+        runner.enableControllerService(parquetReader);
+
+        runner.enqueue(Paths.get("src/test/resources/TestParquetReaderWithArray.parquet"));
+
+        runner.setProperty(TestParquetProcessor.READER, "reader");
+
+        runner.run();
+        runner.assertAllFlowFilesTransferred(TestParquetProcessor.SUCCESS, 1);
+        runner.getFlowFilesForRelationship(TestParquetProcessor.SUCCESS).getFirst().assertContentEquals(
+                "MapRecord[{name=Bob, favorite_number=1, favorite_colors=[blue, red, yellow]}]");
     }
 
     private List<Record> getRecords(File parquetFile, Map<String, String> variables)

@@ -16,6 +16,8 @@
  */
 package org.apache.nifi.parquet;
 
+import static org.apache.nifi.parquet.utils.ParquetUtils.AVRO_ADD_LIST_ELEMENT_RECORDS;
+import static org.apache.nifi.parquet.utils.ParquetUtils.AVRO_READ_COMPATIBILITY;
 import static org.apache.nifi.parquet.utils.ParquetUtils.applyCommonConfig;
 import static org.apache.nifi.parquet.utils.ParquetUtils.createParquetConfig;
 
@@ -31,7 +33,6 @@ import org.apache.nifi.controller.AbstractControllerService;
 import org.apache.nifi.logging.ComponentLog;
 import org.apache.nifi.parquet.record.ParquetRecordReader;
 import org.apache.nifi.parquet.utils.ParquetConfig;
-import org.apache.nifi.parquet.utils.ParquetUtils;
 import org.apache.nifi.serialization.RecordReader;
 import org.apache.nifi.serialization.RecordReaderFactory;
 
@@ -41,7 +42,8 @@ import org.apache.nifi.serialization.RecordReaderFactory;
 public class ParquetReader extends AbstractControllerService implements RecordReaderFactory {
 
     private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS = List.of(
-            ParquetUtils.AVRO_READ_COMPATIBILITY
+            AVRO_READ_COMPATIBILITY,
+            AVRO_ADD_LIST_ELEMENT_RECORDS
     );
 
     @Override

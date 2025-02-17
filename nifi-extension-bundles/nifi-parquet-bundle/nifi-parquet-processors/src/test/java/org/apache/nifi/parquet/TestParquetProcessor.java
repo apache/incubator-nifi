@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.flowfile.FlowFile;
@@ -60,7 +61,7 @@ public class TestParquetProcessor extends AbstractProcessor {
              final RecordReader reader = readerFactory.createRecordReader(flowFile, in, getLogger())) {
             Record record;
             while ((record = reader.nextRecord()) != null) {
-                records.add(record.toString());
+                records.add(serializeRecord(record));
             }
         } catch (Exception e) {
             throw new ProcessException(e);
@@ -81,4 +82,29 @@ public class TestParquetProcessor extends AbstractProcessor {
         return new HashSet<>(singletonList(SUCCESS));
     }
 
+    private String serializeRecord(Record record) {
+        final List<String> result = new ArrayList<>();
+        for (Map.Entry<String, Object> entry : record.toMap().entrySet()) {
+            result.add(entry.getKey() + "=" + serializeField(record.getValue(entry.getKey())));
+        }
+
+        return "MapRecord[{" + String.join(", ", result) + "}]";
+    }
+
+    private String serializeField(Object value) {
+        final StringBuilder result = new StringBuilder();
+        if (value instanceof Object[]) {
+            final List<String> array = new ArrayList<>();
+            for (Object arrayValue : (Object[]) value) {
+                array.add(serializeField(arrayValue));
+            }
+            result.append("[").append(String.join(", ", array)).append("]");
+        } else if (value instanceof Record) {
+            result.append(serializeRecord((Record) value));
+        } else {
+            result.append(value);
+        }
+
+        return result.toString();
+    }
 }
