@@ -71,7 +71,9 @@ A common concern when inferring schemas is how to handle the condition of two va
 example, consider a FlowFile with the following two records:
 
 ```
-name, age John, 8 Jane, Ten
+name, age
+John, 8
+Jane, Ten
 ```
 
 It is clear that the "name" field will be inferred as a STRING type. However, how should we handle the "age" field?
@@ -141,7 +143,10 @@ Processors handle the data.
 As an example, consider a FlowFile whose contents consists of the following:
 
 ```
-id, name, balance, join_date, notes   1, John, 48.23, 04/03/2007 "Our very   first customer!"   2, Jane, 1245.89, 08/22/2009,   3, Frank Franklin, "48481.29", 04/04/2016,   
+id, name, balance, join_date, notes
+1, John, 48.23, 04/03/2007, "Our very   first customer!"
+2, Jane, 1245.89, 08/22/2009,	  
+3, Frank Franklin, "48481.29", 04/04/2016,  
 ```
 
 Additionally, let's consider that this Controller Service is configured with the Schema Registry pointing to an
