@@ -22,7 +22,9 @@ import {
     ComponentRunStatusRequest,
     ControllerServiceStateRequest,
     CreateComponentRequest,
+    CreateComponentResponse,
     CreateConnection,
+    CreateLabelRequest,
     CreatePortRequest,
     CreateProcessGroupRequest,
     CreateProcessorRequest,
@@ -117,14 +119,18 @@ export class FlowService implements PropertyDescriptorRetriever {
         });
     }
 
-    createLabel(processGroupId = 'root', createLabel: CreateComponentRequest): Observable<any> {
-        return this.httpClient.post(`${FlowService.API}/process-groups/${processGroupId}/labels`, {
-            revision: createLabel.revision,
-            disconnectedNodeAcknowledged: this.clusterConnectionService.isDisconnectionAcknowledged(),
-            component: {
-                position: createLabel.position
+    createLabel(processGroupId = 'root', createLabel: CreateLabelRequest) {
+        return this.httpClient.post<CreateComponentResponse>(
+            `${FlowService.API}/process-groups/${processGroupId}/labels`,
+            {
+                revision: createLabel.revision,
+                disconnectedNodeAcknowledged: this.clusterConnectionService.isDisconnectionAcknowledged(),
+                component: {
+                    position: createLabel.position,
+                    zIndex: createLabel.zIndex
+                }
             }
-        });
+        );
     }
 
     goToRemoteProcessGroup(goToRemoteProcessGroupRequest: GoToRemoteProcessGroupRequest) {

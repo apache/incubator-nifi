@@ -775,9 +775,23 @@ export class FlowEffects {
         this.actions$.pipe(
             ofType(FlowActions.createConnection),
             map((action) => action.request),
-            concatLatestFrom(() => this.store.select(selectCurrentProcessGroupId)),
-            switchMap(([request, processGroupId]) =>
-                from(this.flowService.createConnection(processGroupId, request)).pipe(
+            concatLatestFrom(() => [
+                this.store.select(selectCurrentProcessGroupId),
+                this.store.select(selectMaxZIndex(ComponentType.Connection))
+            ]),
+            switchMap(([{ payload }, processGroupId, maxZIndex]) =>
+                from(
+                    this.flowService.createConnection(processGroupId, {
+                        payload: {
+                            ...payload,
+                            component: {
+                                ...payload.component,
+                                // pass zIndex as max + 1, so that new connections are always on top
+                                zIndex: maxZIndex + 1
+                            }
+                        }
+                    })
+                ).pipe(
                     map((response) =>
                         FlowActions.createComponentSuccess({
                             response: {
@@ -862,9 +876,13 @@ export class FlowEffects {
         this.actions$.pipe(
             ofType(FlowActions.createLabel),
             map((action) => action.request),
-            concatLatestFrom(() => this.store.select(selectCurrentProcessGroupId)),
-            switchMap(([request, processGroupId]) =>
-                from(this.flowService.createLabel(processGroupId, request)).pipe(
+            concatLatestFrom(() => [
+                this.store.select(selectCurrentProcessGroupId),
+                // Get the current max index so that we can pass it to the backend.
+                this.store.select(selectMaxZIndex(ComponentType.Label))
+            ]),
+            switchMap(([request, processGroupId, maxZIndex]) =>
+                from(this.flowService.createLabel(processGroupId, { ...request, zIndex: maxZIndex + 1 })).pipe(
                     map((response) =>
                         FlowActions.createComponentSuccess({
                             response: {
@@ -4431,7 +4449,9 @@ export class FlowEffects {
             ofType(FlowActions.moveToFront),
             map((action) => action.request),
             concatLatestFrom((request) => this.store.select(selectMaxZIndex(request.componentType))),
-            filter(([request, maxZIndex]) => request.zIndex < maxZIndex),
+            // Bump up the index if it's less or same as the max.
+            // In addition of zIndex order there's also a DOM order of components, which might have the same zIndex.
+            filter(([request, maxZIndex]) => request.zIndex <= maxZIndex),
             switchMap(([request, maxZIndex]) => {
                 const updateRequest: UpdateComponentRequest = {
                     id: request.id,
